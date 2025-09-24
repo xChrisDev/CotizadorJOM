@@ -1,0 +1,129 @@
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useColorMode } from "@vueuse/core";
+import {
+    NavigationMenu,
+    NavigationMenuItem,
+    NavigationMenuList,
+} from "@/shared/components/ui/navigation-menu";
+import {
+    Sheet,
+    SheetContent,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/shared/components/ui/sheet";
+import { Button } from "@/shared/components/ui/button";
+import { Separator } from "@/shared/components/ui/separator";
+import { Menu, LogInIcon } from "lucide-vue-next";
+import ThemeButton from "@/shared/components/ThemeButton.vue";
+import { User, Mail, Settings } from "lucide-vue-next";
+
+const mode = useColorMode();
+mode.value = "light";
+
+
+interface RouteProps {
+    href: string;
+    label: string;
+    icon: any;
+}
+
+const routeList: RouteProps[] = [
+    { href: "#about-us", label: "Nosotros", icon: User },
+    { href: "#contact", label: "Contacto", icon: Mail },
+    { href: "#services", label: "Servicios", icon: Settings },
+];
+
+
+const isOpen = ref<boolean>(false);
+</script>
+
+<template>
+    <header :class="{
+        'shadow-light': mode === 'light',
+        'shadow-dark': mode === 'dark',
+        'w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl sticky top-5 mx-auto flex justify-between items-center px-3 py-1 border rounded-2xl bg-white/10 dark:bg-gray-900/30 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl': true,
+    }">
+        <!-- Logo -->
+        <a href="/" class="font-bold text-lg flex items-center gap-2">
+            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12 w-12 md:h-16 md:w-16" />
+            <span class="hidden md:inline-block text-xl font-bold tracking-tight">JOM</span>
+        </a>
+
+        <!-- Mobile -->
+        <div class="flex items-center lg:hidden">
+            <Sheet v-model:open="isOpen">
+                <SheetTrigger as-child>
+                    <Menu @click="isOpen = true"
+                        class="cursor-pointer hover:text-primary transition-colors duration-200" />
+                </SheetTrigger>
+
+                <SheetContent side="left"
+                    class="flex flex-col justify-between rounded-tr-2xl rounded-br-2xl bg-card/90 backdrop-blur-lg border-r">
+                    <div>
+                        <SheetHeader class="mb-6 ml-2">
+                            <SheetTitle class="flex items-center">
+                                <a href="/" class="flex items-center gap-2">
+                                    <img src="@/shared/assets/JOM.png" alt="JOM" class="rounded-lg h-16 w-16" />
+                                    <span class="font-semibold">JOM</span>
+                                </a>
+                            </SheetTitle>
+                        </SheetHeader>
+
+                        <div class="flex flex-col gap-3 p-4">
+                            <Button v-for="{ href, label, icon } in routeList" :key="label" as-child variant="ghost"
+                                size="lg"
+                                class="justify-start text-xl hover:bg-primary/10 transition-colors duration-200">
+                                <a @click="isOpen = false" :href="href" class="flex items-center gap-2">
+                                    <component :is="icon" class="w-5 h-5" />
+                                    {{ label }}
+                                </a>
+                            </Button>
+                        </div>
+
+                    </div>
+
+                    <SheetFooter class="flex-col sm:flex-col justify-start items-start">
+                        <Separator class="mb-3 opacity-40" />
+                        <ThemeButton />
+                    </SheetFooter>
+                </SheetContent>
+            </Sheet>
+        </div>
+
+        <!-- Desktop -->
+        <NavigationMenu class="hidden lg:flex">
+            <NavigationMenuList class="flex gap-4">
+                <NavigationMenuItem v-for="{ href, label, icon } in routeList" :key="label">
+                    <a :href="href" class="relative flex items-center gap-2 px-3 py-2 text-base font-medium text-foreground hover:text-primary
+               after:content-[''] after:absolute after:left-0 after:bottom-0 
+               after:h-[3px] after:w-0 after:bg-primary after:transition-all after:duration-300
+               hover:after:w-full">
+                        <component :is="icon" class="w-4 h-4" />
+                        {{ label }}
+                    </a>
+                </NavigationMenuItem>
+            </NavigationMenuList>
+        </NavigationMenu>
+
+        <div class="hidden lg:flex gap-2">
+            <ThemeButton />
+            <Button size="lg" class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+                <LogInIcon class="size-5" />
+                Ingresar
+            </Button>
+        </div>
+    </header>
+</template>
+
+<style scoped>
+.shadow-light {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.085);
+}
+
+.shadow-dark {
+    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.141);
+}
+</style>
