@@ -62,7 +62,7 @@ onMounted(() => {
         </p>
     </div>
     <div id="map"
-        class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto my-12 md:my-20 h-[600px] rounded-2xl shadow-lg">
+        class="z-1 w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto my-12 md:my-20 lg:h-[600px] h-[400px] rounded-2xl shadow-lg">
     </div>
 </template>
 <style>

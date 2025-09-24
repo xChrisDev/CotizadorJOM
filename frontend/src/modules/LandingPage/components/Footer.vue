@@ -142,7 +142,7 @@ const currentYear = new Date().getFullYear();
           © {{ currentYear }} JOM. Todos los derechos reservados.
         </div>
 
-        <div class="lg:flex hidden flex items-center gap-6 text-sm text-muted-foreground">
+        <div class="lg:flex hidden items-center gap-6 text-sm text-muted-foreground">
           <span class="flex items-center gap-2">
             Hecho con
             <span class="text-red-500">❤️</span>

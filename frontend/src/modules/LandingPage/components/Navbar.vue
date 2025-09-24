@@ -16,7 +16,7 @@ import {
 } from "@/shared/components/ui/sheet";
 import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
-import { Menu, LogInIcon, UserPlus } from "lucide-vue-next";
+import { Menu, LogInIcon } from "lucide-vue-next";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
 import { User, Mail, Settings } from "lucide-vue-next";
 
@@ -63,7 +63,7 @@ const isOpen = ref<boolean>(false);
                 </SheetTrigger>
 
                 <SheetContent side="left"
-                    class="flex flex-col justify-between rounded-tr-2xl rounded-br-2xl bg-card/90 backdrop-blur-lg border-r">
+                    class="z-9999 flex flex-col justify-between rounded-tr-2xl rounded-br-2xl bg-card/90 backdrop-blur-lg border-r">
                     <div>
                         <SheetHeader class="mb-6 ml-2">
                             <SheetTitle class="flex items-center">
