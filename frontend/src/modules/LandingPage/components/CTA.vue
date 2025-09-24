@@ -77,7 +77,7 @@ import { ArrowRight, Sparkles, Zap } from "lucide-vue-next";
               size="lg" 
               class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 font-bold text-lg px-12 py-4 group shadow-2xl hover:shadow-3xl transition-all duration-300"
             >
-              Comenzar ahora GRATIS
+              Comenzar ahora!
               <ArrowRight class="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform duration-300" />
             </Button>
             
@@ -113,14 +113,6 @@ import { ArrowRight, Sparkles, Zap } from "lucide-vue-next";
               </div>
               <span>Soporte incluido</span>
             </div>
-          </div>
-
-          <!-- Urgencia -->
-          <div class="mt-8 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
-            <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-              🔥 <strong>Oferta limitada:</strong> Los primeros 100 usuarios obtienen 
-              <strong>3 meses adicionales GRATIS</strong> en cualquier plan anual.
-            </p>
           </div>
         </CardContent>
       </Card>

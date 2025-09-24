@@ -67,7 +67,7 @@ const contactInfo = [
 </script>
 
 <template>
-  <section id="contact" class="py-20 md:py-32 bg-gradient-to-b from-white to-gray-50/50 dark:from-background to-gray-900/50">
+  <section id="contact" class="py-20 md:py-32 bg-gradient-to-b from-white dark:from-background to-gray-900/50">
     <div class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto">
       <div class="text-center mb-16">
         <Badge variant="outline" class="text-sm py-2 mb-6">

@@ -189,8 +189,5 @@ const currentYear = new Date().getFullYear();
         </div>
       </div>
     </div>
-
-    <!-- Decoración de fondo -->
-    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#4ed636] to-[#09cb6d] opacity-50"></div>
   </footer>
 </template>

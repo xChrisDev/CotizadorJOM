@@ -2,7 +2,6 @@
 import Hero from '../components/Hero.vue';
 import Navbar from '../components/Navbar.vue';
 import Services from '../components/Services.vue';
-import Features from '../components/Features.vue';
 import About from '../components/About.vue';
 import Testimonials from '../components/Testimonials.vue';
 import CTA from '../components/CTA.vue';
@@ -15,7 +14,6 @@ import Footer from '../components/Footer.vue';
     <Navbar />
     <Hero />
     <Services />
-    <Features />
     <About />
     <Testimonials />
     <CTA />

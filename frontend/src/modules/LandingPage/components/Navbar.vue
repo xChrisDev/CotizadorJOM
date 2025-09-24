@@ -16,7 +16,7 @@ import {
 } from "@/shared/components/ui/sheet";
 import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
-import { Menu, LogInIcon } from "lucide-vue-next";
+import { Menu, LogInIcon, UserPlus } from "lucide-vue-next";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
 import { User, Mail, Settings } from "lucide-vue-next";
 
@@ -31,9 +31,9 @@ interface RouteProps {
 }
 
 const routeList: RouteProps[] = [
+    { href: "#services", label: "Servicios", icon: Settings },
     { href: "#about-us", label: "Nosotros", icon: User },
     { href: "#contact", label: "Contacto", icon: Mail },
-    { href: "#services", label: "Servicios", icon: Settings },
 ];
 
 
@@ -44,8 +44,10 @@ const isOpen = ref<boolean>(false);
     <header :class="{
         'shadow-light': mode === 'light',
         'shadow-dark': mode === 'dark',
-        'w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl sticky top-5 mx-auto flex justify-between items-center px-3 py-1 border rounded-2xl bg-white/10 dark:bg-gray-900/30 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl': true,
+        'fixed top-0 left-0 right-0 z-50 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
+            true,
     }">
+
         <!-- Logo -->
         <a href="/" class="font-bold text-lg flex items-center gap-2">
             <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12 w-12 md:h-16 md:w-16" />
@@ -70,23 +72,36 @@ const isOpen = ref<boolean>(false);
                                     <span class="font-semibold">JOM</span>
                                 </a>
                             </SheetTitle>
+                            <div class="w-full grid grid-cols-2 gap-4">
+                                <Button size="lg" variant="ghost"
+                                    class="flex justify-start border-2 border-[#4ed636] hover:opacity-90">
+                                    <UserPlus class="size-5" />
+                                    Registrarse
+                                </Button>
+                                <Button size="lg"
+                                    class="flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+                                    <LogInIcon class="size-5" />
+                                    Ingresar
+                                </Button>
+                            </div>
                         </SheetHeader>
 
                         <div class="flex flex-col gap-3 p-4">
                             <Button v-for="{ href, label, icon } in routeList" :key="label" as-child variant="ghost"
                                 size="lg"
-                                class="justify-start text-xl hover:bg-primary/10 transition-colors duration-200">
+                                class="justify-start text-base hover:bg-primary/10 transition-colors duration-200">
                                 <a @click="isOpen = false" :href="href" class="flex items-center gap-2">
                                     <component :is="icon" class="w-5 h-5" />
                                     {{ label }}
                                 </a>
                             </Button>
+
                         </div>
 
                     </div>
 
                     <SheetFooter class="flex-col sm:flex-col justify-start items-start">
-                        <Separator class="mb-3 opacity-40" />
+                        <Separator class="mb-3 opacity-30 bg-primary" />
                         <ThemeButton />
                     </SheetFooter>
                 </SheetContent>

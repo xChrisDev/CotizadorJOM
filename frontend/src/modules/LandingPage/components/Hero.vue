@@ -48,8 +48,7 @@ import { ArrowRight } from "lucide-vue-next";
                 </div>
 
                 <img class="w-full h-124 object-cover rounded-lg border" src="@/shared/assets/hero-image.jpg"
-                    alt="dashboard using shadcn-vue" />
-
+                    alt="refacciones" />
                 <div
                     class="absolute bottom-0 left-0 w-full h-20 md:h-28 bg-gradient-to-b from-background/0 via-background/50 to-background rounded-lg">
                 </div>
