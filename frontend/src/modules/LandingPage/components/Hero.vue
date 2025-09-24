@@ -2,6 +2,12 @@
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { ArrowRight } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const redirect = () => {
+    router.push("/buscar")
+}
 </script>
 
 <template>
@@ -32,7 +38,7 @@ import { ArrowRight } from "lucide-vue-next";
                 </p>
 
                 <div class="space-y-4 md:space-y-0 md:space-x-4">
-                    <Button
+                    <Button @click="redirect"
                         class="w-full lg:w-2/4 font-bold group/arrow bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 text-lg md:text-xl py-4 md:py-5">
                         Cotizar ahora
                         <ArrowRight class="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />

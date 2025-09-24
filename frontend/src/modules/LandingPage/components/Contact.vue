@@ -61,7 +61,7 @@ const contactInfo = [
   {
     icon: Clock,
     title: "Horarios",
-    content: "Lunes a Viernes: 9:00 - 19:00\nSábados: 9:00 - 15:00",
+    content: "Lunes a Viernes:\n 9:00 - 19:00\nSábados:\n 9:00 - 15:00",
     action: "Ver disponibilidad"
   }
 ];
@@ -95,7 +95,7 @@ const contactInfo = [
             </p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card v-for="info in contactInfo" :key="info.title"
               class="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#4ed636]/20 cursor-pointer">
               <CardContent class="p-6">

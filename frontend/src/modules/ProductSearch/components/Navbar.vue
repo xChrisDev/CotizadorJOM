@@ -16,18 +16,26 @@ import {
 } from "@/shared/components/ui/sheet";
 import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
-import { Menu, LogInIcon } from "lucide-vue-next";
+import { Box, Home, ShoppingBag } from "lucide-vue-next";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
-import { User, Mail, Settings } from "lucide-vue-next";
+import { User, Mail, Settings, LogInIcon, ShoppingCart } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
 
 const mode = useColorMode();
 mode.value = "light";
 
 const routeList = [
-    { href: "#services", label: "Servicios", icon: Settings },
-    { href: "#about-us", label: "Nosotros", icon: User },
-    { href: "#contact", label: "Contacto", icon: Mail },
-];
+    {
+        name: "Inicio",
+        icon: Home,
+        url: "/"
+    },
+    {
+        name: "Productos",
+        icon: Box,
+        url: "/buscar"
+    }
+]
 
 
 const isOpen = ref(false);
@@ -97,23 +105,27 @@ const isOpen = ref(false);
         <!-- Desktop -->
         <NavigationMenu class="hidden lg:flex">
             <NavigationMenuList class="flex gap-4">
-                <NavigationMenuItem v-for="route in routeList" :key="label">
-                    <a :href="route.href" class="relative flex items-center gap-2 px-3 py-2 text-base font-medium text-foreground hover:text-primary
+                <NavigationMenuItem v-for="route in routeList">
+                    <RouterLink :to="route.url" class="relative flex items-center gap-2 px-3 py-2 text-base font-medium text-foreground hover:text-primary
                after:content-[''] after:absolute after:left-0 after:bottom-0 
                after:h-[3px] after:w-0 after:bg-primary after:transition-all after:duration-300
                hover:after:w-full">
                         <component :is="route.icon" class="w-4 h-4" />
-                        {{ route.label }}
-                    </a>
+                        {{ route.name }}
+                    </RouterLink>
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
 
         <div class="hidden lg:flex gap-2">
             <ThemeButton />
-            <Button size="lg" class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+            <!-- <Button size="lg" class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
                 <LogInIcon class="size-5" />
                 Ingresar
+            </Button> -->
+            <Button variant="outline" size="lg" >
+                <ShoppingCart class="size-5" />
+                Carrito
             </Button>
         </div>
     </header>

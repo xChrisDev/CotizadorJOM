@@ -9,7 +9,7 @@ import { Moon, Sun } from "lucide-vue-next";
   <Button
     @click="mode = mode === 'dark' ? 'light' : 'dark'"
     size="lg"
-    variant="ghost"
+    variant="outline"
     class="lg:w-5 lg:justify-center w-full justify-start"
   >
     <div
