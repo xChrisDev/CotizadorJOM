@@ -44,7 +44,7 @@ const isOpen = ref<boolean>(false);
     <header :class="{
         'shadow-light': mode === 'light',
         'shadow-dark': mode === 'dark',
-        'fixed top-0 left-0 right-0 z-50 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
+        'fixed top-0 left-0 right-0 z-1001 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
             true,
     }">
 
@@ -72,18 +72,11 @@ const isOpen = ref<boolean>(false);
                                     <span class="font-semibold">JOM</span>
                                 </a>
                             </SheetTitle>
-                            <div class="w-full grid grid-cols-2 gap-4">
-                                <Button size="lg" variant="ghost"
-                                    class="flex justify-start border-2 border-[#4ed636] hover:opacity-90">
-                                    <UserPlus class="size-5" />
-                                    Registrarse
-                                </Button>
-                                <Button size="lg"
-                                    class="flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-                                    <LogInIcon class="size-5" />
-                                    Ingresar
-                                </Button>
-                            </div>
+                            <Button size="lg"
+                                class="flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+                                <LogInIcon class="size-5" />
+                                Ingresar
+                            </Button>
                         </SheetHeader>
 
                         <div class="flex flex-col gap-3 p-4">

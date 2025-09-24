@@ -86,7 +86,7 @@ const values = [
     </div>
 
     <!-- Valores -->
-    <div class="mt-24">
+    <div class="mt-20">
       <div class="text-center mb-12">
         <h3 class="text-3xl font-bold mb-4">Nuestros Valores</h3>
         <p class="text-lg text-muted-foreground max-w-2xl mx-auto">

@@ -58,18 +58,10 @@ const testimonials = [
 <template>
   <section class="py-20 md:py-32 bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-900/50 dark:to-background">
     <div class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto">
-      <div class="text-center mb-16">
-        <Badge variant="outline" class="text-sm py-2 mb-6">
-          <span class="mr-1 text-primary">
-            <Badge class="bg-[#3fc029] font-bold">Testimonios</Badge>
-          </span>
-          <span class="font-bold">Lo que dicen nuestros clientes</span>
-        </Badge>
-        
+      <div class="text-center mb-16">        
         <h2 class="text-4xl md:text-5xl font-bold mb-6">
-          Historias de
           <span class="text-transparent bg-gradient-to-r from-[#4ed636] to-[#048044] bg-clip-text">
-            éxito
+            Testimonios
           </span>
           reales
         </h2>

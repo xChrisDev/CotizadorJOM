@@ -4,7 +4,6 @@ import Navbar from '../components/Navbar.vue';
 import Services from '../components/Services.vue';
 import About from '../components/About.vue';
 import Testimonials from '../components/Testimonials.vue';
-import CTA from '../components/CTA.vue';
 import Contact from '../components/Contact.vue';
 import Footer from '../components/Footer.vue';
 </script>
@@ -16,7 +15,6 @@ import Footer from '../components/Footer.vue';
     <Services />
     <About />
     <Testimonials />
-    <CTA />
     <Contact />
     <Footer />
   </div>

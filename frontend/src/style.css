@@ -5,6 +5,13 @@ html{
   scroll-behavior: smooth;
 }
 
+@layer base {
+  body {
+    @apply font-sans;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

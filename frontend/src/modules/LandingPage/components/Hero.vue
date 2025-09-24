@@ -5,11 +5,10 @@ import { ArrowRight } from "lucide-vue-next";
 </script>
 
 <template>
-    <section class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center gap-10 mx-auto py-20 md:py-32">
-
+    <section class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto min-h-screen">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center gap-10 mx-auto pt-10 md:pt-32 mt-16">
             <!-- Texto -->
-            <div class="space-y-8 text-left w-full lg:w-1/2">
+            <div class="space-y-10 text-left w-full lg:w-1/2">
                 <Badge variant="outline" class="text-sm py-2">
                     <span class="mr-1 text-primary">
                         <Badge class="bg-[#3fc029] font-bold">Nuevo</Badge>
