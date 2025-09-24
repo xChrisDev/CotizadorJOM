@@ -1,0 +1,254 @@
+<script setup>
+import { ref } from 'vue';
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Card, CardHeader, CardContent } from "@/shared/components/ui/card";
+import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from "lucide-vue-next";
+
+// Formulario reactivo
+const form = ref({
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  message: ''
+});
+
+const isSubmitting = ref(false);
+
+const handleSubmit = async () => {
+  isSubmitting.value = true;
+  
+  // Simular envío del formulario
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // Aquí iría la lógica real de envío
+  console.log('Formulario enviado:', form.value);
+  
+  // Reset form
+  form.value = {
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    message: ''
+  };
+  
+  isSubmitting.value = false;
+  alert('¡Mensaje enviado correctamente! Te contactaremos pronto.');
+};
+
+const contactInfo = [
+  {
+    icon: MapPin,
+    title: "Ubicación",
+    content: "Av. Principal 123, Col. Industrial\nCiudad de México, CDMX 01234",
+    action: "Ver en mapa"
+  },
+  {
+    icon: Phone,
+    title: "Teléfono",
+    content: "+52 (55) 1234-5678\n+52 (55) 8765-4321",
+    action: "Llamar ahora"
+  },
+  {
+    icon: Mail,
+    title: "Email",
+    content: "contacto@jom.com\nventas@jom.com",
+    action: "Enviar email"
+  },
+  {
+    icon: Clock,
+    title: "Horarios",
+    content: "Lunes a Viernes: 8:00 - 18:00\nSábados: 9:00 - 14:00",
+    action: "Ver disponibilidad"
+  }
+];
+</script>
+
+<template>
+  <section id="contact" class="py-20 md:py-32 bg-gradient-to-b from-white to-gray-50/50 dark:from-background to-gray-900/50">
+    <div class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto">
+      <div class="text-center mb-16">
+        <Badge variant="outline" class="text-sm py-2 mb-6">
+          <span class="mr-1 text-primary">
+            <Badge class="bg-[#3fc029] font-bold">Contacto</Badge>
+          </span>
+          <span class="font-bold">Hablemos</span>
+        </Badge>
+        
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">
+          ¿Listo para
+          <span class="text-transparent bg-gradient-to-r from-[#4ed636] to-[#048044] bg-clip-text">
+            comenzar?
+          </span>
+        </h2>
+        
+        <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Estamos aquí para ayudarte. Contáctanos y descubre cómo JOM puede 
+          transformar tu proceso de cotización de refacciones.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <!-- Información de contacto -->
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-2xl font-bold mb-6">Información de Contacto</h3>
+            <p class="text-muted-foreground mb-8 leading-relaxed">
+              Nuestro equipo de expertos está disponible para resolver todas tus dudas 
+              y ayudarte a implementar la mejor solución para tu negocio.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <Card 
+              v-for="info in contactInfo" 
+              :key="info.title"
+              class="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#4ed636]/20 cursor-pointer"
+            >
+              <CardContent class="p-6">
+                <div class="flex items-start gap-4">
+                  <div class="p-3 rounded-xl bg-gradient-to-r from-[#4ed636]/10 to-[#09cb6d]/10 group-hover:from-[#4ed636]/20 group-hover:to-[#09cb6d]/20 transition-all duration-300">
+                    <component :is="info.icon" class="w-6 h-6 text-[#4ed636] group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-foreground mb-2 group-hover:text-[#048044] transition-colors duration-300">
+                      {{ info.title }}
+                    </h4>
+                    <p class="text-sm text-muted-foreground whitespace-pre-line mb-3">
+                      {{ info.content }}
+                    </p>
+                    <button class="text-xs text-[#4ed636] font-medium hover:text-[#048044] transition-colors duration-200">
+                      {{ info.action }} →
+                    </button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <!-- CTA adicional -->
+          <Card class="bg-gradient-to-r from-[#4ed636]/5 to-[#09cb6d]/5 border-[#4ed636]/20">
+            <CardContent class="p-6">
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-[#4ed636]/10">
+                  <MessageCircle class="w-6 h-6 text-[#4ed636]" />
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-foreground mb-1">
+                    ¿Necesitas ayuda inmediata?
+                  </h4>
+                  <p class="text-sm text-muted-foreground">
+                    Chatea con nuestro equipo de soporte en tiempo real
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" class="border-[#4ed636]/30 text-[#4ed636] hover:bg-[#4ed636]/10">
+                  Chat en vivo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Formulario de contacto -->
+        <Card class="shadow-2xl border-2 hover:border-[#4ed636]/20 transition-all duration-300">
+          <CardHeader>
+            <h3 class="text-2xl font-bold text-center">Envíanos un mensaje</h3>
+            <p class="text-muted-foreground text-center">
+              Completa el formulario y te contactaremos en menos de 24 horas
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form @submit.prevent="handleSubmit" class="space-y-6">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-foreground">
+                    Nombre completo *
+                  </label>
+                  <input
+                    v-model="form.name"
+                    type="text"
+                    required
+                    class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-[#4ed636] focus:ring-2 focus:ring-[#4ed636]/20 transition-all duration-200"
+                    placeholder="Tu nombre"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-foreground">
+                    Email *
+                  </label>
+                  <input
+                    v-model="form.email"
+                    type="email"
+                    required
+                    class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-[#4ed636] focus:ring-2 focus:ring-[#4ed636]/20 transition-all duration-200"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-foreground">
+                    Teléfono
+                  </label>
+                  <input
+                    v-model="form.phone"
+                    type="tel"
+                    class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-[#4ed636] focus:ring-2 focus:ring-[#4ed636]/20 transition-all duration-200"
+                    placeholder="+52 (55) 1234-5678"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-foreground">
+                    Empresa
+                  </label>
+                  <input
+                    v-model="form.company"
+                    type="text"
+                    class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-[#4ed636] focus:ring-2 focus:ring-[#4ed636]/20 transition-all duration-200"
+                    placeholder="Nombre de tu empresa"
+                  />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">
+                  Mensaje *
+                </label>
+                <textarea
+                  v-model="form.message"
+                  required
+                  rows="4"
+                  class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-[#4ed636] focus:ring-2 focus:ring-[#4ed636]/20 transition-all duration-200 resize-none"
+                  placeholder="Cuéntanos cómo podemos ayudarte..."
+                ></textarea>
+              </div>
+
+              <Button 
+                type="submit" 
+                :disabled="isSubmitting"
+                class="w-full bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 font-semibold py-3 group"
+              >
+                <template v-if="isSubmitting">
+                  <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Enviando...
+                </template>
+                <template v-else>
+                  Enviar mensaje
+                  <Send class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </template>
+              </Button>
+
+              <p class="text-xs text-muted-foreground text-center">
+                Al enviar este formulario, aceptas nuestros términos de privacidad y 
+                el procesamiento de tus datos personales.
+              </p>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </section>
+</template>
