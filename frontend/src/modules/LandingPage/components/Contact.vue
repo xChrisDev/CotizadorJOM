@@ -20,10 +20,6 @@ const isSubmitting = ref(false);
 const handleSubmit = async () => {
   isSubmitting.value = true;
 
-  // Simular envío del formulario
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  // Aquí iría la lógica real de envío
   console.log('Formulario enviado:', form.value);
 
   // Reset form
@@ -68,7 +64,7 @@ const contactInfo = [
 </script>
 
 <template>
-  <section id="contact" class="py-20 md:py-26 ">
+  <section id="contact" class="py-56 lg:p-32">
     <div class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto">
       <div class="text-center mb-16">
         <h2 class="text-4xl md:text-5xl font-bold mb-6">

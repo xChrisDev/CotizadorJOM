@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from "vue";
-import { useColorMode } from "@vueuse/core";
+import { onMounted, ref } from "vue";
+import { useColorMode, useDraggable } from "@vueuse/core";
 import {
     NavigationMenu,
     NavigationMenuItem,
@@ -15,14 +15,14 @@ import {
     SheetTrigger,
 } from "@/shared/components/ui/sheet";
 import { Button } from "@/shared/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip'
 import { Separator } from "@/shared/components/ui/separator";
-import { Box, Home, ShoppingBag } from "lucide-vue-next";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
-import { User, Mail, Settings, LogInIcon, ShoppingCart } from "lucide-vue-next";
+import { Menu, Box, Home, ShoppingBag, User, Mail, Settings, LogInIcon, ShoppingCart } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
+import ShoppingCartButton from "./ShoppingCartButton.vue";
 
 const mode = useColorMode();
-mode.value = "light";
 
 const routeList = [
     {
@@ -45,7 +45,7 @@ const isOpen = ref(false);
     <header :class="{
         'shadow-light': mode === 'light',
         'shadow-dark': mode === 'dark',
-        'fixed top-0 left-0 right-0 z-1001 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
+        'fixed top-0 left-0 right-0 z-999 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
             true,
     }">
 
@@ -56,38 +56,44 @@ const isOpen = ref(false);
         </a>
 
         <!-- Mobile -->
-        <div class="flex items-center lg:hidden">
+        <div class="flex items-center gap-2 lg:hidden">
+            <ShoppingCartButton />
+            <!-- <Button size="icon"
+                class="h-14 w-14 md:hidden bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+                <ShoppingCart class="size-6" />
+            </Button> -->
             <Sheet v-model:open="isOpen">
-                <SheetTrigger as-child>
-                    <Menu @click="isOpen = true"
-                        class="cursor-pointer hover:text-primary transition-colors duration-200" />
+                <SheetTrigger class="flex items-center gap-3" as-child>
+                    <Button @click="isOpen = true" variant="outline" size="icon" class="h-14 w-14 lg:hidden">
+                        <Menu class="size-6" />
+                    </Button>
                 </SheetTrigger>
 
                 <SheetContent side="left"
-                    class="z-9999 flex flex-col justify-between rounded-tr-2xl rounded-br-2xl bg-card/90 backdrop-blur-lg border-r">
+                    class="z-9999 flex flex-col justify-between bg-card/90 backdrop-blur-lg border-r">
                     <div>
-                        <SheetHeader class="mb-6 ml-2">
+                        <SheetHeader class="mb-3 ml-2">
                             <SheetTitle class="flex items-center">
                                 <a href="/" class="flex items-center gap-2">
                                     <img src="@/shared/assets/JOM.png" alt="JOM" class="rounded-lg h-16 w-16" />
                                     <span class="font-semibold">JOM</span>
                                 </a>
                             </SheetTitle>
-                            <Button size="lg"
-                                class="flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+                            <Separator class="opacity-30 bg-primary" />
+                        </SheetHeader>
+
+                        <div class="flex flex-col gap-3 px-4">
+                            <Button
+                                class="h-14 text-base flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
                                 <LogInIcon class="size-5" />
                                 Ingresar
                             </Button>
-                        </SheetHeader>
-
-                        <div class="flex flex-col gap-3 p-4">
-                            <Button v-for="{ href, label, icon } in routeList" :key="label" as-child variant="ghost"
-                                size="lg"
-                                class="justify-start text-base hover:bg-primary/10 transition-colors duration-200">
-                                <a @click="isOpen = false" :href="href" class="flex items-center gap-2">
-                                    <component :is="icon" class="w-5 h-5" />
-                                    {{ label }}
-                                </a>
+                            <Button v-for="route in routeList" as-child variant="outline"
+                                class="h-14 justify-start text-base hover:bg-primary/10 transition-colors duration-200">
+                                <RouterLink @click="isOpen = false" :to="route.url" class="flex items-center gap-2">
+                                    <component :is="route.icon" class="w-5 h-5" />
+                                    {{ route.name }}
+                                </RouterLink>
                             </Button>
 
                         </div>
@@ -119,14 +125,11 @@ const isOpen = ref(false);
 
         <div class="hidden lg:flex gap-2">
             <ThemeButton />
+            <ShoppingCartButton />
             <!-- <Button size="lg" class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-                <LogInIcon class="size-5" />
-                Ingresar
-            </Button> -->
-            <Button variant="outline" size="lg" >
                 <ShoppingCart class="size-5" />
                 Carrito
-            </Button>
+            </Button> -->
         </div>
     </header>
 </template>

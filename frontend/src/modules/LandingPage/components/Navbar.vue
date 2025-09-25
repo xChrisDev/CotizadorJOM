@@ -16,12 +16,12 @@ import {
 } from "@/shared/components/ui/sheet";
 import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
-import { Menu, LogInIcon } from "lucide-vue-next";
+import { Menu, LogInIcon, Box } from "lucide-vue-next";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
 import { User, Mail, Settings } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
 
 const mode = useColorMode();
-mode.value = "light";
 
 const routeList = [
     { href: "#services", label: "Servicios", icon: Settings },
@@ -51,35 +51,44 @@ const isOpen = ref(false);
         <div class="flex items-center lg:hidden">
             <Sheet v-model:open="isOpen">
                 <SheetTrigger as-child>
-                    <Menu @click="isOpen = true"
-                        class="cursor-pointer hover:text-primary transition-colors duration-200" />
+                    <Button @click="isOpen = true" variant="outline" size="icon"
+                        class="h-14 w-14 lg:hidden">
+                        <Menu class="size-6" />
+                    </Button>
                 </SheetTrigger>
 
                 <SheetContent side="left"
-                    class="z-9999 flex flex-col justify-between rounded-tr-2xl rounded-br-2xl bg-card/90 backdrop-blur-lg border-r">
+                    class="z-9999 flex flex-col justify-between bg-card/90 backdrop-blur-lg border-r">
                     <div>
-                        <SheetHeader class="mb-6 ml-2">
+                        <SheetHeader class="ml-2">
                             <SheetTitle class="flex items-center">
                                 <a href="/" class="flex items-center gap-2">
                                     <img src="@/shared/assets/JOM.png" alt="JOM" class="rounded-lg h-16 w-16" />
                                     <span class="font-semibold">JOM</span>
                                 </a>
                             </SheetTitle>
-                            <Button size="lg"
-                                class="flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+                            <Separator class="my-3 opacity-30 bg-primary" />
+                        </SheetHeader>
+
+                        <div class="flex flex-col gap-3 px-4">
+                            <Button
+                                class="h-14 text-base flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
                                 <LogInIcon class="size-5" />
                                 Ingresar
                             </Button>
-                        </SheetHeader>
-
-                        <div class="flex flex-col gap-3 p-4">
-                            <Button v-for="{ href, label, icon } in routeList" :key="label" as-child variant="ghost"
-                                size="lg"
-                                class="justify-start text-base hover:bg-primary/10 transition-colors duration-200">
-                                <a @click="isOpen = false" :href="href" class="flex items-center gap-2">
-                                    <component :is="icon" class="w-5 h-5" />
-                                    {{ label }}
+                            <Button v-for="route in routeList" as-child variant="outline"
+                                class="h-14 justify-start text-base hover:bg-primary/10 transition-colors duration-200">
+                                <a @click="isOpen = false" :href="route.href" class="flex items-center gap-2">
+                                    <component :is="route.icon" class="w-5 h-5" />
+                                    {{ route.label }}
                                 </a>
+                            </Button>
+                            <Button as-child variant="outline"
+                                class="h-14 justify-start text-base hover:bg-primary/10 transition-colors duration-200">
+                                <RouterLink @click="isOpen = false" to="/buscar" class="flex items-center gap-2">
+                                    <component :is="Box" class="w-5 h-5" />
+                                    Productos
+                                </RouterLink>
                             </Button>
 
                         </div>
@@ -97,7 +106,7 @@ const isOpen = ref(false);
         <!-- Desktop -->
         <NavigationMenu class="hidden lg:flex">
             <NavigationMenuList class="flex gap-4">
-                <NavigationMenuItem v-for="route in routeList" :key="label">
+                <NavigationMenuItem v-for="route in routeList">
                     <a :href="route.href" class="relative flex items-center gap-2 px-3 py-2 text-base font-medium text-foreground hover:text-primary
                after:content-[''] after:absolute after:left-0 after:bottom-0 
                after:h-[3px] after:w-0 after:bg-primary after:transition-all after:duration-300
@@ -106,12 +115,21 @@ const isOpen = ref(false);
                         {{ route.label }}
                     </a>
                 </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <RouterLink to="/buscar" class="relative flex items-center gap-2 px-3 py-2 text-base font-medium text-foreground hover:text-primary
+               after:content-[''] after:absolute after:left-0 after:bottom-0 
+               after:h-[3px] after:w-0 after:bg-primary after:transition-all after:duration-300
+               hover:after:w-full">
+                        <component :is="Box" class="w-4 h-4" />
+                        Productos
+                    </RouterLink>
+                </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
 
         <div class="hidden lg:flex gap-2">
             <ThemeButton />
-            <Button size="lg" class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+            <Button size="lg" class="h-14 bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
                 <LogInIcon class="size-5" />
                 Ingresar
             </Button>

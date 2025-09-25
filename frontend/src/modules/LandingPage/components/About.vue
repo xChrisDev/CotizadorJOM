@@ -29,8 +29,8 @@ const values = [
 </script>
 
 <template>
-  <section class="bg-white">
-    <div id="about-us" class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto py-20 md:py-32 ">
+  <section id="about-us">
+    <div class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto py-32">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div class="space-y-8">
           <div>

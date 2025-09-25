@@ -5,6 +5,25 @@ html{
   scroll-behavior: smooth;
 }
 
+/* La transición de salida es muy rápida */
+.fade-zoom-leave-active {
+  transition: opacity 0.15s ease-in;
+}
+
+/* La transición de entrada es un poco más lenta para ser suave */
+.fade-zoom-enter-active {
+  transition: opacity 0.25s ease-out;
+  /* Retrasamos ligeramente la entrada para que no se solape bruscamente */
+  transition-delay: 0.1s;
+}
+
+.fade-zoom-enter-from,
+.fade-zoom-leave-to {
+  opacity: 0;
+}
+
+
+
 @layer base {
   body {
     @apply font-sans;

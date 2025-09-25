@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { ArrowRight } from "lucide-vue-next";
@@ -52,11 +52,11 @@ const redirect = () => {
                     class="absolute -top-6 right-12 w-[90%] h-12 lg:h-[80%] bg-[#4ed636]/60 blur-3xl rounded-full img-shadow-animation -z-10">
                 </div>
 
-                <img class="w-full h-124 object-cover rounded-lg border" src="@/shared/assets/hero-image.jpg"
+                <img class="w-full h-120 object-cover rounded-lg border" src="@/shared/assets/hero-image.jpg"
                     alt="refacciones" />
-                <div
+                <!-- <div
                     class="absolute bottom-0 left-0 w-full h-20 md:h-28 bg-gradient-to-b from-background/0 via-background/50 to-background rounded-lg">
-                </div>
+                </div> -->
             </div>
         </div>
     </section>

@@ -10,7 +10,7 @@ const testimonials = [
     company: "AutoServicio Mendoza",
     content: "JOM ha revolucionado completamente mi negocio. Antes tardaba horas buscando refacciones y comparando precios. Ahora en minutos tengo las mejores opciones disponibles. Mis clientes están más satisfechos y mi productividad se ha triplicado.",
     rating: 5,
-    avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150"
+    avatar: new URL("@/shared/assets/user-default.png", import.meta.url).href
   },
   {
     name: "María González",
@@ -18,7 +18,7 @@ const testimonials = [
     company: "Distribuidora AutoParts",
     content: "La precisión y rapidez del sistema de cotización de JOM es impresionante. Hemos reducido nuestros costos de operación en un 30% y mejorado significativamente nuestros tiempos de respuesta a clientes. Una herramienta indispensable.",
     rating: 5,
-    avatar: "https://images.pexels.com/photos/3785077/pexels-photo-3785077.jpeg?auto=compress&cs=tinysrgb&w=150"
+    avatar: new URL("@/shared/assets/user-default.png", import.meta.url).href
   },
   {
     name: "Roberto Silva",
@@ -26,7 +26,7 @@ const testimonials = [
     company: "Taller Silva",
     content: "Como mecánico independiente, necesitaba una solución que me diera acceso a precios competitivos sin las complicaciones de negociar con múltiples proveedores. JOM me ha dado exactamente eso y más. Excelente servicio.",
     rating: 5,
-    avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150"
+    avatar: new URL("@/shared/assets/user-default.png", import.meta.url).href
   },
   {
     name: "Ana Rodríguez",
@@ -34,7 +34,7 @@ const testimonials = [
     company: "FlotaMax Transportes",
     content: "Gestionar el mantenimiento de nuestra flota de 200+ vehículos era un desafío enorme. Con JOM, hemos optimizado todo el proceso de adquisición de refacciones. El ahorro en tiempo y dinero ha sido extraordinario.",
     rating: 5,
-    avatar: "https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg?auto=compress&cs=tinysrgb&w=150"
+    avatar: new URL("@/shared/assets/user-default.png", import.meta.url).href
   },
   {
     name: "Luis Herrera",
@@ -42,7 +42,7 @@ const testimonials = [
     company: "AutoRepuestos Herrera",
     content: "La transparencia en los precios y la facilidad de uso de la plataforma JOM nos ha permitido expandir nuestro negocio. Nuestros clientes confían en nosotros porque siempre les ofrecemos las mejores opciones del mercado.",
     rating: 5,
-    avatar: "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150"
+    avatar: new URL("@/shared/assets/user-default.png", import.meta.url).href
   },
   {
     name: "Patricia Morales",
@@ -50,7 +50,7 @@ const testimonials = [
     company: "Servicio Integral Morales",
     content: "JOM no solo nos ayuda a encontrar las mejores refacciones, sino que también nos ha permitido brindar un mejor servicio a nuestros clientes. La confianza que genera tener precios justos y productos de calidad es invaluable.",
     rating: 5,
-    avatar: "https://images.pexels.com/photos/3823488/pexels-photo-3823488.jpeg?auto=compress&cs=tinysrgb&w=150"
+    avatar: new URL("@/shared/assets/user-default.png", import.meta.url).href
   }
 ];
 </script>
@@ -58,26 +58,23 @@ const testimonials = [
 <template>
   <section class="py-20 md:py-32 bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-900/50 dark:to-background">
     <div class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto">
-      <div class="text-center mb-16">        
+      <div class="text-center mb-16">
         <h2 class="text-4xl md:text-5xl font-bold mb-6">
           <span class="text-transparent bg-gradient-to-r from-[#4ed636] to-[#048044] bg-clip-text">
             Testimonios
           </span>
           reales
         </h2>
-        
+
         <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Descubre cómo JOM ha transformado la experiencia de cotización para cientos de 
+          Descubre cómo JOM ha transformado la experiencia de cotización para cientos de
           talleres, mecánicos y distribuidores en todo el país.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <Card 
-          v-for="(testimonial, index) in testimonials" 
-          :key="index"
-          class="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-2 hover:border-[#4ed636]/20 bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-900 dark:to-gray-800/30 relative overflow-hidden"
-        >
+        <Card v-for="(testimonial, index) in testimonials" :key="index"
+          class="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-2 hover:border-[#4ed636]/20 bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-900 dark:to-gray-800/30 relative overflow-hidden">
           <!-- Icono de comillas decorativo -->
           <div class="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
             <Quote class="w-12 h-12 text-[#4ed636]" />
@@ -99,12 +96,11 @@ const testimonials = [
             <!-- Información del cliente -->
             <div class="flex items-center gap-4">
               <div class="relative">
-                <img 
-                  :src="testimonial.avatar" 
-                  :alt="testimonial.name"
-                  class="w-12 h-12 rounded-full object-cover border-2 border-[#4ed636]/20 group-hover:border-[#4ed636]/40 transition-all duration-300"
-                />
-                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-[#4ed636] rounded-full border-2 border-white dark:border-gray-900"></div>
+                <img :src="testimonial.avatar" :alt="testimonial.name"
+                  class="w-12 h-12 rounded-full object-cover border-2 border-[#4ed636]/20 group-hover:border-[#4ed636]/40 transition-all duration-300" />
+                <div
+                  class="absolute -bottom-1 -right-1 w-4 h-4 bg-[#4ed636] rounded-full border-2 border-white dark:border-gray-900">
+                </div>
               </div>
               <div>
                 <div class="font-semibold text-foreground group-hover:text-[#048044] transition-colors duration-300">
