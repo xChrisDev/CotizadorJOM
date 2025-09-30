@@ -48,7 +48,7 @@ function handleSubmit() {
       <CardFooter>
         <div class="flex flex-col w-full">
           <Button class="mt-6 w-full bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-            Crear Cuenta
+            Solicitar registro
           </Button>
           <div class="text-white mt-4 text-center text-sm">
             ¿Ya tienes una cuenta?,

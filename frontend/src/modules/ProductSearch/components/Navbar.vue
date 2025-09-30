@@ -53,7 +53,6 @@ const isOpen = ref(false);
         <!-- Logo -->
         <a href="#" class="font-bold text-lg flex items-center gap-2">
             <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12 md:h-16" />
-            <span class="hidden md:inline-block text-xl font-bold tracking-tight">JOM</span>
         </a>
 
         <!-- Mobile -->
