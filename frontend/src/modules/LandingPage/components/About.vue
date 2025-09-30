@@ -58,9 +58,6 @@ const values = [
               Conoce más sobre nosotros
               <ArrowRight class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg" class="font-semibold">
-              Ver nuestros logros
-            </Button>
           </div>
         </div>
 

@@ -21,11 +21,10 @@ function handleCheckout() {
 <template>
     <Sheet v-model:open="isOpenCart">
         <SheetTrigger as-child>
-            <Button
-                class="relative h-14 w-14 bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
+            <Button size="lg" variant="outline" class="h-14 lg:w-14 lg:justify-center justify-start relative">
                 <ShoppingCart class="size-6" />
                 <span v-if="cartStore.cartCount > 0"
-                    class="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                    class="absolute -top-1 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                     {{ cartStore.cartCount }}
                 </span>
             </Button>

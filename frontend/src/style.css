@@ -10,9 +10,8 @@ html{
   transition: opacity 0.15s ease-in;
 }
 
-/* La transición de entrada es un poco más lenta para ser suave */
 .fade-zoom-enter-active {
-  transition: opacity 0.25s ease-out;
+  transition: opacity 0.15s ease-out;
   /* Retrasamos ligeramente la entrada para que no se solape bruscamente */
   transition-delay: 0.1s;
 }

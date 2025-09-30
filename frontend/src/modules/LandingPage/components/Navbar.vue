@@ -20,6 +20,7 @@ import { Menu, LogInIcon, Box } from "lucide-vue-next";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
 import { User, Mail, Settings } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
+import LoginButton from "@/shared/components/LoginButton.vue";
 
 const mode = useColorMode();
 
@@ -37,22 +38,20 @@ const isOpen = ref(false);
     <header :class="{
         'shadow-light': mode === 'light',
         'shadow-dark': mode === 'dark',
-        'fixed top-0 left-0 right-0 z-1001 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
+        'fixed top-0 left-0 right-0 z-1001 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-[#09090b]/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
             true,
     }">
 
         <!-- Logo -->
         <a href="#" class="font-bold text-lg flex items-center gap-2">
-            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12 w-12 md:h-16 md:w-16" />
-            <span class="hidden md:inline-block text-xl font-bold tracking-tight">JOM</span>
+            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12 md:h-16" />
         </a>
 
         <!-- Mobile -->
         <div class="flex items-center lg:hidden">
             <Sheet v-model:open="isOpen">
                 <SheetTrigger as-child>
-                    <Button @click="isOpen = true" variant="outline" size="icon"
-                        class="h-14 w-14 lg:hidden">
+                    <Button @click="isOpen = true" variant="outline" size="icon" class="h-14 w-14 lg:hidden">
                         <Menu class="size-6" />
                     </Button>
                 </SheetTrigger>
@@ -63,19 +62,14 @@ const isOpen = ref(false);
                         <SheetHeader class="ml-2">
                             <SheetTitle class="flex items-center">
                                 <a href="/" class="flex items-center gap-2">
-                                    <img src="@/shared/assets/JOM.png" alt="JOM" class="rounded-lg h-16 w-16" />
-                                    <span class="font-semibold">JOM</span>
+                                    <img src="@/shared/assets/JOM.png" alt="JOM" class="rounded-lg h-16" />
                                 </a>
                             </SheetTitle>
                             <Separator class="my-3 opacity-30 bg-primary" />
                         </SheetHeader>
 
                         <div class="flex flex-col gap-3 px-4">
-                            <Button
-                                class="h-14 text-base flex justify-start bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-                                <LogInIcon class="size-5" />
-                                Ingresar
-                            </Button>
+                            <LoginButton type="mobile" />
                             <Button v-for="route in routeList" as-child variant="outline"
                                 class="h-14 justify-start text-base hover:bg-primary/10 transition-colors duration-200">
                                 <a @click="isOpen = false" :href="route.href" class="flex items-center gap-2">
@@ -129,10 +123,7 @@ const isOpen = ref(false);
 
         <div class="hidden lg:flex gap-2">
             <ThemeButton />
-            <Button size="lg" class="h-14 bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-                <LogInIcon class="size-5" />
-                Ingresar
-            </Button>
+            <LoginButton type="desktop" />
         </div>
     </header>
 </template>

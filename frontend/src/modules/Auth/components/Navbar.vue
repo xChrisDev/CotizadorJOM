@@ -20,8 +20,6 @@ import { Separator } from "@/shared/components/ui/separator";
 import ThemeButton from "@/shared/components/ThemeButton.vue";
 import { Menu, Box, Home, ShoppingBag, User, Mail, Settings, LogInIcon, ShoppingCart } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
-import ShoppingCartButton from "./ShoppingCartButton.vue";
-import LoginButton from "@/shared/components/LoginButton.vue";
 
 const mode = useColorMode();
 
@@ -46,19 +44,17 @@ const isOpen = ref(false);
     <header :class="{
         'shadow-light': mode === 'light',
         'shadow-dark': mode === 'dark',
-        'fixed top-0 left-0 right-0 z-998 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-4 py-2 bg-white/80 dark:bg-[#09090b]/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
+        'fixed top-0 left-0 right-0 z-998 w-full md:w-[70%] lg:w-[75%] lg:max-w-screen-xl lg:mt-2 mx-auto flex justify-between items-center px-3 py-2 bg-white/80 dark:bg-[#09090b]/70 backdrop-blur-xl transition-all duration-500 shadow-lg hover:shadow-2xl rounded-none md:rounded-2xl':
             true,
     }">
 
         <!-- Logo -->
         <a href="#" class="font-bold text-lg flex items-center gap-2">
-            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12 md:h-16" />
-            <span class="hidden md:inline-block text-xl font-bold tracking-tight">JOM</span>
+            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-12" />
         </a>
 
         <!-- Mobile -->
         <div class="flex items-center gap-2 lg:hidden">
-            <ShoppingCartButton />
             <Sheet v-model:open="isOpen">
                 <SheetTrigger class="flex items-center gap-3" as-child>
                     <Button @click="isOpen = true" variant="outline" size="icon" class="h-14 w-14 lg:hidden">
@@ -79,7 +75,6 @@ const isOpen = ref(false);
                         </SheetHeader>
 
                         <div class="flex flex-col gap-3 px-4">
-                            <LoginButton type="mobile" />
                             <Button v-for="route in routeList" as-child variant="outline"
                                 class="h-14 justify-start text-base hover:bg-primary/10 transition-colors duration-200">
                                 <RouterLink @click="isOpen = false" :to="route.url" class="flex items-center gap-2">
@@ -116,9 +111,7 @@ const isOpen = ref(false);
         </NavigationMenu>
 
         <div class="hidden lg:flex gap-2">
-            <ShoppingCartButton />
             <ThemeButton />
-            <LoginButton type="desktop" />
         </div>
     </header>
 </template>

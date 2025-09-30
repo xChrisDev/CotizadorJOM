@@ -46,7 +46,7 @@ const currentYear = new Date().getFullYear();
         <!-- Información de la empresa -->
         <div class="lg:col-span-1 space-y-6">
           <div class="flex items-center gap-3">
-            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-16 w-16" />
+            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-16" />
             <span class="text-2xl font-bold text-foreground">JOM</span>
           </div>
 

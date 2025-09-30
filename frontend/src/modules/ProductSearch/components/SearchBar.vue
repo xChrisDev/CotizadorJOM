@@ -6,7 +6,7 @@ import { Search } from 'lucide-vue-next';
 
 <template>
     <section class="w-[90%] md:w-[70%] lg:w-[75%] lg:max-w-screen-xl mx-auto pb-32">
-        <div class="flex flex-col items-center gap-16 text-center pt-10 md:pt-32 mt-12">
+        <div class="flex flex-col items-center gap-16 text-center pt-10 md:pt-32 mt-6">
             <div>
                 <h2 class="text-3xl md:text-4xl font-bold mb-3">
                     Encuentra tus
