@@ -11,7 +11,7 @@ import Navbar from '../components/Navbar.vue';
 
         <div class="absolute inset-0 bg-gray-600 opacity-60 dark:bg-black dark:opacity-80"></div>
 
-        <div class="relative z-10 flex flex-col items-center justify-center w-full">
+        <div class="relative z-10 flex flex-col items-center justify-center w-full pt-20">
             <RegisterForm />
         </div>
     </div>

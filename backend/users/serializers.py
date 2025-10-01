@@ -14,4 +14,5 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "phone_number",
             "rol",
+            "status"
         ]

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-html{
+html {
   scroll-behavior: smooth;
 }
 
@@ -146,10 +146,12 @@ html{
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-  button{
+
+  button {
     @apply cursor-pointer;
   }
 }
