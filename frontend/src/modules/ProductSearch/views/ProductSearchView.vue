@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import ProductFilters from '../components/ProductFilters.vue';
 import ProductGrid from '../components/ProductGrid.vue';
-import Navbar from '../components/Navbar.vue';
+import Navbar from '@/shared/components/Navbar.vue';
 import SearchBar from '../components/SearchBar.vue';
 import Footer from '@/modules/LandingPage/components/Footer.vue';
 
@@ -20,7 +20,7 @@ const products = ref([
 <template>
     <div>
         <div class="w-[90%] lg:max-w-screen-xl mx-auto py-8">
-            <Navbar />
+            <Navbar variant="app"/>
             <SearchBar />
 
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">

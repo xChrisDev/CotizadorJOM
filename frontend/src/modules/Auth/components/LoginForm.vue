@@ -12,10 +12,12 @@ import { CircleCheckBig, Eye, EyeClosed, LoaderCircle } from 'lucide-vue-next'
 import { useToast } from 'vue-toastification'
 import { loginUser } from '../services/authService.js'
 import { useAuthStore } from '@/shared/stores/auth.js'
+import { useUserStore } from "@/shared/stores/user.js";
 
 const router = useRouter()
 const toast = useToast()
-const auth = useAuthStore();
+const authStore = useAuthStore();
+const userStore = useUserStore();
 const showPassword = ref(false)
 const isLoading = ref(false)
 
@@ -52,7 +54,8 @@ const onSubmit = handleSubmit(async (values) => {
       icon: CircleCheckBig,
     });
     resetForm();
-    auth.login(response.data.token, response.data.user.rol);
+    authStore.login(response.data.token, response.data.user.rol);
+    userStore.fetchUser();
 
     switch (response.data.user.rol) {
       case "ADMIN":

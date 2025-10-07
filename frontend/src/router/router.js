@@ -5,8 +5,11 @@ import ProductSearchView from "@/modules/ProductSearch/views/ProductSearchView.v
 import LoginView from "@/modules/Auth/views/LoginView.vue";
 import RegisterView from "@/modules/Auth/views/RegisterView.vue";
 import DashboardView from "@/modules/Admin/views/DashboardView.vue";
+import UserRequestView from "@/modules/Admin/views/UserRequestView.vue";
 import MainViewSeller from "@/modules/Seller/views/MainView.vue";
 import MainViewStaff from "@/modules/PurchasingStaff/views/MainView.vue";
+import QuoteView from "@/modules/Quote/views/QuoteView.vue";
+import PurchaseOrderView from "@/modules/PurchaseOrder/views/PurchaseOrderView.vue";
 import Unauthorized from "@/shared/components/Unauthorized.vue";
 
 const routes = [
@@ -31,8 +34,23 @@ const routes = [
     meta: { transition: "fade-zoom" },
   },
   {
+    path: "/cotizacion",
+    component: QuoteView,
+    meta: { transition: "fade-zoom" },
+  },
+  {
+    path: "/orden-compra",
+    component: PurchaseOrderView,
+    meta: { transition: "fade-zoom" },
+  },
+  {
     path: "/admin",
     component: DashboardView,
+    meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN"] },
+  },
+  {
+    path: "/admin/solicitudes",
+    component: UserRequestView,
     meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN"] },
   },
   {
@@ -62,7 +80,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const rol = localStorage.getItem("rol");
 
   // Si requiere autenticación y no hay token
   if (to.meta.requiresAuth && !token) {
@@ -70,7 +88,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Si la ruta tiene roles definidos y el usuario no cumple
-  if (to.meta.roles && !to.meta.roles.includes(role)) {
+  if (to.meta.roles && !to.meta.roles.includes(rol)) {
     return next("/unauthorized");
   }
 

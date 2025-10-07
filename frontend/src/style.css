@@ -21,8 +21,6 @@ html {
   opacity: 0;
 }
 
-
-
 @layer base {
   body {
     @apply font-sans;
