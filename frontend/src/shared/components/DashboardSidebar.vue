@@ -27,7 +27,6 @@ import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { Separator } from '@/shared/components/ui/separator'
 import { Button } from '@/shared/components/ui/button'
 import ThemeButton from '@/shared/components/ThemeButton.vue'
-import { RouterLink } from "vue-router";
 
 import {
   ChevronsUpDown,
@@ -59,6 +58,11 @@ const props = defineProps({
 
 const router = useRouter()
 const authStore = useAuthStore()
+const emit = defineEmits(["update:view"])
+
+const handleClick = (option) => {
+  emit("update:view", option);
+}
 
 const getUserRoleLabel = () => {
   const roles = {
@@ -107,10 +111,10 @@ const handleLogout = () => {
             <SidebarMenu>
               <SidebarMenuItem v-for="item in menuItems" :key="item.title">
                 <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <RouterLink :to="item.url" class="flex items-center gap-3">
+                  <Button @click="handleClick(item.option)" variant="ghost" class="flex justify-start" >
                     <component :is="item.icon" class="w-4 h-4" />
                     <span>{{ item.title }}</span>
-                  </RouterLink>
+                  </Button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

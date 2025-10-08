@@ -55,7 +55,7 @@ const onSubmit = handleSubmit(async (values) => {
     });
     resetForm();
     authStore.login(response.data.token, response.data.user.rol);
-    userStore.fetchUser();
+    // userStore.fetchUser();
 
     switch (response.data.user.rol) {
       case "ADMIN":

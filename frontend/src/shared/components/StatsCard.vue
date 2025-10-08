@@ -11,7 +11,7 @@ defineProps({
     required: true
   },
   icon: {
-    type: Object,
+    type: [Object, Function],
     required: true
   },
   description: {

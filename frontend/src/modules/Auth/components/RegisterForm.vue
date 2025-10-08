@@ -57,11 +57,12 @@ const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true
   const userData = {
     username: values.username,
+    password: values.password,
     first_name: values.firstName,
     last_name: values.lastName,
     email: values.email,
-    password: values.password,
     phone_number: "+52" + values.phoneNumber,
+    client_type: "A"
   }
 
   const response = await registerUser(userData)

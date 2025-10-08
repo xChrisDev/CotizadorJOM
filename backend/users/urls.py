@@ -10,7 +10,7 @@ router.register(r"admins", views.AdminViewSet, basename="admin")
 router.register(r"clients", views.ClientViewSet, basename="client")
 
 urlpatterns = [
-    path("login", views.login, name="login"),
-    path("me", views.me, name="profile"),
+    path("login/", views.login, name="login"),
+    path("me/", views.me, name="profile"),
     path("", include(router.urls)),
 ]

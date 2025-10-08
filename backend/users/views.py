@@ -7,7 +7,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -27,6 +29,12 @@ from .serializers import (
 )
 
 
+class UserPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 50
+
+
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -35,9 +43,32 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class SellerViewSet(viewsets.ModelViewSet):
     queryset = Seller.objects.all()
     permission_classes = [IsRoleAdmin]
+    pagination_class = UserPagination
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    
+    search_fields = [
+        'profile__user__username',
+        'profile__user__first_name',
+        'profile__user__last_name',
+        'profile__user__email',
+        'profile__phone_number',
+        'workstation',
+    ]
+    
+    filterset_fields = ['profile__status']
+    
+    ordering_fields = [
+        'profile__user__username',
+        'profile__user__first_name',
+        'profile__user__last_name',
+        'workstation',
+        'profile__status',
+    ]
+    ordering = ['profile__user__username']
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return SellerCreateSerializer
         return SellerSerializer
 
@@ -47,15 +78,40 @@ class SellerViewSet(viewsets.ModelViewSet):
         instance = write_serializer.save()
         read_serializer = SellerSerializer(instance)
         headers = self.get_success_headers(read_serializer.data)
-        return Response(read_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            read_serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class PurchasingStaffViewSet(viewsets.ModelViewSet):
     queryset = PurchasingStaff.objects.all()
     permission_classes = [IsRoleAdmin]
+    pagination_class = UserPagination
     
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+
+    search_fields = [
+        'profile__user__username',
+        'profile__user__first_name',
+        'profile__user__last_name',
+        'profile__user__email',
+        'profile__phone_number',
+        'department',
+    ]
+
+    filterset_fields = ['profile__status']
+
+    ordering_fields = [
+        'profile__user__username',
+        'profile__user__first_name',
+        'profile__user__last_name',
+        'department',
+        'profile__status',
+    ]
+    ordering = ['profile__user__username']
+
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return PurchasingStaffCreateSerializer
         return PurchasingStaffSerializer
 
@@ -65,15 +121,39 @@ class PurchasingStaffViewSet(viewsets.ModelViewSet):
         instance = write_serializer.save()
         read_serializer = PurchasingStaffSerializer(instance)
         headers = self.get_success_headers(read_serializer.data)
-        return Response(read_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            read_serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = Admin.objects.all()
     permission_classes = [IsRoleAdmin]
+    pagination_class = UserPagination
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+
+    search_fields = [
+        'profile__user__username',
+        'profile__user__first_name',
+        'profile__user__last_name',
+        'profile__user__email',
+        'profile__phone_number',
+    ]
+
+    filterset_fields = ['profile__status', 'full_access']
+
+    ordering_fields = [
+        'profile__user__username',
+        'profile__user__first_name',
+        'profile__user__last_name',
+        'profile__status',
+        'full_access'
+    ]
+    ordering = ['profile__user__username']
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return AdminCreateSerializer
         return AdminSerializer
 
@@ -83,15 +163,44 @@ class AdminViewSet(viewsets.ModelViewSet):
         instance = write_serializer.save()
         read_serializer = AdminSerializer(instance)
         headers = self.get_success_headers(read_serializer.data)
-        return Response(read_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            read_serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     permission_classes = [AllowAny]
-    
+    pagination_class = UserPagination
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    search_fields = [
+        "profile__user__username",
+        "profile__user__first_name",
+        "profile__user__last_name",
+        "profile__user__email",
+        "profile__phone_number",
+        "client_type",
+    ]
+
+    filterset_fields = ["client_type", "profile__status"]
+
+    ordering_fields = [
+        "profile__user__username",
+        "profile__user__first_name",
+        "profile__user__last_name",
+        "client_type",
+        "profile__status",
+    ]
+    ordering = ["profile__user__username"]
+
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return ClientCreateSerializer
         return ClientSerializer
 
@@ -106,6 +215,7 @@ class ClientViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def login(request):
     username = request.data.get("username")
     password = request.data.get("password")
@@ -137,11 +247,11 @@ def login(request):
     except UserProfile.DoesNotExist:
         return Response(
             {"error": "El perfil de este usuario no existe."},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     token, created = Token.objects.get_or_create(user=user)
-    
+
     data = {"username": user.username, "rol": profile.rol}
 
     return Response({"token": token.key, "user": data}, status=status.HTTP_200_OK)
@@ -166,5 +276,6 @@ def me(request):
         return Response({"user": data}, status=status.HTTP_200_OK)
     except UserProfile.DoesNotExist:
         return Response(
-            {"error": "Perfil de usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND
+            {"error": "Perfil de usuario no encontrado."},
+            status=status.HTTP_404_NOT_FOUND,
         )

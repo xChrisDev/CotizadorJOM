@@ -5,7 +5,6 @@ import ProductSearchView from "@/modules/ProductSearch/views/ProductSearchView.v
 import LoginView from "@/modules/Auth/views/LoginView.vue";
 import RegisterView from "@/modules/Auth/views/RegisterView.vue";
 import DashboardView from "@/modules/Admin/views/DashboardView.vue";
-import UserRequestView from "@/modules/Admin/views/UserRequestView.vue";
 import MainViewSeller from "@/modules/Seller/views/MainView.vue";
 import MainViewStaff from "@/modules/PurchasingStaff/views/MainView.vue";
 import QuoteView from "@/modules/Quote/views/QuoteView.vue";
@@ -46,11 +45,6 @@ const routes = [
   {
     path: "/admin",
     component: DashboardView,
-    meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN"] },
-  },
-  {
-    path: "/admin/solicitudes",
-    component: UserRequestView,
     meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN"] },
   },
   {
