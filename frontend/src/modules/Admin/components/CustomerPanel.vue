@@ -37,6 +37,7 @@ import {
     PaginationEllipsis
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
+import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
 
 const customers = ref([]);
 const isLoading = ref(true);
@@ -44,7 +45,7 @@ const search = ref("");
 const ordering = ref("profile__user__username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 1;
+const itemsPerPage = 5;
 
 const loadCustomers = async () => {
     isLoading.value = true;
@@ -67,16 +68,6 @@ const loadCustomers = async () => {
 
 onMounted(loadCustomers);
 watch([search, ordering, page], loadCustomers);
-
-const getStatusVariant = (status) => {
-    if (!status) return 'default';
-    const s = status.toLowerCase();
-    if (s === 'active') return 'success';
-    if (s === 'banned') return 'secondary';
-    if (s === 'rejected') return 'destructive';
-    if (s === 'pending') return 'outline';
-    return 'default';
-};
 
 </script>
 
@@ -129,8 +120,8 @@ const getStatusVariant = (status) => {
         </div>
 
         <Card>
-            <CardContent class="min-h-[250px]">
-                <div v-if="isLoading" class="flex justify-center items-center py-20">
+            <CardContent class="min-h-[350px]">
+                <div v-if="isLoading" class="flex justify-center items-center py-25">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
 
@@ -150,22 +141,23 @@ const getStatusVariant = (status) => {
                     <TableBody>
                         <TableRow v-for="customer in customers" :key="customer.id">
                             <TableCell class="font-medium">
-                                {{ customer.profile.user.username }}
+                                {{ customer.user.username }}
                             </TableCell>
                             <TableCell>
-                                {{ customer.profile.user.first_name }} {{ customer.profile.user.last_name }}
+                                {{ customer.user.first_name }} {{ customer.user.last_name }}
                             </TableCell>
-                            <TableCell>{{ customer.profile.user.email }}</TableCell>
-                            <TableCell>{{ customer.profile.phone_number }}</TableCell>
+                            <TableCell>{{ customer.user.email }}</TableCell>
+                            <TableCell>{{ customer.phone_number }}</TableCell>
 
                             <TableCell>
-                                <Badge variant="outline">{{ customer.client_type }}</Badge>
+                                <Badge variant="outline">{{ customer.customer_type }}</Badge>
                             </TableCell>
 
                             <TableCell class="text-center">
-                                <Badge :variant="getStatusVariant(customer.profile.status)">
-                                    {{ customer.profile.status }}
-                                </Badge>
+                                <div
+                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(customer.profile.status)]">
+                                    {{ getStatusText(customer.profile.status) }}
+                                </div>
                             </TableCell>
 
                             <TableCell class="flex gap-2 justify-center">

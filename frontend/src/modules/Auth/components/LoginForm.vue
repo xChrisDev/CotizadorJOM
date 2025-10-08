@@ -64,7 +64,7 @@ const onSubmit = handleSubmit(async (values) => {
       case "SELLER":
         router.push("/vendedor");
         break;
-      case "SHOPPER":
+      case "STAFF":
         router.push("/compras");
         break;
       default:

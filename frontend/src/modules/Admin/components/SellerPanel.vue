@@ -36,6 +36,7 @@ import {
     PaginationEllipsis
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
+import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
 import EditSeller from './modals/EditSeller.vue';
 import BanSeller from './modals/BanSeller.vue';
 
@@ -45,7 +46,7 @@ const search = ref("");
 const ordering = ref("profile__user__username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 1;
+const itemsPerPage = 3;
 
 const loadSellers = async () => {
     isLoading.value = true;
@@ -64,7 +65,6 @@ const loadSellers = async () => {
         isLoading.value = false;
     }
 };
-
 
 onMounted(loadSellers);
 watch([search, ordering, page], loadSellers);
@@ -131,7 +131,7 @@ const getStatusVariant = (status) => {
         </div>
 
         <Card>
-            <CardContent class="min-h-[250px]">
+            <CardContent class="min-h-[350px]">
                 <div v-if="isLoading" class="flex justify-center items-center py-20">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
@@ -142,7 +142,6 @@ const getStatusVariant = (status) => {
                             <TableHead>Usuario</TableHead>
                             <TableHead>Nombre completo</TableHead>
                             <TableHead>Correo</TableHead>
-                            <TableHead>Número telefónico</TableHead>
                             <TableHead>Puesto</TableHead>
                             <TableHead class="text-center">Status</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
@@ -151,27 +150,27 @@ const getStatusVariant = (status) => {
                     <TableBody>
                         <TableRow v-for="seller in sellers" :key="seller.id">
                             <TableCell class="font-medium">
-                                {{ seller.profile.user.username }}
+                                {{ seller.user.username }}
                             </TableCell>
                             <TableCell>
-                                {{ seller.profile.user.first_name }} {{ seller.profile.user.last_name }}
+                                {{ seller.user.first_name }} {{ seller.user.last_name }}
                             </TableCell>
-                            <TableCell>{{ seller.profile.user.email }}</TableCell>
-                            <TableCell>{{ seller.profile.phone_number }}</TableCell>
+                            <TableCell>{{ seller.user.email }}</TableCell>
 
                             <TableCell>
                                 <Badge variant="outline">{{ seller.workstation }}</Badge>
                             </TableCell>
 
                             <TableCell class="text-center">
-                                <Badge :variant="getStatusVariant(seller.profile.status)">
-                                    {{ seller.profile.status }}
-                                </Badge>
+                                <div
+                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(seller.profile.status)]">
+                                    {{ getStatusText(seller.profile.status) }}
+                                </div>
                             </TableCell>
 
                             <TableCell class="flex gap-2 justify-center">
-                                <EditSeller :id="seller.id"/>
-                                <BanSeller/>
+                                <EditSeller :id="seller.id" @update="loadSellers" />
+                                <BanSeller />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -184,18 +183,16 @@ const getStatusVariant = (status) => {
             </CardContent>
             <CardFooter v-if="totalItems > itemsPerPage" class="flex justify-center">
                 <div class="pt-6 flex justify-center">
-                    <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems" show-edges>
+                    <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems">
                         <PaginationContent v-slot="{ items }">
                             <PaginationPrevious />
                             <template v-for="(item, index) in items" :key="index">
-                                <PaginationItem v-if="item.type === 'page'" :value="item.value" as-child>
-                                    <Button class="w-10 h-10 p-0"
-                                        :variant="item.value === page ? 'default' : 'outline'">
-                                        {{ item.value }}
-                                    </Button>
+                                <PaginationItem v-if="item.type === 'page'" :value="item.value"
+                                    :is-active="item.value === page">
+                                    {{ item.value }}
                                 </PaginationItem>
-                                <PaginationEllipsis v-else :key="item.type" :index="index" />
                             </template>
+                            <PaginationEllipsis :index="4" />
                             <PaginationNext />
                         </PaginationContent>
                     </Pagination>

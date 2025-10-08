@@ -13,21 +13,22 @@ import {
 } from "@/shared/components/ui/dialog"
 import { Label } from "@/shared/components/ui/label"
 import { Input } from "@/shared/components/ui/input"
-import { PencilLine } from "lucide-vue-next"
+import { CircleCheckBig, PencilLine } from "lucide-vue-next"
 import { fetchSellerByID, putSeller } from "../../services/sellerService.js"
+import { useToast } from "vue-toastification"
+const toast = useToast()
 
 const props = defineProps({
     id: Number
 })
 
 const seller = ref(null)
-
+const emit = defineEmits(["update"])
 const form = reactive({
     first_name: "",
     last_name: "",
     username: "",
     email: "",
-    phone_number: "",
     workstation: "",
 })
 
@@ -36,7 +37,6 @@ const errors = reactive({
     last_name: null,
     username: null,
     email: null,
-    phone_number: null,
     workstation: null,
 })
 
@@ -45,27 +45,23 @@ const schema = z.object({
     last_name: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
     username: z.string().min(3, "El usuario debe tener al menos 3 caracteres"),
     email: z.string().email("Correo electrónico no válido"),
-    phone_number: z
-        .string()
-        .regex(/^\+?\d{10,15}$/, "Número telefónico inválido"),
     workstation: z.string().min(3, "La estación de trabajo es obligatoria"),
 })
 
 watch(seller, (newSeller) => {
     if (newSeller) {
-        form.first_name = newSeller.profile.user.first_name
-        form.last_name = newSeller.profile.user.last_name
-        form.username = newSeller.profile.user.username
-        form.email = newSeller.profile.user.email
-        form.phone_number = newSeller.profile.phone_number
+        form.first_name = newSeller.user.first_name
+        form.last_name = newSeller.user.last_name
+        form.username = newSeller.user.username
+        form.email = newSeller.user.email
         form.workstation = newSeller.workstation
     }
 })
 
-onMounted(async () => {
+const fetchSeller = async () => {
     const values = await fetchSellerByID(props.id)
     seller.value = values
-})
+}
 
 const submitForm = async () => {
     const result = schema.safeParse(form)
@@ -80,10 +76,28 @@ const submitForm = async () => {
     }
 
     try {
-        const response = await putSeller(props.id, JSON.stringify(form))
-        console.log(response)
+        const data = {
+            user: {
+                username: form.username,
+                first_name: form.first_name,
+                last_name: form.last_name,
+                email: form.email
+            },
+            workstation: form.workstation
+        }
+        const response = await putSeller(props.id, data)
+        toast.success("Vendedor actualizado.", {
+            position: "top-center",
+            icon: CircleCheckBig,
+        })
+        emit("update")
     } catch (err) {
-        console.error("Error al guardar:", err)
+        for (let field in err.response.data.user) {
+            const messages = err.response.data.user[field];
+            messages.forEach(msg => {
+                toast.error(msg, { position: "top-center" });
+            });
+        }
     }
 }
 </script>
@@ -92,14 +106,18 @@ const submitForm = async () => {
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button class="bg-gradient-to-r from-[#FBBF24] to-[#F59E0B]" size="icon">
+            <Button @click="fetchSeller" class="bg-gradient-to-r from-[#FBBF24] to-[#F59E0B]" size="icon">
                 <PencilLine class="size-5" />
             </Button>
         </DialogTrigger>
 
         <DialogContent class="sm:max-w-[500px]">
             <DialogHeader>
-                <DialogTitle>Editar perfil</DialogTitle>
+                <DialogTitle>
+                    <div
+                        class="w-fit px-2 py-1 rounded-sm bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] font-medium text-white dark:text-black">
+                        Editar perfil</div>
+                </DialogTitle>
                 <DialogDescription>
                     Modifica la información del vendedor y guarda los cambios.
                 </DialogDescription>
@@ -107,9 +125,9 @@ const submitForm = async () => {
 
             <div class="grid gap-4 py-4">
                 <!-- Nombre -->
-                <div class="grid grid-cols-4 items-center gap-4">
+                <div class="grid gap-2">
                     <Label for="first_name" class="text-right">Nombre</Label>
-                    <div class="col-span-3">
+                    <div>
                         <Input id="first_name" v-model="form.first_name" />
                         <p v-if="errors.first_name" class="text-red-500 text-sm">
                             {{ errors.first_name }}
@@ -118,9 +136,9 @@ const submitForm = async () => {
                 </div>
 
                 <!-- Apellido -->
-                <div class="grid grid-cols-4 items-center gap-4">
+                <div class="grid gap-2">
                     <Label for="last_name" class="text-right">Apellido</Label>
-                    <div class="col-span-3">
+                    <div>
                         <Input id="last_name" v-model="form.last_name" />
                         <p v-if="errors.last_name" class="text-red-500 text-sm">
                             {{ errors.last_name }}
@@ -129,9 +147,9 @@ const submitForm = async () => {
                 </div>
 
                 <!-- Usuario -->
-                <div class="grid grid-cols-4 items-center gap-4">
+                <div class="grid gap-2">
                     <Label for="username" class="text-right">Usuario</Label>
-                    <div class="col-span-3">
+                    <div>
                         <Input id="username" v-model="form.username" />
                         <p v-if="errors.username" class="text-red-500 text-sm">
                             {{ errors.username }}
@@ -140,9 +158,9 @@ const submitForm = async () => {
                 </div>
 
                 <!-- Email -->
-                <div class="grid grid-cols-4 items-center gap-4">
+                <div class="grid gap-2">
                     <Label for="email" class="text-right">Email</Label>
-                    <div class="col-span-3">
+                    <div>
                         <Input id="email" type="email" v-model="form.email" />
                         <p v-if="errors.email" class="text-red-500 text-sm">
                             {{ errors.email }}
@@ -150,21 +168,10 @@ const submitForm = async () => {
                     </div>
                 </div>
 
-                <!-- Teléfono -->
-                <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="phone_number" class="text-right">Teléfono</Label>
-                    <div class="col-span-3">
-                        <Input id="phone_number" v-model="form.phone_number" />
-                        <p v-if="errors.phone_number" class="text-red-500 text-sm">
-                            {{ errors.phone_number }}
-                        </p>
-                    </div>
-                </div>
-
                 <!-- Estación de trabajo -->
-                <div class="grid grid-cols-4 items-center gap-4">
+                <div class="grid gap-2">
                     <Label for="workstation" class="text-right">Estación</Label>
-                    <div class="col-span-3">
+                    <div>
                         <Input id="workstation" v-model="form.workstation" />
                         <p v-if="errors.workstation" class="text-red-500 text-sm">
                             {{ errors.workstation }}

@@ -22,7 +22,7 @@ export const fetchSellerByID = async (id) => {
 
 export const putSeller = async (id, data) => {
   try {
-    const response = await apiClient.put(`/sellers/${id}`, data);
+    const response = await apiClient.patch(`/sellers/${id}/`, data);
     return response.data;
   } catch (error) {
     console.error("Error updating sellers:", error);

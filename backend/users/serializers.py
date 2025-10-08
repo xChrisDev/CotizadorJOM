@@ -1,163 +1,158 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from django.db import transaction
-from .models import UserProfile, Seller, PurchasingStaff, Admin, Client
 from phonenumber_field.serializerfields import PhoneNumberField
-
-# ===================================================================
-#  SERIALIZERS DE LECTURA
-# ===================================================================
+from .models import Admin, Seller, PurchasingStaff, Customer, UserProfile
 
 
-class UserDataSerializer(serializers.ModelSerializer):
+class BaseUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)  
+
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email"]
+        fields = ["id", "username", "first_name", "last_name", "email", "password"]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", None)
+        if user_data:
+            BaseUserSerializer().update(instance.profile.user, user_data)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserDataSerializer(read_only=True)
-
     class Meta:
         model = UserProfile
-        fields = ["user", "phone_number", "rol", "status"]
-
-
-class SellerSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer(read_only=True)
-
-    class Meta:
-        model = Seller
-        fields = "__all__"
-
-
-class PurchasingStaffSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer(read_only=True)
-
-    class Meta:
-        model = PurchasingStaff
-        fields = "__all__"
+        fields = ["rol", "status"]
+        read_only_fields = [
+            "rol",
+            "status",
+        ]
 
 
 class AdminSerializer(serializers.ModelSerializer):
+    user = BaseUserSerializer(source="profile.user")
     profile = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = Admin
-        fields = "__all__"
+        fields = ["id", "user", "profile"]
+
+    def create(self, validated_data):
+        user_data = validated_data.pop("profile")["user"]
+        user = BaseUserSerializer().create(user_data)
+        profile = UserProfile.objects.create(user=user, rol="ADMIN", status="ACTIVE")
+        return Admin.objects.create(profile=profile)
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.get("profile", {}).get("user", {})
+        if user_data:
+            BaseUserSerializer().update(instance.profile.user, user_data)
+        return instance
 
 
-class ClientSerializer(serializers.ModelSerializer):
+class SellerSerializer(serializers.ModelSerializer):
+    user = BaseUserSerializer(source="profile.user")
     profile = UserProfileSerializer(read_only=True)
 
     class Meta:
-        model = Client
-        fields = "__all__"
+        model = Seller
+        fields = ["id", "user", "profile", "workstation"]
+
+    def create(self, validated_data):
+        user_data = validated_data.pop("profile")["user"]
+        workstation = validated_data.get("workstation", "")
+        user = BaseUserSerializer().create(user_data)
+        profile = UserProfile.objects.create(user=user, rol="SELLER", status="ACTIVE")
+        return Seller.objects.create(profile=profile, workstation=workstation)
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.get("profile", {}).get("user", {})
+        if user_data:
+            BaseUserSerializer().update(instance.profile.user, user_data)
+        instance.workstation = validated_data.get("workstation", instance.workstation)
+        instance.save()
+        return instance
 
 
-class UserSerializer(serializers.ModelSerializer):
+class PurchasingStaffSerializer(serializers.ModelSerializer):
+    user = BaseUserSerializer(source="profile.user")
     profile = UserProfileSerializer(read_only=True)
 
     class Meta:
-        model = User
-        fields = [
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "password",
-            "profile",
-        ]
-        extra_kwargs = {"password": {"write_only": True}}
-
-
-# ===================================================================
-#  SERIALIZERS DE ESCRITURA
-# ===================================================================
-
-
-class BaseUserRoleSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-    first_name = serializers.CharField(required=False, allow_blank=True, default="")
-    last_name = serializers.CharField(required=False, allow_blank=True, default="")
-    email = serializers.EmailField(required=False, allow_blank=True, default="")
-    phone_number = PhoneNumberField()
-
-    def validate_username(self, value):
-        if User.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError("Este nombre de usuario ya está en uso.")
-        return value
-
-    def validate_email(self, value):
-        if value and User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("Este correo electrónico ya está en uso.")
-        return value
-
-    def create(
-        self, validated_data, role, role_model, role_specific_data, status="PENDING"
-    ):
-        """
-        Maneja la creación atómica de User, UserProfile y el modelo de rol.
-        """
-        with transaction.atomic():
-            user = User.objects.create_user(
-                username=validated_data["username"],
-                password=validated_data["password"],
-                first_name=validated_data.get("first_name", ""),
-                last_name=validated_data.get("last_name", ""),
-                email=validated_data.get("email", ""),
-            )
-            profile = UserProfile.objects.create(
-                user=user,
-                phone_number=validated_data["phone_number"],
-                rol=role,
-                status=status,
-            )
-            role_instance = role_model.objects.create(
-                profile=profile, **role_specific_data
-            )
-        return role_instance
-
-
-class SellerCreateSerializer(BaseUserRoleSerializer):
-    workstation = serializers.CharField()
+        model = PurchasingStaff
+        fields = ["id", "user", "profile"]
 
     def create(self, validated_data):
-        role_specific_data = {"workstation": validated_data.pop("workstation")}
-        return super().create(
-            validated_data, "SELLER", Seller, role_specific_data, status="ACTIVE"
+        user_data = validated_data.pop("profile")["user"]
+        user = BaseUserSerializer().create(user_data)
+        profile = UserProfile.objects.create(user=user, rol="STAFF", status="ACTIVE")
+        return PurchasingStaff.objects.create(profile=profile)
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.get("profile", {}).get("user", {})
+        if user_data:
+            BaseUserSerializer().update(instance.profile.user, user_data)
+        return instance
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    user = BaseUserSerializer(source="profile.user")
+    profile = UserProfileSerializer(read_only=True)
+    phone_number = PhoneNumberField(required=True)
+    customer_type = serializers.ChoiceField(
+        choices=[("A", "A"), ("B", "B"), ("C", "C")]
+    )
+
+    class Meta:
+        model = Customer
+        fields = ["id", "user", "profile", "customer_type", "phone_number"]
+
+    def validate(self, data):
+        if not data.get("phone_number"):
+            raise serializers.ValidationError(
+                "Los clientes deben tener número de teléfono."
+            )
+        if not data.get("customer_type"):
+            raise serializers.ValidationError("Se debe especificar el tipo de cliente.")
+        return data
+
+    def create(self, validated_data):
+        user_data = validated_data.pop("profile")["user"]
+        phone_number = validated_data.get("phone_number")
+        customer_type = validated_data.get("customer_type")
+
+        # Crear usuario
+        user = BaseUserSerializer().create(user_data)
+
+        # Crear perfil
+        profile = UserProfile.objects.create(
+            user=user, rol="CUSTOMER", status="PENDING"
         )
 
-
-class PurchasingStaffCreateSerializer(BaseUserRoleSerializer):
-    department = serializers.CharField()
-
-    def create(self, validated_data):
-        role_specific_data = {"department": validated_data.pop("department")}
-        return super().create(
-            validated_data,
-            "PURCHASING",
-            PurchasingStaff,
-            role_specific_data,
-            status="ACTIVE",
+        # Crear cliente
+        return Customer.objects.create(
+            profile=profile, phone_number=phone_number, customer_type=customer_type
         )
 
+    def update(self, instance, validated_data):
+        user_data = validated_data.get("profile", {}).get("user", {})
+        if user_data:
+            BaseUserSerializer().update(instance.profile.user, user_data)
 
-class AdminCreateSerializer(BaseUserRoleSerializer):
-    full_access = serializers.BooleanField(default=True)
-
-    def create(self, validated_data):
-        role_specific_data = {"full_access": validated_data.pop("full_access", True)}
-        return super().create(
-            validated_data, "ADMIN", Admin, role_specific_data, status="ACTIVE"
+        instance.phone_number = validated_data.get(
+            "phone_number", instance.phone_number
         )
-
-
-class ClientCreateSerializer(BaseUserRoleSerializer):
-    client_type = serializers.ChoiceField(choices=Client.STATUS_CHOICES)
-
-    def create(self, validated_data):
-        role_specific_data = {"client_type": validated_data.pop("client_type")}
-        return super().create(validated_data, "CLIENT", Client, role_specific_data)
+        instance.customer_type = validated_data.get(
+            "customer_type", instance.customer_type
+        )
+        instance.save()
+        return instance

@@ -1,112 +1,63 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
+ROLES = (
+    ("ADMIN", "Admin"),
+    ("SELLER", "Vendedor"),
+    ("CUSTOMER", "Cliente"),
+    ("STAFF", "Staff"),
+)
+
+STATUS = (
+    ("ACTIVE", "Activo"),
+    ("BANNED", "Baneado"),
+    ("REJECTED", "Rechazado"),
+    ("PENDING", "Pendiente"),
+)
+
+CUSTOMER_TYPE = (
+    ("A", "A"),
+    ("B", "B"),
+    ("C", "C"),
+)
 
 
 class UserProfile(models.Model):
-    """Perfil base para todos los usuarios"""
-
-    STATUS_CHOICES = [
-        ("PENDING", "Pendiente"),
-        ("ACTIVE", "Activo"),
-        ("BANNED", "Suspendido"),
-        ("REJECTED", "Rechazado"),
-    ]
-
-    ROL_CHOICES = [
-        ("SELLER", "Vendedor"),
-        ("PURCHASING", "Compras"),
-        ("CLIENT", "Cliente"),
-        ("ADMIN", "Administrador"),
-    ]
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    phone_number = PhoneNumberField(blank=True, null=True)
-    rol = models.CharField(max_length=20, choices=ROL_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    rol = models.CharField(max_length=20, choices=ROLES)
+    status = models.CharField(max_length=20, choices=STATUS)
 
     class Meta:
-        verbose_name = "Perfil de Usuario"
-        verbose_name_plural = "Perfiles de Usuario"
-
-    def __str__(self):
-        return f"{self.user.username} - {self.get_rol_display()}"
+        db_table = "profile_info"
 
 
 class Seller(models.Model):
-    profile = models.OneToOneField(
-        UserProfile,
-        on_delete=models.CASCADE,
-        related_name="seller_data",
-        null=True,
-        blank=True,
-    )
-    workstation = models.CharField(max_length=100, verbose_name="Estación de trabajo")
+    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    workstation = models.CharField(max_length=100)
 
     class Meta:
-        verbose_name = "Vendedor"
-        verbose_name_plural = "Vendedores"
-
-    def __str__(self):
-        return f"{self.profile.user.get_full_name()} - {self.workstation}"
+        db_table = "sellers"
 
 
 class PurchasingStaff(models.Model):
-    profile = models.OneToOneField(
-        UserProfile,
-        on_delete=models.CASCADE,
-        related_name="purchasing_data",
-        null=True,
-        blank=True,
-    )
-    department = models.CharField(max_length=100, verbose_name="Departamento")
+    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = "Personal de Compras"
-        verbose_name_plural = "Personal de Compras"
-
-    def __str__(self):
-        return f"{self.profile.user.get_full_name()} - {self.department}"
+        db_table = "purchasing_staff"
 
 
 class Admin(models.Model):
-    profile = models.OneToOneField(
-        UserProfile,
-        on_delete=models.CASCADE,
-        related_name="admin_data",
-        null=True,
-        blank=True,
-    )
-    full_access = models.BooleanField(default=True, verbose_name="Acceso completo")
+    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = "Administrador"
-        verbose_name_plural = "Administradores"
-
-    def __str__(self):
-        return f"{self.profile.user.get_full_name()} - Admin"
+        db_table = "admins"
 
 
-class Client(models.Model):
-    profile = models.OneToOneField(
-        UserProfile,
-        on_delete=models.CASCADE,
-        related_name="client_data",
-        null=True,
-        blank=True,
-    )
-    STATUS_CHOICES = [
-        ("A", "Tipo A"),
-        ("B", "Tipo B"),
-        ("C", "Tipo C"),
-    ]
-    client_type = models.CharField(max_length=20, choices=STATUS_CHOICES, default="A")
+class Customer(models.Model):
+    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPE, default="A")
+    phone_number = PhoneNumberField()
 
     class Meta:
-        verbose_name = "Cliente"
-        verbose_name_plural = "Clientes"
-
-    def __str__(self):
-        return f"{self.profile.user.get_full_name()} - {self.client_type}"
+        db_table = "customers"
