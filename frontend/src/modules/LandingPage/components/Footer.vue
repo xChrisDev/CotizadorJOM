@@ -12,6 +12,7 @@ import {
   MapPin,
   ArrowRight
 } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
 
 const quickLinks = [
   { name: "Inicio", href: "#" },
@@ -21,17 +22,14 @@ const quickLinks = [
 ];
 
 const legal = [
-  { name: "Términos y Condiciones", href: "#" },
-  { name: "Política de Privacidad", href: "#" },
-  { name: "Aviso Legal", href: "#" }
+  { name: "Términos y Condiciones", href: "/terminos-condiciones" },
+  { name: "Política de Privacidad", href: "/politica" },
 ];
 
 const socialLinks = [
   { name: "Facebook", icon: Facebook, href: "https://www.facebook.com/p/JOM-61555701680633/", color: "hover:text-blue-600" },
-  { name: "Twitter", icon: Twitter, href: "#", color: "hover:text-blue-400" },
   { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/jom__refaccionaria/", color: "hover:text-pink-600" },
   { name: "LinkedIn", icon: Linkedin, href: "#", color: "hover:text-blue-700" },
-  { name: "YouTube", icon: Youtube, href: "#", color: "hover:text-red-600" }
 ];
 
 const currentYear = new Date().getFullYear();
@@ -100,10 +98,10 @@ const currentYear = new Date().getFullYear();
             <h3 class="text-lg font-semibold text-foreground">Legal</h3>
             <ul class="space-y-3 mt-4">
               <li v-for="item in legal" :key="item.name">
-                <a :href="item.href"
+                <RouterLink :to="item.href"
                   class="text-base text-muted-foreground hover:text-[#4ed636] transition-colors duration-200">
                   {{ item.name }}
-                </a>
+                </RouterLink>
               </li>
             </ul>
           </div>

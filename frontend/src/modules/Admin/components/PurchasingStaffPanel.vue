@@ -43,7 +43,7 @@ const search = ref("");
 const ordering = ref("profile__user__username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 1;
+const itemsPerPage = 5;
 
 const loadPurchasingStaff = async () => {
     isLoading.value = true;
@@ -139,8 +139,6 @@ const getStatusVariant = (status) => {
                             <TableHead>Usuario</TableHead>
                             <TableHead>Nombre completo</TableHead>
                             <TableHead>Correo</TableHead>
-                            <TableHead>Número telefónico</TableHead>
-                            <TableHead>Departamento</TableHead>
                             <TableHead class="text-center">Status</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
@@ -148,21 +146,16 @@ const getStatusVariant = (status) => {
                     <TableBody>
                         <TableRow v-for="staff in purchasingStaff" :key="staff.id">
                             <TableCell class="font-medium">
-                                {{ staff.profile.user.username }}
+                                {{ staff.user.username }}
                             </TableCell>
                             <TableCell>
-                                {{ staff.profile.user.first_name }} {{ staff.profile.user.last_name }}
+                                {{ staff.user.first_name }} {{ staff.user.last_name }}
                             </TableCell>
-                            <TableCell>{{ staff.profile.user.email }}</TableCell>
-                            <TableCell>{{ staff.profile.phone_number }}</TableCell>
-
-                            <TableCell>
-                                <Badge variant="outline">{{ staff.department }}</Badge>
-                            </TableCell>
+                            <TableCell>{{ staff.user.email }}</TableCell>
 
                             <TableCell class="text-center">
-                                <Badge :variant="getStatusVariant(staff.profile.status)">
-                                    {{ staff.profile.status }}
+                                <Badge :variant="getStatusVariant(staff.status)">
+                                    {{ staff.status }}
                                 </Badge>
                             </TableCell>
 
@@ -199,20 +192,19 @@ const getStatusVariant = (status) => {
                 </div>
 
             </CardContent>
-            <CardFooter class="flex justify-center">
-                <div v-if="totalItems > itemsPerPage" class="pt-6 flex justify-center">
-                     <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems" show-edges>
+            <CardFooter v-if="totalItems > itemsPerPage" class="flex justify-center">
+                <div class="pt-6 flex justify-center">
+                    <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems">
                         <PaginationContent v-slot="{ items }">
                             <PaginationPrevious />
                             <template v-for="(item, index) in items" :key="index">
-                                <PaginationItem v-if="item.type === 'page'" :value="item.value" as-child>
-                                     <Button class="w-10 h-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                                        {{ item.value }}
-                                    </Button>
+                                <PaginationItem v-if="item.type === 'page'" :value="item.value"
+                                    :is-active="item.value === page">
+                                    {{ item.value }}
                                 </PaginationItem>
-                                 <PaginationEllipsis v-else :key="item.type" :index="index" />
                             </template>
-                            <PaginationNext/>
+                            <PaginationEllipsis :index="4" />
+                            <PaginationNext />
                         </PaginationContent>
                     </Pagination>
                 </div>

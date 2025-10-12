@@ -1,6 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router";
 
 import LandingView from "@/modules/LandingPage/views/LandingView.vue";
+import TermsConditionsView from "@/modules/LandingPage/views/TermsConditionsView.vue";
+import PrivatePolicyView from "@/modules/LandingPage/views/PrivatePolicyView.vue";
 import ProductSearchView from "@/modules/ProductSearch/views/ProductSearchView.vue";
 import LoginView from "@/modules/Auth/views/LoginView.vue";
 import RegisterView from "@/modules/Auth/views/RegisterView.vue";
@@ -15,6 +17,16 @@ const routes = [
   {
     path: "/",
     component: LandingView,
+    meta: { transition: "fade-zoom" },
+  },
+  {
+    path: "/politica",
+    component: PrivatePolicyView,
+    meta: { transition: "fade-zoom" },
+  },
+  {
+    path: "/terminos-condiciones",
+    component: TermsConditionsView,
     meta: { transition: "fade-zoom" },
   },
   {

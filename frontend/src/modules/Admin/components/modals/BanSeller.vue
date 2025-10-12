@@ -2,6 +2,7 @@
 import { Button } from "@/shared/components/ui/button"
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -9,8 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/shared/components/ui/dialog"
-import { Label } from "@/shared/components/ui/label"
-import { Input } from "@/shared/components/ui/input"
 import { Ban } from "lucide-vue-next"
 </script>
 
@@ -23,28 +22,19 @@ import { Ban } from "lucide-vue-next"
         </DialogTrigger>
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Edit profile</DialogTitle>
+                <DialogTitle>¿Estás seguro?</DialogTitle>
                 <DialogDescription>
-                    Make changes to your profile here. Click save when you're done.
+                    Suspenderas este usuario permanentemente.
                 </DialogDescription>
             </DialogHeader>
-            <div class="grid gap-4 py-4">
-                <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="name" class="text-right">
-                        Name
-                    </Label>
-                    <Input id="name" value="Pedro Duarte" class="col-span-3" />
-                </div>
-                <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="username" class="text-right">
-                        Username
-                    </Label>
-                    <Input id="username" value="@peduarte" class="col-span-3" />
-                </div>
-            </div>
-            <DialogFooter>
-                <Button type="submit">
-                    Save changes
+            <DialogFooter class="sm:justify-end gap-2 pt-4">
+                <DialogClose as-child>
+                    <Button type="button" variant="outline">
+                        Cancelar
+                    </Button>
+                </DialogClose>
+                <Button type="button" class="bg-gradient-to-r from-[#EF4444] to-[#DC2626]">
+                    Confirmar
                 </Button>
             </DialogFooter>
         </DialogContent>

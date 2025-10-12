@@ -57,7 +57,7 @@ const contactInfo = [
   {
     icon: Clock,
     title: "Horarios",
-    content: "Lunes a Viernes:\n 9:00 - 19:00\nSábados:\n 9:00 - 15:00",
+    content: "Lunes a Viernes:\n 9:00 - 19:00\nSábados:\n 9:00 - 16:00",
     action: "Ver disponibilidad"
   }
 ];

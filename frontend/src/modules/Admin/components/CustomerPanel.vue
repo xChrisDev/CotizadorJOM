@@ -120,7 +120,7 @@ watch([search, ordering, page], loadCustomers);
         </div>
 
         <Card>
-            <CardContent class="min-h-[350px]">
+            <CardContent>
                 <div v-if="isLoading" class="flex justify-center items-center py-25">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
@@ -155,8 +155,8 @@ watch([search, ordering, page], loadCustomers);
 
                             <TableCell class="text-center">
                                 <div
-                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(customer.profile.status)]">
-                                    {{ getStatusText(customer.profile.status) }}
+                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(customer.status)]">
+                                    {{ getStatusText(customer.status) }}
                                 </div>
                             </TableCell>
 

@@ -46,7 +46,7 @@ const search = ref("");
 const ordering = ref("profile__user__username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 3;
+const itemsPerPage = 5;
 
 const loadSellers = async () => {
     isLoading.value = true;
@@ -163,8 +163,8 @@ const getStatusVariant = (status) => {
 
                             <TableCell class="text-center">
                                 <div
-                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(seller.profile.status)]">
-                                    {{ getStatusText(seller.profile.status) }}
+                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(seller.status)]">
+                                    {{ getStatusText(seller.status) }}
                                 </div>
                             </TableCell>
 
