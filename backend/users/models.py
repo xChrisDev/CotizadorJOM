@@ -1,63 +1,44 @@
-from django.contrib.auth.models import User
+import secrets
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-
-ROLES = (
-    ("ADMIN", "Admin"),
-    ("SELLER", "Vendedor"),
-    ("CUSTOMER", "Cliente"),
-    ("STAFF", "Staff"),
-)
-
-STATUS = (
-    ("ACTIVE", "Activo"),
-    ("BANNED", "Baneado"),
-    ("REJECTED", "Rechazado"),
-    ("PENDING", "Pendiente"),
-)
-
-CUSTOMER_TYPE = (
-    ("A", "A"),
-    ("B", "B"),
-    ("C", "C"),
-)
+from .enums import ROLE_CHOICES, STATUS_CHOICES
+from django.utils import timezone
+from datetime import timedelta
 
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    rol = models.CharField(max_length=20, choices=ROLES)
-    status = models.CharField(max_length=20, choices=STATUS)
+class User(models.Model):
+    username = models.CharField(max_length=128, unique=True)
+    password = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.EmailField(null=True, blank=True, unique=True)
+    phone_number = PhoneNumberField(null=True, blank=True, unique=True)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
 
     class Meta:
-        db_table = "profile_info"
+        db_table = "users"
 
 
-class Seller(models.Model):
-    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    workstation = models.CharField(max_length=100)
-
-    class Meta:
-        db_table = "sellers"
+def get_expiration_time():
+    return timezone.now() + timedelta(days=7)
 
 
-class PurchasingStaff(models.Model):
-    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = "purchasing_staff"
-
-
-class Admin(models.Model):
-    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+class Token(models.Model):
+    key = models.CharField(max_length=40, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tokens')
+    created = models.DateTimeField(auto_now_add=True)
+    expires = models.DateTimeField(default=get_expiration_time)
 
     class Meta:
-        db_table = "admins"
+        db_table = "tokens"
 
+    @staticmethod
+    def generate_token(user):
+        Token.objects.filter(user=user, expires__lt=timezone.now()).delete()
+        
+        token = secrets.token_hex(20)
+        return Token.objects.create(user=user, key=token)
 
-class Customer(models.Model):
-    profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPE, default="A")
-    phone_number = PhoneNumberField()
-
-    class Meta:
-        db_table = "customers"
+    def is_expired(self):
+        return self.expires < timezone.now()

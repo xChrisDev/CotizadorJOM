@@ -23,9 +23,9 @@ import {
 import Button from '@/shared/components/ui/button/Button.vue';
 import Badge from '@/shared/components/ui/badge/Badge.vue';
 import Separator from '@/shared/components/ui/separator/Separator.vue';
-import { Ban, PencilLine, MoreVertical, Info, Search } from 'lucide-vue-next';
+import { Ban, PencilLine, MoreVertical, Info, Search, ListCollapse } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-import { fetchPurchasingStaff } from '../services/purchasingStaffService.js';
+import { fetchUsers } from '../services/userService.js';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import {
     Pagination,
@@ -36,19 +36,22 @@ import {
     PaginationEllipsis
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
+import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
+import EditUser from './modals/EditUser.vue';
+import BanUser from './modals/BanUser.vue';
 
 const purchasingStaff = ref([]);
 const isLoading = ref(true);
 const search = ref("");
-const ordering = ref("profile__user__username");
+const ordering = ref("username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 5;
+const itemsPerPage = 8;
 
 const loadPurchasingStaff = async () => {
     isLoading.value = true;
     try {
-        const data = await fetchPurchasingStaff({
+        const data = await fetchUsers('STAFF', {
             search: search.value,
             ordering: ordering.value,
             page: page.value,
@@ -66,16 +69,6 @@ const loadPurchasingStaff = async () => {
 
 onMounted(loadPurchasingStaff);
 watch([search, ordering, page], loadPurchasingStaff);
-
-const getStatusVariant = (status) => {
-    if (!status) return 'default';
-    const s = status.toLowerCase();
-    if (s === 'active') return 'success';
-    if (s === 'banned') return 'secondary';
-    if (s === 'rejected') return 'destructive';
-    if (s === 'pending') return 'default';
-    return 'default';
-};
 
 </script>
 
@@ -96,30 +89,27 @@ const getStatusVariant = (status) => {
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
             <div class="relative w-full max-w-md items-center">
-                <Input v-model="search" type="text" placeholder="Buscar por nombre, departamento..." autocomplete="off"
+                <Input v-model="search" type="text" placeholder="Buscar por nombre..." autocomplete="off"
                     class="pl-10" />
                 <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
                     <Search class="size-5 text-muted-foreground" />
                 </span>
             </div>
 
-            <Select v-model="ordering">
+            <Select v-model="ordering" class="relative w-full max-w-md items-center">
                 <SelectTrigger>
                     <SelectValue placeholder="Ordenar por..." />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Filtros</SelectLabel>
-                        <SelectItem value="profile__user__username">
+                        <SelectItem value="username">
                             Ordenar por usuario
                         </SelectItem>
-                        <SelectItem value="profile__user__first_name">
+                        <SelectItem value="first_name">
                             Ordenar por nombre
                         </SelectItem>
-                        <SelectItem value="department">
-                            Ordenar por departamento
-                        </SelectItem>
-                        <SelectItem value="profile__status">
+                        <SelectItem value="status">
                             Ordenar por status
                         </SelectItem>
                     </SelectGroup>
@@ -128,7 +118,11 @@ const getStatusVariant = (status) => {
         </div>
 
         <Card>
-            <CardContent class="min-h-[250px]">
+            <CardContent class="h-auto lg:min-h-[630px]">
+                <div class="flex items-center gap-2 ps-2 pb-2">
+                    <ListCollapse class="size-5" />
+                    Mostrando <span class="font-bold">{{ totalItems }}</span> registros
+                </div>
                 <div v-if="isLoading" class="flex justify-center items-center py-20">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
@@ -138,7 +132,6 @@ const getStatusVariant = (status) => {
                         <TableRow>
                             <TableHead>Usuario</TableHead>
                             <TableHead>Nombre completo</TableHead>
-                            <TableHead>Correo</TableHead>
                             <TableHead class="text-center">Status</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
@@ -146,42 +139,21 @@ const getStatusVariant = (status) => {
                     <TableBody>
                         <TableRow v-for="staff in purchasingStaff" :key="staff.id">
                             <TableCell class="font-medium">
-                                {{ staff.user.username }}
+                                {{ staff.username }}
                             </TableCell>
                             <TableCell>
-                                {{ staff.user.first_name }} {{ staff.user.last_name }}
+                                {{ staff.first_name }} {{ staff.last_name }}
                             </TableCell>
-                            <TableCell>{{ staff.user.email }}</TableCell>
-
                             <TableCell class="text-center">
-                                <Badge :variant="getStatusVariant(staff.status)">
-                                    {{ staff.status }}
-                                </Badge>
+                                <div
+                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(staff.status)]">
+                                    {{ getStatusText(staff.status) }}
+                                </div>
                             </TableCell>
 
                             <TableCell class="flex gap-2 justify-center">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger as-child>
-                                        <Button variant="outline" size="icon">
-                                            <MoreVertical class="size-5" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem class="cursor-pointer">
-                                            <PencilLine class="mr-2 size-4" />
-                                            <span>Editar</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem class="cursor-pointer">
-                                            <Info class="mr-2 size-4" />
-                                            <span>Ver Detalles</span>
-                                        </DropdownMenuItem>
-                                        <Separator />
-                                        <DropdownMenuItem class="text-red-600 cursor-pointer">
-                                            <Ban class="mr-2 size-4 text-red-600" />
-                                            <span>Bloquear</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <EditUser :id="staff.id" @update="loadPurchasingStaff" />
+                                <BanUser />
                             </TableCell>
                         </TableRow>
                     </TableBody>

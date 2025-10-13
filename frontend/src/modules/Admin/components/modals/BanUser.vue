@@ -16,7 +16,7 @@ import { Ban } from "lucide-vue-next"
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button class="bg-gradient-to-r from-[#EF4444] to-[#DC2626]" size="icon">
+            <Button class="bg-red-300" size="icon">
                 <Ban class="size-5" />
             </Button>
         </DialogTrigger>

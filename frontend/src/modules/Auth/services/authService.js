@@ -2,7 +2,7 @@ import apiClient from "@/shared/services/baseURL";
 
 export const loginUser = async (userData) => {
   try {
-    const response = await apiClient.post("/login/", userData);
+    const response = await apiClient.post("/users/login/", userData);
 
     return { success: true, data: response.data };
   } catch (error) {
@@ -16,7 +16,7 @@ export const loginUser = async (userData) => {
 
 export const registerUser = async (userData) => {
   try {
-    const response = await apiClient.post("/clients/", userData);
+    const response = await apiClient.post("/users/register/", userData);
     return { success: true, data: response.data };
   } catch (error) {
     if (error.response && error.response.data) {
@@ -28,6 +28,6 @@ export const registerUser = async (userData) => {
 };
 
 export const getProfileUser = async () => {
-  const response = await apiClient.post("/me/", {});
+  const response = await apiClient.post("/users/me/", {});
   return response.data;
 };

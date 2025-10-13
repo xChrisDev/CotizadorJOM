@@ -1,234 +1,144 @@
-from rest_framework.decorators import (
-    api_view,
-    permission_classes,
-    authentication_classes,
-)
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import TokenAuthentication
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework import status, viewsets, filters
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.hashers import check_password
+from .models import User, Token
+from .serializers import UserSerializer
+from .permissions import IsAuth
 from django_filters.rest_framework import DjangoFilterBackend
-
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-
-from .models import Admin, Seller, PurchasingStaff, Customer, UserProfile
-from .serializers import (
-    AdminSerializer,
-    SellerSerializer,
-    PurchasingStaffSerializer,
-    CustomerSerializer,
-)
-from .permissions import IsAdminOrOwner
+from rest_framework import filters
+from .filters import UserFilter
+from .pagination import PageNumberPagination
 
 
-class UserPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 50
-
-
-class AdminViewSet(viewsets.ModelViewSet):
-    queryset = Admin.objects.all()
-    serializer_class = AdminSerializer
-    permission_classes = [IsAdminOrOwner]
-
-    pagination_class = UserPagination
-
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuth]
     filter_backends = [
         DjangoFilterBackend,
-        filters.SearchFilter,
         filters.OrderingFilter,
-    ]
-
-    search_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__user__email",
-    ]
-
-    filterset_fields = ["profile__status"]
-
-    ordering_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__status",
-    ]
-    ordering = ["profile__user__username"]
-
-
-class SellerViewSet(viewsets.ModelViewSet):
-    queryset = Seller.objects.all()
-    serializer_class = SellerSerializer
-    permission_classes = [IsAdminOrOwner]
-
-    pagination_class = UserPagination
-
-    filter_backends = [
-        DjangoFilterBackend,
         filters.SearchFilter,
-        filters.OrderingFilter,
     ]
+    filterset_class = UserFilter
+    search_fields = ["username", "first_name", "last_name"]
+    ordering_fields = ["username", "first_name", "last_name", "status"]
+    pagination_class = PageNumberPagination
 
-    search_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__user__email",
-        "workstation",
-    ]
+    def get_permissions(self):
+        if self.action == "create":
+            return [AllowAny()]
+        return super().get_permissions()
 
-    filterset_fields = ["profile__status"]
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def login(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
 
-    ordering_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "workstation",
-        "profile__status",
-    ]
-    ordering = ["profile__user__username"]
-
-
-class StaffViewSet(viewsets.ModelViewSet):
-    queryset = PurchasingStaff.objects.all()
-    serializer_class = PurchasingStaffSerializer
-    permission_classes = [IsAdminOrOwner]
-
-    pagination_class = UserPagination
-
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
-
-    search_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__user__email",
-    ]
-
-    filterset_fields = ["profile__status"]
-
-    ordering_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__status",
-    ]
-    ordering = ["profile__user__username"]
-
-
-class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = [IsAdminOrOwner]
-
-    pagination_class = UserPagination
-
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
-
-    search_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__user__email",
-        "phone_number",
-        "profile__status",
-    ]
-
-    filterset_fields = ["profile__status"]
-
-    ordering_fields = [
-        "profile__user__username",
-        "profile__user__first_name",
-        "profile__user__last_name",
-        "profile__status",
-    ]
-    ordering = ["profile__user__username"]
-
-
-
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
-
-    user = get_object_or_404(User, username=username)
-
-    if not user.check_password(password):
-        return Response(
-            {"error": "Contraseña no válida"}, status=status.HTTP_400_BAD_REQUEST
-        )
-
-    try:
-        profile = user.profile
-        if profile.status == "PENDING":
+        if not username or not password:
             return Response(
-                {"error": "Aún no se ha aceptado tu solicitud."},
-                status=status.HTTP_403_FORBIDDEN,
+                {"error": "Username y contraseña son requeridos."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        if profile.status == "BANNED":
-            return Response(
-                {"error": "Tu cuenta ha sido suspendida."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        if profile.status == "REJECTED":
-            return Response(
-                {"error": "Tu solicitud ha sido rechazada."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-    except UserProfile.DoesNotExist:
-        return Response(
-            {"error": "El perfil de este usuario no existe."},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
 
-    token, created = Token.objects.get_or_create(user=user)
-
-    data = {"username": user.username, "rol": profile.rol}
-
-    return Response({"token": token.key, "user": data}, status=status.HTTP_200_OK)
-
-
-@api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def me(request):
-    user = request.user
-    try:
-        profile = user.profile
-    except UserProfile.DoesNotExist:
-        return Response({"error": "Perfil de usuario no encontrado."},
-                        status=status.HTTP_404_NOT_FOUND)
-
-    # Número telefónico solo si es cliente
-    phone_number = None
-    if profile.rol == "CUSTOMER":
         try:
-            customer = user.customer
-            phone_number = str(customer.phone_number)
-        except Customer.DoesNotExist:
-            phone_number = None
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND
+            )
 
-    data = {
-        "username": user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "rol": profile.get_rol_display(),
-        "status": profile.get_status_display(),
-        "phone_number": phone_number
-    }
-    return Response({"user": data}, status=status.HTTP_200_OK)
+        if user.status == "BANNED":
+            return Response(
+                {"error": "Usuario suspendido."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        if user.status == "REJECTED":
+            return Response(
+                {"error": "Usuario rechazado."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        if not check_password(password, user.password):
+            return Response(
+                {"error": "Contraseña incorrecta."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        token = Token.generate_token(user)
+
+        return Response(
+            {
+                "token": token.key,
+                "user": UserSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"])
+    def logout(self, request):
+        if hasattr(request, "auth") and request.auth:
+            request.auth.delete()
+            return Response(
+                {"message": "Sesión cerrada correctamente."}, status=status.HTTP_200_OK
+            )
+        return Response(
+            {"error": "No hay token activo o sesión iniciada."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @action(detail=False, methods=["get"])
+    def me(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def register(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            if "role" not in request.data:
+                serializer.validated_data["role"] = "CUSTOMER"
+            if "status" not in request.data:
+                serializer.validated_data["status"] = "PENDING"
+
+            user = serializer.save()
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["get"], url_path="get_by_role/(?P<role>[^/.]+)")
+    def get_by_role(self, request, role=None):
+        users = self.queryset.filter(role=role.upper())
+        filtered_users = UserFilter(request.GET, queryset=users).qs
+
+        if not filtered_users.exists():
+            return Response(
+                {"error": f"No se encontraron usuarios con el rol '{role}'."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        page = self.paginate_queryset(filtered_users)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="pending")
+    def get_pending_users(self, request):
+        users = self.queryset.filter(role="CUSTOMER", status="PENDING")
+
+        filtered_users = UserFilter(request.GET, queryset=users).qs
+
+        if not filtered_users.exists():
+            return Response(
+                {"error": "No hay usuarios pendientes de aceptación."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        page = self.paginate_queryset(filtered_users)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

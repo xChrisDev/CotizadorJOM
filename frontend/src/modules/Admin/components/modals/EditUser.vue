@@ -14,7 +14,7 @@ import {
 import { Label } from "@/shared/components/ui/label"
 import { Input } from "@/shared/components/ui/input"
 import { CircleCheckBig, PencilLine } from "lucide-vue-next"
-import { fetchSellerByID, putSeller } from "../../services/sellerService.js"
+
 import { useToast } from "vue-toastification"
 const toast = useToast()
 
@@ -59,8 +59,8 @@ watch(seller, (newSeller) => {
 })
 
 const fetchSeller = async () => {
-    const values = await fetchSellerByID(props.id)
-    seller.value = values
+    // const values = await fetchSellerByID(props.id)
+    // seller.value = values
 }
 
 const submitForm = async () => {
@@ -85,7 +85,7 @@ const submitForm = async () => {
             },
             workstation: form.workstation
         }
-        const response = await putSeller(props.id, data)
+        // const response = await putSeller(props.id, data)
         toast.success("Vendedor actualizado.", {
             position: "top-center",
             icon: CircleCheckBig,
@@ -106,7 +106,7 @@ const submitForm = async () => {
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button @click="fetchSeller" class="bg-gradient-to-r from-[#FBBF24] to-[#F59E0B]" size="icon">
+            <Button @click="fetchSeller" class="bg-yellow-500 hover:bg-orange-400" size="icon">
                 <PencilLine class="size-5" />
             </Button>
         </DialogTrigger>

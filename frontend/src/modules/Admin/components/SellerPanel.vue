@@ -23,9 +23,9 @@ import {
 import Button from '@/shared/components/ui/button/Button.vue';
 import Badge from '@/shared/components/ui/badge/Badge.vue';
 import Separator from '@/shared/components/ui/separator/Separator.vue';
-import { MoreVertical, Info, Search, UserRoundPlus } from 'lucide-vue-next';
+import { MoreVertical, Info, Search, UserRoundPlus, ListCollapse } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-import { fetchSellers } from '../services/sellerService.js';
+import { fetchUsers } from '../services/userService.js';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import {
     Pagination,
@@ -37,21 +37,21 @@ import {
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
 import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
-import EditSeller from './modals/EditSeller.vue';
-import BanSeller from './modals/BanSeller.vue';
+import EditUser from './modals/EditUser.vue';
+import BanUser from './modals/BanUser.vue';
 
 const sellers = ref([]);
 const isLoading = ref(true);
 const search = ref("");
-const ordering = ref("profile__user__username");
+const ordering = ref("username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
 const loadSellers = async () => {
     isLoading.value = true;
     try {
-        const data = await fetchSellers({
+        const data = await fetchUsers('SELLER', {
             search: search.value,
             ordering: ordering.value,
             page: page.value,
@@ -67,17 +67,13 @@ const loadSellers = async () => {
 };
 
 onMounted(loadSellers);
-watch([search, ordering, page], loadSellers);
-
-const getStatusVariant = (status) => {
-    if (!status) return 'default';
-    const s = status.toLowerCase();
-    if (s === 'active') return 'success';
-    if (s === 'banned') return 'secondary';
-    if (s === 'rejected') return 'destructive';
-    if (s === 'pending') return 'default';
-    return 'default';
-};
+let timeout;
+watch([search, ordering, page], () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        loadSellers();
+    }, 300);
+});
 
 </script>
 
@@ -93,13 +89,13 @@ const getStatusVariant = (status) => {
 
             <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
                 <UserRoundPlus />
-                <span class="hidden lg:block">Registrar vendedor</span>
+                <span class="hidden lg:block">Nuevo</span>
             </Button>
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
             <div class="relative w-full max-w-md items-center">
-                <Input v-model="search" type="text" placeholder="Buscar por nombre, puesto..." autocomplete="off"
+                <Input v-model="search" type="text" placeholder="Buscar por nombre..." autocomplete="off"
                     class="pl-10" />
                 <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
                     <Search class="size-5 text-muted-foreground" />
@@ -113,16 +109,13 @@ const getStatusVariant = (status) => {
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Filtros</SelectLabel>
-                        <SelectItem value="profile__user__username">
+                        <SelectItem value="username">
                             Ordenar por usuario
                         </SelectItem>
-                        <SelectItem value="profile__user__first_name">
+                        <SelectItem value="first_name">
                             Ordenar por nombre
                         </SelectItem>
-                        <SelectItem value="workstation">
-                            Ordenar por puesto
-                        </SelectItem>
-                        <SelectItem value="profile__status">
+                        <SelectItem value="status">
                             Ordenar por status
                         </SelectItem>
                     </SelectGroup>
@@ -131,7 +124,11 @@ const getStatusVariant = (status) => {
         </div>
 
         <Card>
-            <CardContent class="min-h-[350px]">
+            <CardContent class="h-auto lg:min-h-[630px]">
+                <div class="flex items-center gap-2 ps-2 pb-2">
+                    <ListCollapse class="size-5" />
+                    Mostrando <span class="font-bold">{{ totalItems }}</span> registros
+                </div>
                 <div v-if="isLoading" class="flex justify-center items-center py-20">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
@@ -141,8 +138,6 @@ const getStatusVariant = (status) => {
                         <TableRow>
                             <TableHead>Usuario</TableHead>
                             <TableHead>Nombre completo</TableHead>
-                            <TableHead>Correo</TableHead>
-                            <TableHead>Puesto</TableHead>
                             <TableHead class="text-center">Status</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
@@ -150,15 +145,10 @@ const getStatusVariant = (status) => {
                     <TableBody>
                         <TableRow v-for="seller in sellers" :key="seller.id">
                             <TableCell class="font-medium">
-                                {{ seller.user.username }}
+                                {{ seller.username }}
                             </TableCell>
                             <TableCell>
-                                {{ seller.user.first_name }} {{ seller.user.last_name }}
-                            </TableCell>
-                            <TableCell>{{ seller.user.email }}</TableCell>
-
-                            <TableCell>
-                                <Badge variant="outline">{{ seller.workstation }}</Badge>
+                                {{ seller.first_name }} {{ seller.last_name }}
                             </TableCell>
 
                             <TableCell class="text-center">
@@ -169,8 +159,8 @@ const getStatusVariant = (status) => {
                             </TableCell>
 
                             <TableCell class="flex gap-2 justify-center">
-                                <EditSeller :id="seller.id" @update="loadSellers" />
-                                <BanSeller />
+                                <EditUser :id="seller.id" @update="loadSellers" />
+                                <BanUser />
                             </TableCell>
                         </TableRow>
                     </TableBody>

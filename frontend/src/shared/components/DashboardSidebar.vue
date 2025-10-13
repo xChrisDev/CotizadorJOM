@@ -16,70 +16,40 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from '@/shared/components/ui/sidebar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shared/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { Separator } from '@/shared/components/ui/separator'
 import { Button } from '@/shared/components/ui/button'
 import ThemeButton from '@/shared/components/ThemeButton.vue'
-
-import {
-  ChevronsUpDown,
-  LogOut,
-  User,
-  Settings as SettingsIcon,
-  Bell
-} from 'lucide-vue-next'
+import { ChevronsUpDown, LogOut, User } from 'lucide-vue-next'
 import { useAuthStore } from '@/shared/stores/auth.js'
 
 const props = defineProps({
-  menuItems: {
-    type: Array,
-    required: true
-  },
-  userRole: {
-    type: String,
-    required: true
-  },
-  userName: {
-    type: String,
-    default: 'Usuario'
-  },
-  userEmail: {
-    type: String,
-    default: 'usuario@jom.com'
-  }
+  menuItems: { type: Array, required: true },
+  userRole: { type: String, required: true },
+  userName: { type: String, default: 'Usuario' },
+  userEmail: { type: String, default: 'usuario@jom.com' }
 })
 
 const router = useRouter()
 const authStore = useAuthStore()
 const emit = defineEmits(["update:view"])
 
+const activeOption = ref(localStorage.getItem('sidebarActive') || '')
+
 const handleClick = (option) => {
-  emit("update:view", option);
+  activeOption.value = option
+  localStorage.setItem('sidebarActive', option)
+  emit("update:view", option)
 }
 
 const getUserRoleLabel = () => {
-  const roles = {
-    'ADMIN': 'Administrador',
-    'SELLER': 'Vendedor',
-    'SHOPPER': 'Compras'
-  }
+  const roles = { 'ADMIN': 'Administrador', 'SELLER': 'Vendedor', 'STAFF': 'Compras' }
   return roles[props.userRole] || 'Usuario'
 }
 
 const getUserInitials = () => {
-  return props.userName
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+  return props.userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 }
 
 const handleLogout = () => {
@@ -93,12 +63,11 @@ const handleLogout = () => {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div class="flex gap-2 py-2">
-          <div
-            class="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
-            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-4 w-6" />
+          <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
+            <img src="@/shared/assets/JOM.png" alt="JOM" class="h-4" />
           </div>
           <div class="grid flex-1 text-left text-sm leading-tight">
-            <span class="truncate font-semibold">JOM Refacciones</span>
+            <span class="truncate font-semibold">JOM</span>
             <span class="truncate text-xs text-muted-foreground">{{ getUserRoleLabel() }}</span>
           </div>
         </div>
@@ -111,7 +80,12 @@ const handleLogout = () => {
             <SidebarMenu>
               <SidebarMenuItem v-for="item in menuItems" :key="item.title">
                 <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <Button @click="handleClick(item.option)" variant="ghost" class="flex justify-start" >
+                  <Button
+                    @click="handleClick(item.option)"
+                    variant="ghost"
+                    class="flex justify-start gap-2"
+                    :class="{'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option}"
+                  >
                     <component :is="item.icon" class="w-4 h-4" />
                     <span>{{ item.title }}</span>
                   </Button>
@@ -127,8 +101,7 @@ const handleLogout = () => {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
-                <SidebarMenuButton size="lg"
-                  class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                   <Avatar class="h-8 w-8 rounded-lg">
                     <AvatarFallback class="rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
                       {{ getUserInitials() }}
@@ -141,16 +114,13 @@ const handleLogout = () => {
                   <ChevronsUpDown class="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom"
-                align="end" :side-offset="4">
+              <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom" align="end" :side-offset="4">
                 <DropdownMenuItem @click="router.push('/perfil')" class="cursor-pointer">
-                  <User class="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
+                  <User class="mr-2 h-4 w-4" /> Perfil
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem @click="handleLogout" class="text-red-400 cursor-pointer">
-                  <LogOut class="mr-2 h-4 w-4 " />
-                  <span>Cerrar Sesión</span>
+                  <LogOut class="mr-2 h-4 w-4" /> Cerrar Sesión
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -164,9 +134,7 @@ const handleLogout = () => {
         <SidebarTrigger class="-ml-1" />
         <Separator orientation="vertical" class="mr-2 h-4" />
         <div class="flex items-center gap-2 flex-1">
-          <slot name="header">
-            <h1 class="text-lg font-semibold">Dashboard</h1>
-          </slot>
+
         </div>
         <div class="flex items-center gap-2">
           <ThemeButton />

@@ -1,16 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AdminViewSet, SellerViewSet, StaffViewSet, CustomerViewSet
-from . import views
+from .views import UserViewSet
 
 router = DefaultRouter()
-router.register(r'admins', AdminViewSet)
-router.register(r'sellers', SellerViewSet)
-router.register(r'staff', StaffViewSet)
-router.register(r'customers', CustomerViewSet)
+router.register(r"users", UserViewSet, basename="user")
 
 urlpatterns = [
-    path("login/", views.login, name="login"),
-    path("me/", views.me, name="profile"),
-    path("", include(router.urls)),
+    path("api/", include(router.urls)),
 ]

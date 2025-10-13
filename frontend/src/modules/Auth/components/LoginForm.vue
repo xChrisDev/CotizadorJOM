@@ -54,10 +54,10 @@ const onSubmit = handleSubmit(async (values) => {
       icon: CircleCheckBig,
     });
     resetForm();
-    authStore.login(response.data.token, response.data.user.rol);
+    authStore.login(response.data.token, response.data.user.role);
     // userStore.fetchUser();
 
-    switch (response.data.user.rol) {
+    switch (response.data.user.role) {
       case "ADMIN":
         router.push("/admin");
         break;

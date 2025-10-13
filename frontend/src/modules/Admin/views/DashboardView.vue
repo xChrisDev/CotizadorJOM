@@ -8,10 +8,11 @@ import CustomerPanel from '../components/CustomerPanel.vue'
 import SellerPanel from '../components/SellerPanel.vue'
 import PurchasingStaffPanel from '../components/PurchasingStaffPanel.vue'
 
-const currentView = ref('dashboard')
+const currentView = ref(localStorage.getItem('sidebarActive') || 'dashboard')
 
 const handleViewChange = (newView) => {
   currentView.value = newView
+  localStorage.setItem('sidebarActive', newView)
 }
 
 </script>

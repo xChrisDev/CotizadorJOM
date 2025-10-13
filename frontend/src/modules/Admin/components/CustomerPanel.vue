@@ -23,9 +23,9 @@ import {
 import Button from '@/shared/components/ui/button/Button.vue';
 import Badge from '@/shared/components/ui/badge/Badge.vue';
 import Separator from '@/shared/components/ui/separator/Separator.vue';
-import { Ban, PencilLine, MoreVertical, Info, Search } from 'lucide-vue-next';
+import { Ban, PencilLine, MoreVertical, Info, Search, ListCollapse, UserRoundPlus } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-import { fetchCustomers } from '../services/customerService.js';
+import { fetchUsers } from '../services/userService.js';
 import Skeleton from '@/shared/components/ui/skeleton/Skeleton.vue';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import {
@@ -38,26 +38,28 @@ import {
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
 import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
+import EditUser from './modals/EditUser.vue';
+import BanUser from './modals/BanUser.vue';
 
 const customers = ref([]);
 const isLoading = ref(true);
 const search = ref("");
-const ordering = ref("profile__user__username");
+const ordering = ref("username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 5;
+const itemsPerPage = 8;
 
 const loadCustomers = async () => {
     isLoading.value = true;
     try {
-        const data = await fetchCustomers({
+        const data = await fetchUsers('CUSTOMER', {
             search: search.value,
             ordering: ordering.value,
             page: page.value,
             page_size: itemsPerPage,
         });
-        customers.value = data.results;
-        totalItems.value = data.count;
+        customers.value = data.results ?? [];
+        totalItems.value = data.count ?? 0;
     } catch (error) {
         console.error("Error al cargar clientes:", error);
     } finally {
@@ -67,7 +69,14 @@ const loadCustomers = async () => {
 
 
 onMounted(loadCustomers);
-watch([search, ordering, page], loadCustomers);
+
+let timeout;
+watch([search, ordering, page], () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        loadCustomers();
+    }, 300);
+});
 
 </script>
 
@@ -82,7 +91,8 @@ watch([search, ordering, page], loadCustomers);
             </div>
 
             <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-                Crear Usuario
+                <UserRoundPlus />
+                Nuevo
             </Button>
         </div>
 
@@ -102,16 +112,16 @@ watch([search, ordering, page], loadCustomers);
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Filtros</SelectLabel>
-                        <SelectItem value="profile__user__username">
+                        <SelectItem value="username">
                             Ordenar por usuario
                         </SelectItem>
-                        <SelectItem value="profile__user__first_name">
+                        <SelectItem value="first_name">
                             Ordenar por nombre
                         </SelectItem>
-                        <SelectItem value="client_type">
-                            Ordenar por tipo
+                        <SelectItem value="email">
+                            Ordenar por email
                         </SelectItem>
-                        <SelectItem value="profile__status">
+                        <SelectItem value="status">
                             Ordenar por status
                         </SelectItem>
                     </SelectGroup>
@@ -120,20 +130,23 @@ watch([search, ordering, page], loadCustomers);
         </div>
 
         <Card>
-            <CardContent>
+            <CardContent class="h-auto lg:min-h-[630px]">
+                <div class="flex items-center gap-2 ps-2 pb-2">
+                    <ListCollapse class="size-5" />
+                    Mostrando <span class="font-bold">{{ totalItems }}</span> registros
+                </div>
                 <div v-if="isLoading" class="flex justify-center items-center py-25">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
 
 
-                <Table v-else-if="customers.length > 0">
+                <Table v-else-if="customers && customers.length > 0">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Usuario</TableHead>
                             <TableHead>Nombre completo</TableHead>
                             <TableHead>Correo</TableHead>
                             <TableHead>Número telefónico</TableHead>
-                            <TableHead>Tipo</TableHead>
                             <TableHead class="text-center">Status</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
@@ -141,17 +154,13 @@ watch([search, ordering, page], loadCustomers);
                     <TableBody>
                         <TableRow v-for="customer in customers" :key="customer.id">
                             <TableCell class="font-medium">
-                                {{ customer.user.username }}
+                                {{ customer.username }}
                             </TableCell>
                             <TableCell>
-                                {{ customer.user.first_name }} {{ customer.user.last_name }}
+                                {{ customer.first_name }} {{ customer.last_name }}
                             </TableCell>
-                            <TableCell>{{ customer.user.email }}</TableCell>
+                            <TableCell>{{ customer.email }}</TableCell>
                             <TableCell>{{ customer.phone_number }}</TableCell>
-
-                            <TableCell>
-                                <Badge variant="outline">{{ customer.customer_type }}</Badge>
-                            </TableCell>
 
                             <TableCell class="text-center">
                                 <div
@@ -161,28 +170,8 @@ watch([search, ordering, page], loadCustomers);
                             </TableCell>
 
                             <TableCell class="flex gap-2 justify-center">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger as-child>
-                                        <Button variant="outline" size="icon">
-                                            <MoreVertical class="size-5" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem class="cursor-pointer">
-                                            <PencilLine class="mr-2 size-4" />
-                                            <span>Editar</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem class="cursor-pointer">
-                                            <Info class="mr-2 size-4" />
-                                            <span>Ver Detalles</span>
-                                        </DropdownMenuItem>
-                                        <Separator />
-                                        <DropdownMenuItem class="text-red-600 cursor-pointer">
-                                            <Ban class="mr-2 size-4 text-red-600" />
-                                            <span>Bloquear</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <EditUser :id="customer.id" @update="loadCustomers" />
+                                <BanUser />
                             </TableCell>
                         </TableRow>
                     </TableBody>
