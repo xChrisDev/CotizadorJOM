@@ -15,7 +15,7 @@ fake = Faker("es_MX")
 STATUS_CHOICES = ["ACTIVE", "PENDING", "BANNED", "REJECTED"]
 ROLE_CHOICES = ["ADMIN", "STAFF", "SELLER", "CUSTOMER"]
 
-NUM_USERS = 100
+NUM_USERS = 200
 
 for _ in range(NUM_USERS):
     role = random.choice(ROLE_CHOICES)

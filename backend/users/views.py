@@ -49,6 +49,12 @@ class UserViewSet(viewsets.ModelViewSet):
                 {"error": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND
             )
 
+        if user.status == "PENDING":
+            return Response(
+                {"error": "Su solicitud aun no ha sido aceptada"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         if user.status == "BANNED":
             return Response(
                 {"error": "Usuario suspendido."}, status=status.HTTP_403_FORBIDDEN
@@ -96,8 +102,10 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             if "role" not in request.data:
+                print("⚠️ No hay role en el request")
                 serializer.validated_data["role"] = "CUSTOMER"
             if "status" not in request.data:
+                print("⚠️ No hay status en el request")
                 serializer.validated_data["status"] = "PENDING"
 
             user = serializer.save()

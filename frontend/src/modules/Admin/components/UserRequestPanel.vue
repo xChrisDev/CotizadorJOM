@@ -43,7 +43,7 @@ const search = ref("");
 const ordering = ref("username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 5;
+const itemsPerPage = 8;
 
 const isConfirmDialogOpen = ref(false);
 const selectedCustomerForApproval = ref(null);

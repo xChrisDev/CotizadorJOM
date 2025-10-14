@@ -16,30 +16,30 @@ const isLoading = ref(false)
 
 const formSchema = toTypedSchema(
   z.object({
-  username: z.string()
-    .min(1, { message: "El nombre de usuario es obligatorio." })
-    .min(3, { message: "Debe tener al menos 3 caracteres." }),
+    username: z.string()
+      .min(1, { message: "El nombre de usuario es obligatorio." })
+      .min(3, { message: "Debe tener al menos 3 caracteres." }),
 
-  firstName: z.string()
-    .min(1, { message: "El nombre es obligatorio." })
-    .min(2, { message: "El nombre es demasiado corto." }),
+    firstName: z.string()
+      .min(1, { message: "El nombre es obligatorio." })
+      .min(2, { message: "El nombre es demasiado corto." }),
 
-  lastName: z.string()
-    .min(1, { message: "Los apellidos son obligatorios." })
-    .min(2, { message: "El apellido es demasiado corto." }),
+    lastName: z.string()
+      .min(1, { message: "Los apellidos son obligatorios." })
+      .min(2, { message: "El apellido es demasiado corto." }),
 
-  email: z.string()
-    .min(1, { message: "El correo es obligatorio." })
-    .email({ message: "El formato del correo no es válido." }),
+    email: z.string()
+      .min(1, { message: "El correo es obligatorio." })
+      .email({ message: "El formato del correo no es válido." }),
 
-  password: z.string()
-    .min(1, { message: "La contraseña es obligatoria." })
-    .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
+    password: z.string()
+      .min(1, { message: "La contraseña es obligatoria." })
+      .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
 
-  phoneNumber: z.string()
-    .min(1, { message: "El número telefónico es obligatorio." })
-    .regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
-})
+    phoneNumber: z.string()
+      .min(1, { message: "El número telefónico es obligatorio." })
+      .regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
+  })
 )
 
 const { handleSubmit, defineField, errors, resetForm } = useForm({
@@ -61,8 +61,7 @@ const onSubmit = handleSubmit(async (values) => {
     first_name: values.firstName,
     last_name: values.lastName,
     email: values.email,
-    phone_number: "+52" + values.phoneNumber,
-    client_type: "A"
+    phone_number: "+52" + values.phoneNumber
   }
 
   const response = await registerUser(userData)

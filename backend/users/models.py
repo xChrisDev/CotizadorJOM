@@ -13,8 +13,8 @@ class User(models.Model):
     last_name = models.CharField(max_length=30)
     email = models.EmailField(null=True, blank=True, unique=True)
     phone_number = PhoneNumberField(null=True, blank=True, unique=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="CUSTOMER")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDIG")
 
     class Meta:
         db_table = "users"
@@ -26,7 +26,7 @@ def get_expiration_time():
 
 class Token(models.Model):
     key = models.CharField(max_length=40, primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tokens')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tokens")
     created = models.DateTimeField(auto_now_add=True)
     expires = models.DateTimeField(default=get_expiration_time)
 
@@ -36,7 +36,7 @@ class Token(models.Model):
     @staticmethod
     def generate_token(user):
         Token.objects.filter(user=user, expires__lt=timezone.now()).delete()
-        
+
         token = secrets.token_hex(20)
         return Token.objects.create(user=user, key=token)
 
