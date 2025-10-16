@@ -1,9 +1,10 @@
 <script setup>
-import { ref, reactive, onMounted, watch } from "vue"
+import { ref, reactive, onMounted } from "vue"
 import { z } from "zod"
 import { Button } from "@/shared/components/ui/button"
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -14,22 +15,22 @@ import {
 import { Label } from "@/shared/components/ui/label"
 import { Input } from "@/shared/components/ui/input"
 import { CircleCheckBig, PencilLine } from "lucide-vue-next"
-
+import { fetchUserById, patchUser } from "@/modules/Admin/services/userService.js"
 import { useToast } from "vue-toastification"
+
 const toast = useToast()
-
 const props = defineProps({
-    id: Number
+    id: { type: Number, required: true },
+    role: { type: String, required: true },
 })
-
-const seller = ref(null)
 const emit = defineEmits(["update"])
-const form = reactive({
+
+const form = ref({
     first_name: "",
     last_name: "",
     username: "",
     email: "",
-    workstation: "",
+    phone_number: "",
 })
 
 const errors = reactive({
@@ -37,34 +38,28 @@ const errors = reactive({
     last_name: null,
     username: null,
     email: null,
-    workstation: null,
+    phone_number: null,
 })
 
 const schema = z.object({
-    first_name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-    last_name: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
-    username: z.string().min(3, "El usuario debe tener al menos 3 caracteres"),
-    email: z.string().email("Correo electrónico no válido"),
-    workstation: z.string().min(3, "La estación de trabajo es obligatoria"),
+    username: z.string().min(3, { message: "Debe tener al menos 3 caracteres." }),
+    first_name: z.string().min(2, { message: "El nombre es demasiado corto." }),
+    last_name: z.string().min(2, { message: "El apellido es demasiado corto." }),
+    email: z.string().email({ message: "El formato del correo no es válido." }),
+    phone_number: z.string().regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
 })
 
-watch(seller, (newSeller) => {
-    if (newSeller) {
-        form.first_name = newSeller.user.first_name
-        form.last_name = newSeller.user.last_name
-        form.username = newSeller.user.username
-        form.email = newSeller.user.email
-        form.workstation = newSeller.workstation
+const fetchUser = async () => {
+    try {
+        const data = await fetchUserById(props.id)
+        form.value = data
+    } catch (error) {
+        toast.error("Error al obtener la información del usuario.")
+        console.error(error)
     }
-})
-
-const fetchSeller = async () => {
-    // const values = await fetchSellerByID(props.id)
-    // seller.value = values
 }
-
 const submitForm = async () => {
-    const result = schema.safeParse(form)
+    const result = schema.safeParse(form.value)
     Object.keys(errors).forEach((key) => (errors[key] = null))
 
     if (!result.success) {
@@ -76,27 +71,26 @@ const submitForm = async () => {
     }
 
     try {
-        const data = {
-            user: {
-                username: form.username,
-                first_name: form.first_name,
-                last_name: form.last_name,
-                email: form.email
-            },
-            workstation: form.workstation
-        }
-        // const response = await putSeller(props.id, data)
-        toast.success("Vendedor actualizado.", {
-            position: "top-center",
+        const data = { ...form.value }
+        data.phone_number = "+52" + data.phone_number
+        console.log(data)
+        await patchUser(props.id, data)
+
+        toast.success(`${props.role} actualizado correctamente.`, {
+            position: "top-right",
             icon: CircleCheckBig,
         })
+
         emit("update")
     } catch (err) {
-        for (let field in err.response.data.user) {
-            const messages = err.response.data.user[field];
-            messages.forEach(msg => {
-                toast.error(msg, { position: "top-center" });
-            });
+        if (err.response.data) {
+            for (let field in err.response.data) {
+                err.response.data[field].forEach(msg => {
+                    toast.error(msg, { position: "top-right" })
+                })
+            }
+        } else {
+            toast.error("Error al actualizar el usuario.")
         }
     }
 }
@@ -106,7 +100,7 @@ const submitForm = async () => {
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button @click="fetchSeller" class="bg-yellow-500 hover:bg-orange-400" size="icon">
+            <Button @click="fetchUser" class="bg-yellow-500 hover:bg-orange-400" size="icon">
                 <PencilLine class="size-5" />
             </Button>
         </DialogTrigger>
@@ -114,12 +108,11 @@ const submitForm = async () => {
         <DialogContent class="sm:max-w-[500px]">
             <DialogHeader>
                 <DialogTitle>
-                    <div
-                        class="w-fit px-2 py-1 rounded-sm bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] font-medium text-white dark:text-black">
+                    <div class="w-fit py-1 font-medium">
                         Editar perfil</div>
                 </DialogTitle>
                 <DialogDescription>
-                    Modifica la información del vendedor y guarda los cambios.
+                    Modifica la información del {{ props.role }} y guarda los cambios.
                 </DialogDescription>
             </DialogHeader>
 
@@ -128,7 +121,7 @@ const submitForm = async () => {
                 <div class="grid gap-2">
                     <Label for="first_name" class="text-right">Nombre</Label>
                     <div>
-                        <Input id="first_name" v-model="form.first_name" />
+                        <Input autocomplete="off" id="first_name" v-model="form.first_name" />
                         <p v-if="errors.first_name" class="text-red-500 text-sm">
                             {{ errors.first_name }}
                         </p>
@@ -139,7 +132,7 @@ const submitForm = async () => {
                 <div class="grid gap-2">
                     <Label for="last_name" class="text-right">Apellido</Label>
                     <div>
-                        <Input id="last_name" v-model="form.last_name" />
+                        <Input autocomplete="off" id="last_name" v-model="form.last_name" />
                         <p v-if="errors.last_name" class="text-red-500 text-sm">
                             {{ errors.last_name }}
                         </p>
@@ -150,7 +143,7 @@ const submitForm = async () => {
                 <div class="grid gap-2">
                     <Label for="username" class="text-right">Usuario</Label>
                     <div>
-                        <Input id="username" v-model="form.username" />
+                        <Input autocomplete="off" id="username" v-model="form.username" />
                         <p v-if="errors.username" class="text-red-500 text-sm">
                             {{ errors.username }}
                         </p>
@@ -161,27 +154,33 @@ const submitForm = async () => {
                 <div class="grid gap-2">
                     <Label for="email" class="text-right">Email</Label>
                     <div>
-                        <Input id="email" type="email" v-model="form.email" />
+                        <Input autocomplete="off" id="email" type="email" v-model="form.email" />
                         <p v-if="errors.email" class="text-red-500 text-sm">
                             {{ errors.email }}
                         </p>
                     </div>
                 </div>
 
-                <!-- Estación de trabajo -->
+                <!-- Numero Telefonico -->
                 <div class="grid gap-2">
-                    <Label for="workstation" class="text-right">Estación</Label>
+                    <Label for="phone_number" class="text-right">Número de telefono</Label>
                     <div>
-                        <Input id="workstation" v-model="form.workstation" />
-                        <p v-if="errors.workstation" class="text-red-500 text-sm">
-                            {{ errors.workstation }}
+                        <Input autocomplete="off" id="phone_number" v-model="form.phone_number" />
+                        <p v-if="errors.phone_number" class="text-red-500 text-sm">
+                            {{ errors.phone_number }}
                         </p>
                     </div>
                 </div>
             </div>
 
             <DialogFooter>
-                <Button type="button" @click="submitForm">
+                <DialogClose as-child>
+                    <Button type="button" variant="outline">
+                        Cancelar
+                    </Button>
+                </DialogClose>
+                <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90" type="button"
+                    @click="submitForm">
                     Guardar cambios
                 </Button>
             </DialogFooter>

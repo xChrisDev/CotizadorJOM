@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ title }} - {{ quote.quote_number }}</title>
+    <style>
+      @page {
+        margin: 20mm 15mm;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Helvetica", Arial, sans-serif;
+        font-size: 9pt;
+        color: #222;
+        line-height: 1.3;
+      }
+      .container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 10px;
+      }
+      /* Header */
+      .header {
+        display: table;
+        width: 100%;
+        border-bottom: 2px solid #27ae60;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+      }
+      .header-logo {
+        display: table-cell;
+        width: 25%;
+        vertical-align: middle;
+      }
+      .header-logo img {
+        width: 90px;
+        height: auto;
+      }
+      .header-info {
+        display: table-cell;
+        text-align: left;
+        vertical-align: middle;
+      }
+      .company-name {
+        font-size: 12pt;
+        font-weight: bold;
+        color: #27ae60;
+      }
+      .company-details {
+        font-size: 7.5pt;
+        color: #555;
+      }
+
+      /* Document title */
+      .document-title {
+        text-align: center;
+        font-size: 13pt;
+        font-weight: bold;
+        color: #27ae60;
+        margin: 10px 0 15px;
+        text-transform: uppercase;
+      }
+
+      /* Info section  */
+      .info-table {
+        width: 100%;
+        border-spacing: 0;
+        margin-bottom: 15px;
+      }
+      .info-left,
+      .info-right {
+        width: 50%;
+        vertical-align: top;
+        padding: 0;
+      }
+      .info-right {
+        text-align: right;
+      }
+      .info-label {
+        font-weight: bold;
+        color: #27ae60;
+        font-size: 8.5pt;
+      }
+      .info-value {
+        margin-bottom: 4px;
+        font-size: 8.5pt;
+      }
+
+      /* Items table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        padding-bottom: 10px;
+        /* background-color: #f5f5f5; */
+      }
+      table thead {
+        color: #27ae60;
+      }
+      table th {
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+        font-size: 8.5pt;
+      }
+      table td {
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+        font-size: 8.5pt;
+      }
+      table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .text-right {
+        text-align: right;
+      }
+      .text-center {
+        text-align: center;
+      }
+
+      /* Totals */
+      .totals-section {
+        margin-top: 10px;
+        text-align: right;
+        padding-top: 5px;
+      }
+      .total-row {
+        font-size: 9pt;
+        margin: 2px 0;
+      }
+      .grand-total {
+        font-size: 11pt;
+        font-weight: bold;
+        color: #27ae60;
+        margin-top: 2px;
+      }
+
+      /* Notes & sections */
+      .section-box {
+        margin-top: 20px;
+        border-left: 4px solid #27ae60;
+        border-radius: 3px;
+        padding: 8px;
+      }
+      .section-title {
+        font-weight: bold;
+        font-size: 9pt;
+        color: #27ae60;
+        margin-bottom: 4px;
+      }
+      .bank-detail,
+      .term-item {
+        font-size: 8.5pt;
+        margin-bottom: 2px;
+      }
+      .notes-section {
+        margin: 12px 0;
+        padding: 8px;
+        border-radius: 3px;
+        font-size: 8.5pt;
+      }
+
+      /* Footer */
+      .footer {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 7.5pt;
+        color: #666;
+        padding-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-logo">
+          {% if company_info.logo_url %}
+          <img src="{{ company_info.logo_url }}" alt="Logo" />
+          {% endif %}
+        </div>
+        <div class="header-info">
+          <div class="company-name">{{ company_info.razon_social }}</div>
+          <div class="company-details">
+            {{ company_info.direccion }}<br />
+            Tel: {{ company_info.telefono }} | Email: {{ company_info.email }}
+          </div>
+        </div>
+      </div>
+
+      <div class="document-title">{{ title }}</div>
+
+      <table class="info-table">
+        <tr>
+          <td class="info-left">
+            <div class="info-value">
+              <span class="info-label">Cliente:</span><br />
+              {{ quote.customer.first_name }} {{ quote.customer.last_name }}<br />
+              {{ quote.customer.email }}<br />
+              {{ quote.customer.phone_number }}
+            </div>
+          </td>
+          <td class="info-right">
+            <div class="info-value">
+              <span class="info-label">No. Cotización:</span> {{quote.quote_number }}
+            </div>
+            <div class="info-value">
+              <span class="info-label">Emisión:</span> {{quote.issue_date|date:"d/m/Y" }}
+            </div>
+            <div class="info-value">
+              <span class="info-label">Vencimiento:</span> {{quote.expiration_date|date:"d/m/Y" }}
+            </div>
+            <div class="info-value">
+              <span class="info-label">Vendedor:</span> {{quote.seller.first_name }} {{ quote.seller.last_name }}
+            </div>
+            <div class="info-value">
+              <span class="info-label">Estado:</span> {{quote.get_status_display }}
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 10%">Código</th>
+            <th style="width: 40%">Descripción</th>
+            <th style="width: 10%" class="text-center">Unidad</th>
+            <th style="width: 10%" class="text-right">Cantidad</th>
+            <th style="width: 15%" class="text-right">Precio Unit.</th>
+            <th style="width: 15%" class="text-right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in quote.items.all %}
+          <tr>
+            <td>{{ item.article.item_code }}</td>
+            <td>{{ item.article.article_name }}</td>
+            <td class="text-center">{{ item.article.unit_of_measure }}</td>
+            <td class="text-right">{{ item.quantity }}</td>
+            <td class="text-right">${{ item.price|floatformat:2 }}</td>
+            <td class="text-right">${{ item.subtotal|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="totals-section">
+        <div class="total-row">
+          <strong>Subtotal:</strong> ${{ quote.subtotal|floatformat:2 }}
+        </div>
+        <div class="grand-total">
+          TOTAL: ${{ quote.total|floatformat:2 }} MXN
+        </div>
+      </div>
+
+      {% if quote.notes %}
+      <div class="notes-section">
+        <div class="section-title">Notas</div>
+        <div>{{ quote.notes }}</div>
+      </div>
+      {% endif %}
+
+      <table class="info-table">
+        <tr>
+          <td>
+            <div class="section-box">
+              <div class="section-title">Información Bancaria</div>
+              <div class="bank-detail">
+                <strong>RAZÓN SOCIAL:</strong> {{ bank_info.titular }}
+              </div>
+              <div class="bank-detail">
+                <strong>RFC:</strong> {{ bank_info.rfc }}
+              </div>
+              <div class="bank-detail">
+                <strong>BANCO:</strong> {{ bank_info.banco }}
+              </div>
+              <div class="bank-detail">
+                <strong>CUENTA:</strong> {{ bank_info.cuenta }}
+              </div>
+              <div class="bank-detail">
+                <strong>CLABE:</strong> {{ bank_info.clabe }}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="section-box">
+              <div class="section-title">Términos y Condiciones</div>
+              {% for term in terms %}
+              <div class="term-item">{{ forloop.counter }}. {{ term }}</div>
+              {% endfor %}
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="footer">
+        Documento generado electrónicamente por {{ company_info.razon_social}}<br />
+        Válido sin firma autógrafa
+      </div>
+    </div>
+  </body>
+</html>

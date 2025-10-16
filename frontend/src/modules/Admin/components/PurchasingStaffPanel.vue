@@ -118,7 +118,7 @@ watch([search, ordering, page], loadPurchasingStaff);
         </div>
 
         <Card>
-            <CardContent class="h-auto lg:min-h-[630px]">
+            <CardContent class="h-auto lg:min-h-[600px]">
                 <div class="flex items-center gap-2 ps-2 pb-2">
                     <ListCollapse class="size-5" />
                     Mostrando <span class="font-bold">{{ totalItems }}</span> registros
@@ -152,8 +152,8 @@ watch([search, ordering, page], loadPurchasingStaff);
                             </TableCell>
 
                             <TableCell class="flex gap-2 justify-center">
-                                <EditUser :id="staff.id" @update="loadPurchasingStaff" />
-                                <BanUser />
+                                <EditUser :id="staff.id" role="Colaborador" @update="loadPurchasingStaff" />
+                                <BanUser :id="staff.id" role="Colaborador" @update="loadPurchasingStaff"/>
                             </TableCell>
                         </TableRow>
                     </TableBody>

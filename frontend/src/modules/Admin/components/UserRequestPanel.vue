@@ -137,7 +137,7 @@ watch([search, ordering, page], () => {
         </div>
 
         <Card>
-            <CardContent class="h-auto lg:min-h-[630px]">
+            <CardContent class="h-auto lg:min-h-[600px]">
                 <div class="flex items-center gap-2 ps-2 pb-2">
                     <ListCollapse class="size-5" />
                     Mostrando <span class="font-bold">{{ totalItems }}</span> registros

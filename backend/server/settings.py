@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "users",
     'articles',
+    "quotes_orders",
     "phonenumber_field",
     "drf_spectacular",
     "corsheaders",

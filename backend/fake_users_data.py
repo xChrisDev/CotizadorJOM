@@ -32,12 +32,10 @@ for _ in range(NUM_USERS):
         "last_name": last_name,
         "status": status,
         "role": role,
+        "email": fake.email(),
+        "phone_number": "+52" + str(random.randint(1000000000, 9999999999))
     }
-
-    if role == "CUSTOMER":
-        user_data["email"] = fake.email()
-        user_data["phone_number"] = "+52" + str(random.randint(1000000000, 9999999999))
-
+    
     User.objects.create(**user_data)
 
 print(f"{NUM_USERS} usuarios creados correctamente.")
