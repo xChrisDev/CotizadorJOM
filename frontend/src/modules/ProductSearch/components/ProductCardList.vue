@@ -1,11 +1,12 @@
 <script setup>
+import { ref, computed } from 'vue';
 import { Card } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
-import { Star, Plus, Minus, PackagePlusIcon } from 'lucide-vue-next';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
+import { Plus, Minus, PackagePlusIcon } from 'lucide-vue-next';
 import placeholderImage from '@/shared/assets/default-image.jpg';
-import { ref } from 'vue';
 import { useCartStore } from '../stores/cart.js';
 
 const cartStore = useCartStore();
@@ -16,39 +17,68 @@ const props = defineProps({
         required: true
     }
 });
+
 const productAmount = ref(1);
+const selectedPrice = ref('Lista');
+
 function increment() {
     productAmount.value++;
 }
 
 function decrement() {
-    if (productAmount.value > 1) {
-        productAmount.value--;
-    }
+    if (productAmount.value > 1) productAmount.value--;
 }
+
+const currentPrice = computed(() => {
+    const priceObj = props.product.prices.find(p => p.price_type_name === selectedPrice.value);
+    return priceObj ? parseFloat(priceObj.price) : 0;
+});
 </script>
 
 <template>
     <Card class="flex flex-col md:flex-row items-center p-4 gap-4 w-full">
 
-        <img :src="placeholderImage" :alt="product.name" class="w-full md:w-24 h-36 md:h-24 object-cover rounded-md" />
-
+        <div class="relative">
+            <img :src="product.image_url || placeholderImage" :alt="product.article_name"
+                class="w-full md:w-24 h-36 md:h-24 object-cover rounded-md" />
+            <Badge variant="solid" class="absolute -top-2 -left-2 bg-white text-black shadow-md">
+                {{ product.brand.name }}
+            </Badge>
+        </div>
 
         <div class="flex flex-col justify-between flex-grow h-full w-full md:w-auto">
             <div>
                 <div class="flex gap-2 items-center">
-                    <Badge variant="outline">{{ product.brand }}</Badge>
-                    <h4 class="text-md font-semibold mt-2">{{ product.name }}</h4>
+                    <h4 class="text-md font-semibold mt-2">{{ product.article_name }}</h4>
                 </div>
-                <div class="flex items-center gap-1 mt-2">
-                    <Star v-for="i in 5" :key="i" class="w-3 h-3"
-                        :class="i <= product.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'" />
-                    <span class="text-xs text-muted-foreground ml-1">({{ product.reviews }} reseñas)</span>
+
+                <p class="text-sm text-muted-foreground mt-1">
+                    <strong>Categoría:</strong> {{ product.category.name }} |
+                    <strong>Familia:</strong> {{ product.family.name }}
+                </p>
+
+                <div class="border border-green-400 rounded-lg overflow-hidden mt-2">
+                    <Table>
+                        <TableHeader>
+                            <TableRow class="bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold text-gray-700">
+                                <TableHead class="text-center">Lista</TableHead>
+                                <TableHead class="text-center">Descuento</TableHead>
+                                <TableHead class="text-center">Mayoreo</TableHead>
+                                <TableHead class="text-center">Mínimo</TableHead>
+                                <TableHead class="text-center">Crédito</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow class="text-sm">
+                                <TableCell v-for="price in product.prices" :key="price.id"
+                                    class="text-center font-medium text-gray-800">
+                                    ${{ parseFloat(price.price).toFixed(2) }}
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
                 </div>
-            </div>
-            <div class="flex items-baseline gap-2 mt-4">
-                <p class="text-lg font-bold">${{ product.price.toFixed(2) }}</p>
-                <del v-if="product.oldPrice" class="text-muted-foreground">${{ product.oldPrice.toFixed(2) }}</del>
+
             </div>
         </div>
 
@@ -62,7 +92,8 @@ function decrement() {
                     <Plus class="w-4 h-4" />
                 </Button>
             </div>
-            <Button @click="cartStore.addToCart(product, productAmount);"
+
+            <Button @click="cartStore.addToCart(product, productAmount, currentPrice.value)"
                 class="w-full bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 disabled:opacity-50 disabled:bg-gray-500">
                 <PackagePlusIcon class="size-5 mr-2" />
                 <span>Agregar</span>

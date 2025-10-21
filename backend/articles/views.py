@@ -3,12 +3,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from .models import Article, Category, Family, Brand
+from .models import Article, Category, Family, Brand, PriceType
 from .serializers import (
     ArticleSerializer,
     CategorySerializer,
     FamilySerializer,
     BrandSerializer,
+    PriceTypeSerializer,
 )
 from .filters import ArticleFilter
 from users.permissions import IsAuth
@@ -45,8 +46,16 @@ class BrandViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
 
+class PriceTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet de solo lectura para tipos de precio"""
+    queryset = PriceType.objects.all()
+    serializer_class = PriceTypeSerializer
+    permission_classes = [IsAuth]
+    pagination_class = None
+
+
 class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
+    queryset = Article.objects.prefetch_related('prices', 'prices__price_type').all()
     serializer_class = ArticleSerializer
     permission_classes = [IsAuth]
     filter_backends = [
@@ -62,7 +71,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
         "category__name",
         "family__name",
         "brand__name",
-        "price_A",
     ]
     pagination_class = PageNumberPagination
 
@@ -70,7 +78,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         detail=False, methods=["get"], url_path="by_category/(?P<category_id>[^/.]+)"
     )
     def get_by_category(self, request, category_id=None):
-        articles = self.queryset.filter(category__id=category_id, is_active=True)
+        articles = self.queryset.filter(category__id=category_id)
         filtered_articles = ArticleFilter(request.GET, queryset=articles).qs
 
         if not filtered_articles.exists():
@@ -91,7 +99,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="by_family/(?P<family_id>[^/.]+)")
     def get_by_family(self, request, family_id=None):
-        articles = self.queryset.filter(family__id=family_id, is_active=True)
+        articles = self.queryset.filter(family__id=family_id)
         filtered_articles = ArticleFilter(request.GET, queryset=articles).qs
 
         if not filtered_articles.exists():
@@ -110,7 +118,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="by_brand/(?P<brand_id>[^/.]+)")
     def get_by_brand(self, request, brand_id=None):
-        articles = self.queryset.filter(brand__id=brand_id, is_active=True)
+        articles = self.queryset.filter(brand__id=brand_id)
         filtered_articles = ArticleFilter(request.GET, queryset=articles).qs
 
         if not filtered_articles.exists():

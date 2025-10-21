@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue"
-import { Ban } from "lucide-vue-next"
+import { Ban, Check } from "lucide-vue-next"
 import { useToast } from "vue-toastification"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -43,11 +43,11 @@ const fetchUser = async () => {
 
 const submit = async () => {
     const data = {
-        status: "BANNED"
+        status: "ACTIVE"
     }
     try {
         await patchUser(props.id, data)
-        toast.info(`El ${props.role} ha sido suspendido`)
+        toast.info(`El ${props.role} ha sido reactivado`)
         emit('update')
     } catch (error) {
         console.error(error)
@@ -68,14 +68,14 @@ const getUserInitials = () => {
 <template>
     <Dialog>
         <DialogTrigger as-child>
-            <Button @click="fetchUser" class="bg-red-400 hover:bg-red-500" size="icon">
-                <Ban class="size-5" />
+            <Button @click="fetchUser" class="bg-[#4ed636] hover:bg-[#4ed636]/80" size="icon">
+                <Check class="size-5" />
             </Button>
         </DialogTrigger>
 
         <DialogContent class="sm:max-w-[440px]">
             <DialogHeader>
-                <DialogTitle>¿Suspender {{ props.role }}?</DialogTitle>
+                <DialogTitle>¿Reactivar {{ props.role }}?</DialogTitle>
                 <DialogDescription>
                     <p class="text-sm pt-2 text-muted-foreground">
                         Esta acción solo se puede revertir por el administrador del sistema.
@@ -96,7 +96,7 @@ const getUserInitials = () => {
                     </Avatar>
                     <div class="flex flex-col gap-1">
                         <p class="font-semibold text-lg">{{ user.first_name }} {{ user.last_name }}</p>
-                        <p class="text-sm text-gray-600">{{ user.email }}</p>
+                        <p class="text-sm text-gray-600">{{ user.email || "Sin email" }}</p>
                         <p class="text-sm text-gray-600">{{ user.phone_number || "Sin teléfono" }}</p>
                     </div>
                 </div>
@@ -108,7 +108,7 @@ const getUserInitials = () => {
                 </DialogClose>
 
                 <Button type="button"
-                    class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+                    class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90"
                     @click="submit">
                     Confirmar
                 </Button>

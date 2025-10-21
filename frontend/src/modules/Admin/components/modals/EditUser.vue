@@ -73,9 +73,8 @@ const submitForm = async () => {
     try {
         const data = { ...form.value }
         data.phone_number = "+52" + data.phone_number
-        console.log(data)
+        // console.log(data)
         await patchUser(props.id, data)
-
         toast.success(`${props.role} actualizado correctamente.`, {
             position: "top-right",
             icon: CircleCheckBig,

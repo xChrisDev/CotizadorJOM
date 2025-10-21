@@ -15,7 +15,6 @@ class ArticleFilter(django_filters.FilterSet):
             ("category__name", "category"),
             ("family__name", "family"),
             ("brand__name", "brand"),
-            ("price_A", "price_A"),
         )
     )
 

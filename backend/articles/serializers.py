@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Category, Family, Brand
+from .models import Article, Category, Family, Brand, PriceType, ArticlePrice
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,6 +20,26 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
+class PriceTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PriceType
+        fields = ["id", "name", "description"]
+
+
+class ArticlePriceSerializer(serializers.ModelSerializer):
+    price_type_name = serializers.CharField(source='price_type.get_name_display', read_only=True)
+    
+    class Meta:
+        model = ArticlePrice
+        fields = ["id", "price_type", "price_type_name", "price"]
+
+
+class ArticlePriceWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArticlePrice
+        fields = ["price_type", "price"]
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     family = FamilySerializer(read_only=True)
@@ -35,6 +55,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         queryset=Brand.objects.all(), source="brand", write_only=True
     )
 
+    prices = ArticlePriceSerializer(many=True, read_only=True)
+    prices_data = ArticlePriceWriteSerializer(many=True, write_only=True, required=False)
+    
     image_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -44,9 +67,6 @@ class ArticleSerializer(serializers.ModelSerializer):
             "item_code",
             "article_name",
             "unit_of_measure",
-            "price_A",
-            "price_B",
-            "price_C",
             "category",
             "category_id",
             "family",
@@ -56,6 +76,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             "description",
             "image",
             "image_url",
+            "prices",
+            "prices_data",
         ]
 
     def get_image_url(self, obj):
@@ -63,3 +85,26 @@ class ArticleSerializer(serializers.ModelSerializer):
         if obj.image and hasattr(obj.image, "url"):
             return request.build_absolute_uri(obj.image.url)
         return None
+    
+    def create(self, validated_data):
+        prices_data = validated_data.pop('prices_data', [])
+        article = Article.objects.create(**validated_data)
+        
+        for price_data in prices_data:
+            ArticlePrice.objects.create(article=article, **price_data)
+        
+        return article
+    
+    def update(self, instance, validated_data):
+        prices_data = validated_data.pop('prices_data', None)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        if prices_data is not None:
+            instance.prices.all().delete()
+            for price_data in prices_data:
+                ArticlePrice.objects.create(article=instance, **price_data)
+        
+        return instance

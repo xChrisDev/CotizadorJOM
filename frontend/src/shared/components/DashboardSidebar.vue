@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Sidebar,
@@ -34,13 +34,19 @@ const props = defineProps({
 const router = useRouter()
 const authStore = useAuthStore()
 const emit = defineEmits(["update:view"])
-
+const sidebarTriggerRef = ref(null)
 const activeOption = ref(localStorage.getItem('sidebarActive') || '')
 
-const handleClick = (option) => {
+const handleClick = (option, toggleSidebar) => {
   activeOption.value = option
   localStorage.setItem('sidebarActive', option)
   emit("update:view", option)
+
+  if (window.innerWidth < 768) {
+    nextTick(() => {
+      sidebarTriggerRef.value?.$el?.click?.()
+    })
+  }
 }
 
 const getUserRoleLabel = () => {
@@ -55,15 +61,17 @@ const getUserInitials = () => {
 const handleLogout = () => {
   authStore.logout()
   router.push('/ingresar')
+  localStorage.removeItem('sidebarActive')
 }
 </script>
 
 <template>
-  <SidebarProvider>
+  <SidebarProvider v-slot="{ toggleSidebar }">
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div class="flex gap-2 py-2">
-          <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
+          <div
+            class="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
             <img src="@/shared/assets/JOM.png" alt="JOM" class="h-4" />
           </div>
           <div class="grid flex-1 text-left text-sm leading-tight">
@@ -74,18 +82,79 @@ const handleLogout = () => {
       </SidebarHeader>
 
       <SidebarContent>
+        <!-- Menú Principal -->
         <SidebarGroup>
           <SidebarGroupLabel>Menú Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem v-for="item in menuItems" :key="item.title">
+              <SidebarMenuItem v-for="item in menuItems.filter(i => ['dashboard', 'cotizar'].includes(i.option))"
+                :key="item.title">
                 <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <Button
-                    @click="handleClick(item.option)"
-                    variant="ghost"
+                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
                     class="flex justify-start gap-2"
-                    :class="{'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option}"
-                  >
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
+                    <component :is="item.icon" class="w-4 h-4" />
+                    <span>{{ item.title }}</span>
+                  </Button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Gestión de Usuarios -->
+        <SidebarGroup>
+          <SidebarGroupLabel>Usuarios</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem
+                v-for="item in menuItems.filter(i => ['clientes', 'vendedores', 'compras'].includes(i.option))"
+                :key="item.title">
+                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
+                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
+                    class="flex justify-start gap-2"
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
+                    <component :is="item.icon" class="w-4 h-4" />
+                    <span>{{ item.title }}</span>
+                  </Button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Ventas y Compras -->
+        <SidebarGroup>
+          <SidebarGroupLabel>Compras</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem v-for="item in menuItems.filter(i => ['solicitudes'].includes(i.option))"
+                :key="item.title">
+                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
+                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
+                    class="flex justify-start gap-2"
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
+                    <component :is="item.icon" class="w-4 h-4" />
+                    <span>{{ item.title }}</span>
+                  </Button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Reportes / Documentos -->
+        <SidebarGroup>
+          <SidebarGroupLabel>Reportes / Documentos</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem
+                v-for="item in menuItems.filter(i => ['reportes', 'cotizaciones', 'ordenes'].includes(i.option))"
+                :key="item.title">
+                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
+                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
+                    class="flex justify-start gap-2"
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
                     <component :is="item.icon" class="w-4 h-4" />
                     <span>{{ item.title }}</span>
                   </Button>
@@ -96,12 +165,14 @@ const handleLogout = () => {
         </SidebarGroup>
       </SidebarContent>
 
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
-                <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                <SidebarMenuButton size="lg"
+                  class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                   <Avatar class="h-8 w-8 rounded-lg">
                     <AvatarFallback class="rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
                       {{ getUserInitials() }}
@@ -114,7 +185,8 @@ const handleLogout = () => {
                   <ChevronsUpDown class="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom" align="end" :side-offset="4">
+              <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom"
+                align="end" :side-offset="4">
                 <DropdownMenuItem @click="router.push('/perfil')" class="cursor-pointer">
                   <User class="mr-2 h-4 w-4" /> Perfil
                 </DropdownMenuItem>
@@ -131,11 +203,9 @@ const handleLogout = () => {
 
     <SidebarInset>
       <header class="flex h-16 shrink-0 items-center gap-2 border-b ps-4 pe-1">
-        <SidebarTrigger class="-ml-1" />
+        <SidebarTrigger class="-ml-1" ref="sidebarTriggerRef" />
         <Separator orientation="vertical" class="mr-2 h-4" />
-        <div class="flex items-center gap-2 flex-1">
-
-        </div>
+        <div class="flex items-center gap-2 flex-1"></div>
         <div class="flex items-center gap-2">
           <ThemeButton />
         </div>

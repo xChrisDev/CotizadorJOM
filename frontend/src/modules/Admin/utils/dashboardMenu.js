@@ -14,6 +14,11 @@ export const menuItems = [
     icon: LayoutDashboard,
   },
   {
+    title: "Cotizar",
+    option: "cotizar",
+    icon: FileOutput,
+  },
+  {
     title: "Solicitudes",
     option: "solicitudes",
     icon: UserRoundPlus,

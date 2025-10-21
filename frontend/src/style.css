@@ -28,6 +28,34 @@ html {
   }
 }
 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.scrollbar-transparent::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-thumb {
+  background-color: #4ed636;
+  border-radius: 4px;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-thumb:hover {
+  background-color: #09cb6d;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

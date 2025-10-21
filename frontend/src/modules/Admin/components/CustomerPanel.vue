@@ -40,6 +40,7 @@ import Input from '@/shared/components/ui/input/Input.vue';
 import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
 import EditUser from './modals/EditUser.vue';
 import BanUser from './modals/BanUser.vue';
+import ActivateUser from './modals/ActivateUser.vue';
 
 const customers = ref([]);
 const isLoading = ref(true);
@@ -47,7 +48,7 @@ const search = ref("");
 const ordering = ref("username");
 const page = ref(1);
 const totalItems = ref(0);
-const itemsPerPage = 8;
+const itemsPerPage = 10;
 
 const loadCustomers = async () => {
     isLoading.value = true;
@@ -79,66 +80,64 @@ watch([search, ordering, page], () => {
 });
 
 </script>
-
 <template>
-    <div>
-        <div class="pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
+        <header
+            class="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between bg-card/60 backdrop-blur-md rounded-xl p-4 border border-border shadow-sm">
             <div>
-                <h2 class="text-3xl font-bold">Gestión de Clientes</h2>
-                <p class="text-muted-foreground mt-1">
-                    Administra los clientes registrados en el sistema.
+                <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
+                    <UserRoundPlus class="text-primary size-6" />
+                    Clientes
+                </h2>
+                <p class="text-sm text-muted-foreground">
+                    Administra y gestiona los clientes registrados en el sistema.
                 </p>
             </div>
 
-            <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90">
-                <UserRoundPlus />
-                Nuevo
-            </Button>
-        </div>
+            <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end w-full sm:w-auto">
+                <div class="relative w-full sm:w-72">
+                    <Input v-model="search" type="text" placeholder="Buscar cliente..." autocomplete="off"
+                        class="pl-10 w-full focus:ring-2 focus:ring-primary/30 transition-all" />
+                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                        <Search class="size-5 text-muted-foreground" />
+                    </span>
+                </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
-            <div class="relative w-full max-w-md items-center">
-                <Input v-model="search" type="text" placeholder="Buscar por nombre..." autocomplete="off"
-                    class="pl-10" />
-                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
-                    <Search class="size-5 text-muted-foreground" />
-                </span>
+                <div class="grid grid-cols-2 items-center gap-2 justify-center lg:justify-end">
+                    <Select v-model="ordering">
+                        <SelectTrigger class="col-span-1 w-full">
+                            <SelectValue placeholder="Ordenar por..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Ordenar por</SelectLabel>
+                                <SelectItem value="username">Usuario</SelectItem>
+                                <SelectItem value="first_name">Nombre</SelectItem>
+                                <SelectItem value="email">Correo</SelectItem>
+                                <SelectItem value="status">Status</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+
+                    <Button
+                        class="col-span-1 bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 transition-all">
+                        <UserRoundPlus class="size-4 mr-1" />
+                        Nuevo
+                    </Button>
+                </div>
             </div>
+        </header>
 
-            <Select v-model="ordering">
-                <SelectTrigger>
-                    <SelectValue placeholder="Ordenar por..." />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Filtros</SelectLabel>
-                        <SelectItem value="username">
-                            Ordenar por usuario
-                        </SelectItem>
-                        <SelectItem value="first_name">
-                            Ordenar por nombre
-                        </SelectItem>
-                        <SelectItem value="email">
-                            Ordenar por email
-                        </SelectItem>
-                        <SelectItem value="status">
-                            Ordenar por status
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-        </div>
-
-        <Card>
-            <CardContent class="h-auto lg:min-h-[600px]">
-                <div class="flex items-center gap-2 ps-2 pb-2">
+        <Card class="flex flex-col flex-1 overflow-hidden">
+            <CardContent class="px-2 flex-1 overflow-y-auto">
+                <div class="flex items-center gap-2 ps-2">
                     <ListCollapse class="size-5" />
                     Mostrando <span class="font-bold">{{ totalItems }}</span> registros
                 </div>
-                <div v-if="isLoading" class="flex justify-center items-center py-25">
+
+                <div v-if="isLoading" class="flex justify-center items-center py-20">
                     <div class="w-12 h-12 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
-
 
                 <Table v-else-if="customers && customers.length > 0">
                     <TableHeader>
@@ -161,17 +160,18 @@ watch([search, ordering, page], () => {
                             </TableCell>
                             <TableCell>{{ customer.email }}</TableCell>
                             <TableCell>{{ customer.phone_number }}</TableCell>
-
                             <TableCell class="text-center">
                                 <div
                                     :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(customer.status)]">
                                     {{ getStatusText(customer.status) }}
                                 </div>
                             </TableCell>
-
                             <TableCell class="flex gap-2 justify-center">
                                 <EditUser :id="customer.id" role="Cliente" @update="loadCustomers" />
-                                <BanUser :id="customer.id" role="Cliente" @update="loadCustomers" />
+                                <BanUser v-if="customer.status != 'BANNED'" :id="customer.id" role="Cliente"
+                                    @update="loadCustomers" />
+                                <ActivateUser v-if="customer.status == 'BANNED'" :id="customer.id" role="Cliente"
+                                    @update="loadCustomers" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -180,24 +180,23 @@ watch([search, ordering, page], () => {
                 <div v-else class="text-center py-10 text-muted-foreground">
                     <p class="text-lg">No hay clientes disponibles.</p>
                 </div>
-
             </CardContent>
-            <CardFooter v-if="totalItems > itemsPerPage" class="flex justify-center">
-                <div class="pt-6 flex justify-center">
-                    <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems">
-                        <PaginationContent v-slot="{ items }">
-                            <PaginationPrevious />
-                            <template v-for="(item, index) in items" :key="index">
-                                <PaginationItem v-if="item.type === 'page'" :value="item.value"
-                                    :is-active="item.value === page">
-                                    {{ item.value }}
-                                </PaginationItem>
-                            </template>
-                            <PaginationEllipsis :index="4" />
-                            <PaginationNext />
-                        </PaginationContent>
-                    </Pagination>
-                </div>
+
+            <CardFooter v-if="totalItems > itemsPerPage"
+                class="sticky bottom-0 bg-background border-t flex justify-center p-4">
+                <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems">
+                    <PaginationContent v-slot="{ items }">
+                        <PaginationPrevious />
+                        <template v-for="(item, index) in items" :key="index">
+                            <PaginationItem v-if="item.type === 'page'" :value="item.value"
+                                :is-active="item.value === page">
+                                {{ item.value }}
+                            </PaginationItem>
+                        </template>
+                        <PaginationEllipsis :index="4" />
+                        <PaginationNext />
+                    </PaginationContent>
+                </Pagination>
             </CardFooter>
         </Card>
     </div>
