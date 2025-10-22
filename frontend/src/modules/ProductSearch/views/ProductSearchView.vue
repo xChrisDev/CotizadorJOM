@@ -30,7 +30,6 @@ const products = ref([
 
                 <main class="lg:col-span-3">
                     <ProductGrid :products="products" />
-                    <!-- <ProductPagination /> -->
                 </main>
             </div>
 

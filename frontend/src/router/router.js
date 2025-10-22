@@ -47,7 +47,7 @@ const routes = [
   {
     path: "/cotizacion",
     component: QuoteView,
-    meta: { transition: "fade-zoom" },
+    meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN", "SELLER"]},
   },
   {
     path: "/orden-compra",

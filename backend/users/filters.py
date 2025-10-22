@@ -20,8 +20,10 @@ class UserFilter(django_filters.FilterSet):
         fields = ["username", "email", "first_name", "last_name", "status"]
 
     def filter_search(self, queryset, name, value):
-        return queryset.filter(
-            Q(username__icontains=value)
-            | Q(first_name__icontains=value)
-            | Q(last_name__icontains=value)
-        )
+        terms = value.split()
+        query = Q()
+        for term in terms:
+            query |= Q(username__icontains=term)
+            query |= Q(first_name__icontains=term)
+            query |= Q(last_name__icontains=term)
+        return queryset.filter(query)

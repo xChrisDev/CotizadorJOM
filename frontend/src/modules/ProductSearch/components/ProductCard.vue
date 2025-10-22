@@ -54,7 +54,7 @@ function handleAddToCart() {
     <CardHeader class="p-4">
       <img :src="product.imageUrl || placeholderImage" :alt="product.name" class="w-full rounded-lg h-48 object-cover" />
     </CardHeader>
-    <CardContent class="p-4 space-y-2 flex-grow">
+    <CardContent class="p-4 space-y-2 flex-grow min-h-[216px]">
       <Badge variant="outline">{{ product.brand }}</Badge>
       <h4 class="font-semibold h-12 line-clamp-2">{{ product.name }}</h4>
       <div class="flex items-center gap-1">

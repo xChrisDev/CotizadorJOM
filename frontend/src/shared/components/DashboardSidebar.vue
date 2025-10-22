@@ -23,6 +23,7 @@ import { Button } from '@/shared/components/ui/button'
 import ThemeButton from '@/shared/components/ThemeButton.vue'
 import { ChevronsUpDown, LogOut, User } from 'lucide-vue-next'
 import { useAuthStore } from '@/shared/stores/auth.js'
+import ShoppingCartButton from '@/modules/ProductSearch/components/ShoppingCartButton.vue'
 
 const props = defineProps({
   menuItems: { type: Array, required: true },
@@ -62,6 +63,7 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/ingresar')
   localStorage.removeItem('sidebarActive')
+  localStorage.removeItem('user_id')
 }
 </script>
 
@@ -123,9 +125,9 @@ const handleLogout = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <!-- Ventas y Compras -->
+        <!-- Solicitudes -->
         <SidebarGroup>
-          <SidebarGroupLabel>Compras</SidebarGroupLabel>
+          <SidebarGroupLabel>Solicitudes</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem v-for="item in menuItems.filter(i => ['solicitudes'].includes(i.option))"
@@ -207,6 +209,7 @@ const handleLogout = () => {
         <Separator orientation="vertical" class="mr-2 h-4" />
         <div class="flex items-center gap-2 flex-1"></div>
         <div class="flex items-center gap-2">
+          <ShoppingCartButton v-if="activeOption === 'cotizar'"/>
           <ThemeButton />
         </div>
       </header>

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from users.models import User
 from articles.models import Article
 from .enums import STATUS_CHOICES, PAYMENT_STATUS_CHOICES
@@ -6,17 +6,21 @@ from django.utils import timezone
 from decimal import Decimal
 
 
+class QuoteCounter(models.Model):
+    """Contador global para quotes"""
+
+    last_number = models.PositiveIntegerField(default=0)
+
+
 class Quote(models.Model):
-    quote_number = models.CharField(max_length=50, unique=True)
+    quote_number = models.CharField(max_length=50, unique=True, blank=True)
     customer = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="quotes_as_customer"
     )
     seller = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="quotes_as_seller"
     )
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="PENDING"
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
     issue_date = models.DateField(default=timezone.now)
     expiration_date = models.DateField()
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -24,6 +28,17 @@ class Quote(models.Model):
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.quote_number:
+            with transaction.atomic():
+                counter, created = (
+                    QuoteCounter.objects.select_for_update().get_or_create(id=1)
+                )
+                counter.last_number += 1
+                self.quote_number = f"COT-{counter.last_number:04d}"
+                counter.save()
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = "quotes"
@@ -66,9 +81,7 @@ class Order(models.Model):
     seller = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="orders_as_seller"
     )
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="PENDING"
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
     payment_status = models.CharField(
         max_length=10, choices=PAYMENT_STATUS_CHOICES, default="PENDING"
     )

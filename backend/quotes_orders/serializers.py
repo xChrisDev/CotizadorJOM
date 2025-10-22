@@ -26,6 +26,7 @@ class QuoteItemSerializer(serializers.ModelSerializer):
 
 
 class QuoteSerializer(serializers.ModelSerializer):
+    quote_number = serializers.CharField(read_only=True)
     customer = UserSerializer(read_only=True)
     seller = UserSerializer(read_only=True)
     items = QuoteItemSerializer(many=True, read_only=True)
@@ -72,6 +73,7 @@ class QuoteCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         fields = [
+            "id",
             "quote_number",
             "customer_id",
             "seller_id",

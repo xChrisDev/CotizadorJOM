@@ -30,9 +30,8 @@ function handleCheckout() {
       </Button>
     </SheetTrigger>
 
-    <SheetContent side="right"
-      class="z-[9999] flex flex-col bg-card/90 backdrop-blur-lg border-r w-full sm:max-w-md">
-      <SheetHeader class="mb-3 ml-2">
+    <SheetContent side="right" class="z-[9999] flex flex-col bg-card/90 backdrop-blur-lg border-r w-full sm:max-w-md">
+      <SheetHeader class="mx-2">
         <SheetTitle class="flex items-center gap-2">
           <ShoppingCart class="size-7" />
           <span class="text-lg">Mi cotización</span>
@@ -40,7 +39,7 @@ function handleCheckout() {
         <Separator class="opacity-30 bg-primary" />
       </SheetHeader>
 
-      <div class="flex-grow overflow-y-auto px-1 pr-4">
+      <div class="flex-grow overflow-y-auto px-3">
         <div v-if="cartStore.items.length > 0" class="flex flex-col gap-3">
           <CartItem v-for="item in cartStore.items" :key="item.id" :item="item" />
         </div>
@@ -48,22 +47,16 @@ function handleCheckout() {
         <div v-else class="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
           <PackageX class="size-16 mb-4" />
           <h3 class="text-lg font-semibold">Tu carrito está vacío</h3>
-          <p class="text-sm">¡Agrega productos para verlos aquí!</p>
+          <p class="text-sm">¡Agrega articulos para verlos aquí!</p>
         </div>
       </div>
 
       <SheetFooter v-if="cartStore.items.length > 0" class="flex-col sm:flex-col justify-start items-start p-4">
         <Separator class="mb-4 opacity-30 bg-primary" />
-        <div class="w-full space-y-2 text-lg mb-4">
-          <div class="flex justify-between font-bold">
-            <span>Total:</span>
-            <span>${{ cartStore.cartTotal }}</span>
-          </div>
-        </div>
-        <Button size="lg" class="w-full bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90"
+        <Button size="lg" class="w-full text-base bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90"
           @click="handleCheckout">
-          <FileInput class="size-5 mr-2" />
-          Generar Cotización
+          <FileInput class="size-6 mr-2" />
+          Completar Cotización
         </Button>
       </SheetFooter>
     </SheetContent>

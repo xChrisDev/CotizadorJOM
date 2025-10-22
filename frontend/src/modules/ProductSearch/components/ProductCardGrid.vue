@@ -29,7 +29,7 @@ function decrement() { if (productAmount.value > 1) productAmount.value--; }
 </script>
 
 <template>
-    <Card class="overflow-hidden shadow-lg flex flex-col">
+    <Card class="overflow-visible shadow-lg flex flex-col">
         <CardHeader class="relative px-4">
             <img :src="product.image_url || placeholderImage" :alt="product.article_name"
                 class="w-full h-48 object-cover rounded-lg" />
@@ -48,21 +48,20 @@ function decrement() { if (productAmount.value > 1) productAmount.value--; }
                 <span class="font-medium">Familia:</span> {{ product.family.name }}
             </p>
 
-            <div class="border border-green-400 rounded-lg overflow-hidden">
+            <div class="border dark:border-[#38383d] border-green-400 rounded-lg overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow class="bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold text-gray-700">
-                            <TableHead class="text-center">Lista</TableHead>
-                            <TableHead class="text-center">Descuento</TableHead>
-                            <TableHead class="text-center">Mayoreo</TableHead>
-                            <TableHead class="text-center">Mínimo</TableHead>
-                            <TableHead class="text-center">Crédito</TableHead>
+                        <TableRow class="dark:bg-[#27272a] bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold">
+                            <TableHead class="text-center dark:text-white">Lista</TableHead>
+                            <TableHead class="text-center dark:text-white">Descuento</TableHead>
+                            <TableHead class="text-center dark:text-white">Mayoreo</TableHead>
+                            <TableHead class="text-center dark:text-white">Mínimo</TableHead>
+                            <TableHead class="text-center dark:text-white">Crédito</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <TableRow class="text-sm">
-                            <TableCell v-for="price in product.prices" :key="price.id"
-                                class="text-center font-medium text-gray-800">
+                            <TableCell v-for="price in product.prices" :key="price.id" class="text-center font-medium">
                                 ${{ parseFloat(price.price).toFixed(2) }}
                             </TableCell>
                         </TableRow>
@@ -74,17 +73,16 @@ function decrement() { if (productAmount.value > 1) productAmount.value--; }
         <CardFooter class="px-4 pb-4 flex flex-col gap-3">
             <div class="card w-full grid grid-cols-1 lg:grid-cols-2 gap-2">
                 <div class="col-span-1 flex items-center gap-1">
-                    <Button variant="outline" size="icon" class="h-9 w-9 rounded-full" @click="decrement">
+                    <Button variant="outline" size="icon" class="h-9 w-9" @click="decrement">
                         <Minus class="w-4 h-4" />
                     </Button>
                     <Input type="number" v-model.number="productAmount" min="1"
                         class="h-9 lg:w-18 w-full text-center rounded-md mx-1" />
-                    <Button variant="outline" size="icon" class="h-9 w-9 rounded-full" @click="increment">
+                    <Button variant="outline" size="icon" class="h-9 w-9" @click="increment">
                         <Plus class="w-4 h-4" />
                     </Button>
                 </div>
 
-                <!-- Botón agregar al carrito -->
                 <Button size="lg" @click="cartStore.addToCart(product, productAmount)"
                     class="col-span-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#4ed636] to-[#09cb6d]">
                     <PackagePlusIcon class="w-5 h-5" />

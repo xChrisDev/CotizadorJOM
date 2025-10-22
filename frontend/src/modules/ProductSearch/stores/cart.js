@@ -1,18 +1,20 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 
 export const useCartStore = defineStore("cart", () => {
-  const items = ref([]);
+  const STORAGE_KEY = "quote_cart";
 
-  const cartCount = computed(() => {
-    return items.value.reduce((total, item) => total + item.quantity, 0);
-  });
+  const items = ref(JSON.parse(localStorage.getItem(STORAGE_KEY)) || []);
 
-  const cartTotal = computed(() => {
-    return items.value
+  const cartCount = computed(() =>
+    items.value.reduce((total, item) => total + item.quantity, 0)
+  );
+
+  const cartTotal = computed(() =>
+    items.value
       .reduce((total, item) => total + item.price * item.quantity, 0)
-      .toFixed(2);
-  });
+      .toFixed(2)
+  );
 
   function addToCart(product, amount = 1) {
     const existingItem = items.value.find((item) => item.id === product.id);
@@ -41,6 +43,14 @@ export const useCartStore = defineStore("cart", () => {
   function clearCart() {
     items.value = [];
   }
+
+  watch(
+    items,
+    (newItems) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
+    },
+    { deep: true }
+  );
 
   return {
     items,

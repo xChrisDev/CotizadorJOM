@@ -10,7 +10,7 @@ import { Moon, Sun } from "lucide-vue-next";
     @click="mode = mode === 'dark' ? 'light' : 'dark'"
     size="lg"
     variant="outline"
-    class="h-14 lg:w-14 w-full lg:justify-center justify-start"
+    class="h-14 lg:w-14 w-24 lg:justify-center"
   >
     <div
       v-if="mode == 'light'"

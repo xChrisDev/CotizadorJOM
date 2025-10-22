@@ -7,7 +7,7 @@ import { AlertTriangle } from 'lucide-vue-next'
 const router = useRouter()
 
 const redirectToLogin = () => {
-  router.push('/buscar')
+  router.push('/ingresar')
 }
 </script>
 

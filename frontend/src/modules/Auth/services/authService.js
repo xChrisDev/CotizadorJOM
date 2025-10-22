@@ -28,6 +28,6 @@ export const registerUser = async (userData) => {
 };
 
 export const getProfileUser = async () => {
-  const response = await apiClient.post("/users/me/", {});
+  const response = await apiClient.get("/users/me/");
   return response.data;
 };

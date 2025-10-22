@@ -6,6 +6,10 @@ defineProps({
   product: {
     type: Object,
     required: true
+  },
+  price: {
+    type: Number,
+    required: true
   }
 });
 </script>
@@ -17,19 +21,19 @@ defineProps({
     <div class="flex-grow space-y-2">
       <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
         <div>
-          <Badge variant="outline" class="mb-2">{{ product.brand }}</Badge>
-          <h4 class="font-semibold">{{ product.name }}</h4>
-          <p class="text-sm text-muted-foreground">{{ product.description }}</p>
+          <Badge variant="outline" class="mb-2">{{ product.brand.name }}</Badge>
+          <h4 class="font-semibold">{{ product.article_name }}</h4>
+          <p class="text-sm text-muted-foreground"><span class="font-semibold">SKU:</span> {{ product.item_code }}</p>
         </div>
         <div class="text-right">
-          <p class="font-bold text-lg">${{ (product.unitPrice * product.quantity).toFixed(2) }}</p>
+          <p class="font-bold text-lg">${{ (price * product.quantity).toFixed(2) }}</p>
         </div>
       </div>
       <div class="flex items-center justify-between text-sm pt-2 border-t">
         <span class="text-muted-foreground">Cantidad: <span class="font-medium text-foreground">{{
-            product.quantity }}</span></span>
+          product.quantity }}</span></span>
         <span class="text-muted-foreground">Precio unitario: <span class="font-medium text-foreground">${{
-            product.unitPrice.toFixed(2) }}</span></span>
+          price.toFixed(2) }}</span></span>
       </div>
     </div>
   </div>

@@ -57,21 +57,21 @@ const currentPrice = computed(() => {
                     <strong>Familia:</strong> {{ product.family.name }}
                 </p>
 
-                <div class="border border-green-400 rounded-lg overflow-hidden mt-2">
+                <div class="border dark:border-[#38383d] border-green-400 rounded-lg overflow-hidden mt-2">
                     <Table>
                         <TableHeader>
-                            <TableRow class="bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold text-gray-700">
-                                <TableHead class="text-center">Lista</TableHead>
-                                <TableHead class="text-center">Descuento</TableHead>
-                                <TableHead class="text-center">Mayoreo</TableHead>
-                                <TableHead class="text-center">Mínimo</TableHead>
-                                <TableHead class="text-center">Crédito</TableHead>
+                            <TableRow class="dark:bg-[#27272a] bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold">
+                                <TableHead class="text-center dark:text-white">Lista</TableHead>
+                                <TableHead class="text-center dark:text-white">Descuento</TableHead>
+                                <TableHead class="text-center dark:text-white">Mayoreo</TableHead>
+                                <TableHead class="text-center dark:text-white">Mínimo</TableHead>
+                                <TableHead class="text-center dark:text-white">Crédito</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             <TableRow class="text-sm">
                                 <TableCell v-for="price in product.prices" :key="price.id"
-                                    class="text-center font-medium text-gray-800">
+                                    class="text-center font-medium">
                                     ${{ parseFloat(price.price).toFixed(2) }}
                                 </TableCell>
                             </TableRow>
@@ -82,7 +82,7 @@ const currentPrice = computed(() => {
             </div>
         </div>
 
-        <div class="flex-shrink-0 w-full md:w-48 flex flex-col items-stretch justify-center gap-2 mt-4 md:mt-0">
+        <div class="flex-shrink-0 w-full md:w-48 flex flex-col items-stretch justify-center gap-2 mt-15">
             <div class="w-full flex">
                 <Button variant="outline" size="icon" class="h-9 w-9" @click="decrement">
                     <Minus class="w-4 h-4" />
