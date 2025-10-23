@@ -1,5 +1,18 @@
 import apiClient from "@/shared/services/baseURL";
 
+export const fetchQuotes = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/quotes/", {
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching quotes:", error);
+    throw error;
+  }
+};
+
 export const postQuote = async (data) => {
   try {
     const response = await apiClient.post("/quotes/", data);
@@ -19,7 +32,7 @@ export const downloadQuote = async (quoteId) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `cotizacion_${quoteId}.pdf`);
+    link.setAttribute("download", `JOM_cotizacion_${quoteId}.pdf`);
     document.body.appendChild(link);
     link.click();
 

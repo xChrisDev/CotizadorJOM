@@ -9,6 +9,7 @@ import SellerPanel from '../components/SellerPanel.vue'
 import PurchasingStaffPanel from '../components/PurchasingStaffPanel.vue'
 import QuotePanel from '../components/QuotePanel.vue'
 import { getProfileUser } from '@/modules/Auth/services/authService.js'
+import QuotesListPanel from '../components/QuotesListPanel.vue'
 
 const currentView = ref(localStorage.getItem('sidebarActive') || 'dashboard')
 const handleViewChange = (newView) => {
@@ -42,6 +43,7 @@ onMounted(fetchMe)
       <SellerPanel v-if="currentView === 'vendedores'" />
       <PurchasingStaffPanel v-if="currentView === 'compras'" />
       <QuotePanel v-if="currentView === 'cotizar'" />
+      <QuotesListPanel v-if="currentView === 'cotizaciones'"/>
     </DashboardSidebar>
   </div>
 </template>
