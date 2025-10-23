@@ -41,6 +41,7 @@ import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
 import EditUser from './modals/EditUser.vue';
 import BanUser from './modals/BanUser.vue';
 import ActivateUser from './modals/ActivateUser.vue';
+import CreateUser from './modals/CreateUser.vue';
 
 const customers = ref([]);
 const isLoading = ref(true);
@@ -119,11 +120,7 @@ watch([search, ordering, page], () => {
                         </SelectContent>
                     </Select>
 
-                    <Button
-                        class="col-span-1 bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 transition-all">
-                        <UserRoundPlus class="size-4 mr-1" />
-                        Nuevo
-                    </Button>
+                    <CreateUser role="Cliente" @update="loadCustomers" />
                 </div>
             </div>
         </header>

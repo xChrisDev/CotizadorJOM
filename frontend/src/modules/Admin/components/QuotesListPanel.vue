@@ -30,7 +30,10 @@ import {
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
 import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
+import { downloadQuote, printQuote } from '@/modules/Quote/services/quoteService.js'
+import { useToast } from 'vue-toastification';
 
+const toast = useToast()
 const quotes = ref([]);
 const isLoading = ref(true);
 const search = ref("");
@@ -39,11 +42,9 @@ const page = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = 10;
 
-// --- Nuevos filtros ---
 const status = ref("");
 const issueDateStart = ref("");
 const issueDateEnd = ref("");
-// -----------------------
 
 const formatCurrency = (value) => {
     if (!value) return '$0.00';
@@ -76,6 +77,23 @@ const loadQuotes = async () => {
         isLoading.value = false;
     }
 };
+
+const handleDownloadPDF = async (quote_id) => {
+    try {
+        await downloadQuote(quote_id);
+        toast.success("PDF descargado exitosamente");
+    } catch (error) {
+        toast.error("Error al descargar PDF");
+    }
+}
+
+const handlePrintPDF = async (quote_id) => {
+    try {
+        await printQuote(quote_id);
+    } catch (error) {
+        toast.error("Error al imprimir PDF");
+    }
+}
 
 onMounted(loadQuotes);
 
@@ -253,7 +271,7 @@ watch(page, () => {
 
                                             <Tooltip>
                                                 <TooltipTrigger as-child>
-                                                    <Button variant="default"
+                                                    <Button variant="default" @click="handleDownloadPDF(quote.id)"
                                                         class="bg-red-500 hover:bg-red-600 text-white transition-all">
                                                         <FileDown class="w-5 h-5" />
                                                     </Button>
@@ -265,7 +283,7 @@ watch(page, () => {
 
                                             <Tooltip>
                                                 <TooltipTrigger as-child>
-                                                    <Button variant="default"
+                                                    <Button variant="default" @click="handlePrintPDF(quote.id)"
                                                         class="bg-slate-600 hover:bg-slate-700 text-white transition-all">
                                                         <Printer class="w-5 h-5" />
                                                     </Button>

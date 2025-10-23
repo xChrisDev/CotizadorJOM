@@ -1,9 +1,10 @@
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
+import { useToast } from "vue-toastification";
 
 export const useCartStore = defineStore("cart", () => {
   const STORAGE_KEY = "quote_cart";
-
+  const toast = useToast();
   const items = ref(JSON.parse(localStorage.getItem(STORAGE_KEY)) || []);
 
   const cartCount = computed(() =>
@@ -22,6 +23,7 @@ export const useCartStore = defineStore("cart", () => {
       existingItem.quantity += amount;
     } else {
       items.value.push({ ...product, quantity: amount });
+      toast.info(`${product.article_name} ha sido agregado`)
     }
   }
 
