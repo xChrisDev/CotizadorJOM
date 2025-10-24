@@ -46,8 +46,8 @@ class Quote(models.Model):
 
     def calculate_totals(self):
         items = self.items.all()
-        self.subtotal = sum(item.subtotal for item in items)
-        self.total = self.subtotal
+        self.total = sum(Decimal(item.subtotal) for item in items)
+        self.subtotal = self.total / Decimal("1.16")
         self.save()
 
     def __str__(self):
@@ -57,7 +57,7 @@ class Quote(models.Model):
 class QuoteItem(models.Model):
     quote = models.ForeignKey(Quote, on_delete=models.CASCADE, related_name="items")
     article = models.ForeignKey(Article, on_delete=models.PROTECT)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
