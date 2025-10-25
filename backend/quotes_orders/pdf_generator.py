@@ -9,8 +9,6 @@ class PDFGenerator:
         "logo_url": "https://res.cloudinary.com/dxhjcaqpk/image/upload/v1760545192/JOM_q0pkvn.png",
         "razon_social": "Refaccionaria JOM",
         "direccion": "Calle Fray Servando T. de M. Ote. 211, Barrio Alto, 99070 Fresnillo, Zac.",
-        "telefono": "+52 449 264 0046",
-        "email": "contacto@jom.com.mx",
     }
 
     BANK_INFO = {

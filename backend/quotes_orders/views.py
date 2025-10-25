@@ -15,6 +15,7 @@ from .serializers import (
 )
 from .filters import QuoteFilter, OrderFilter
 from .pdf_generator import PDFGenerator
+from .email_services import EmailService
 from users.permissions import IsAuth
 from users.pagination import PageNumberPagination
 
@@ -71,6 +72,29 @@ class QuoteViewSet(viewsets.ModelViewSet):
             f'attachment; filename="cotizacion_{quote.quote_number}.pdf"'
         )
         return response
+    
+    @action(detail=True, methods=["post"], url_path="send-email")
+    def send_email(self, request, pk=None):
+        quote = self.get_object()
+        recipient_email = request.data.get('recipient_email')
+        cc_emails = request.data.get('cc_emails', [])
+        
+        success = EmailService.send_quote_email(
+            quote=quote,
+            recipient_email=recipient_email,
+            cc_emails=cc_emails
+        )
+        
+        if success:
+            return Response(
+                {"message": "Cotización enviada por email correctamente"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"error": "Error al enviar el email"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(
         detail=False, methods=["get"], url_path="by_customer/(?P<customer_id>[^/.]+)"

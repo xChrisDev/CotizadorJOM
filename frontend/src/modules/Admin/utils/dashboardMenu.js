@@ -5,6 +5,7 @@ import {
   ShoppingCart,
   FileOutput,
   UserRoundPlus,
+  PackagePlus
 } from "lucide-vue-next";
 
 export const menuItems = [
@@ -52,5 +53,10 @@ export const menuItems = [
     title: "Ordenes de compra",
     option: "ordenes",
     icon: ShoppingCart,
+  },
+  {
+    title: "Articulos",
+    option: "articulos",
+    icon: PackagePlus,
   },
 ];

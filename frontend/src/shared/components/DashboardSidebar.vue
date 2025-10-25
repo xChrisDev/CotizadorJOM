@@ -5,9 +5,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -15,13 +12,16 @@ import {
   SidebarProvider,
   SidebarInset,
   SidebarTrigger,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from '@/shared/components/ui/sidebar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shared/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { Separator } from '@/shared/components/ui/separator'
 import { Button } from '@/shared/components/ui/button'
 import ThemeButton from '@/shared/components/ThemeButton.vue'
-import { ChevronsUpDown, LogOut, User } from 'lucide-vue-next'
+import { ChevronsUpDown, LogOut, User, ChevronDown, Shield, FileText, Bell } from 'lucide-vue-next'
 import { useAuthStore } from '@/shared/stores/auth.js'
 import ShoppingCartButton from '@/modules/ProductSearch/components/ShoppingCartButton.vue'
 
@@ -37,6 +37,17 @@ const authStore = useAuthStore()
 const emit = defineEmits(["update:view"])
 const sidebarTriggerRef = ref(null)
 const activeOption = ref(localStorage.getItem('sidebarActive') || '')
+
+// Estado para controlar secciones abiertas
+const openSections = ref({
+  administracion: true,
+  solicitudes: true,
+  documentos: true,
+})
+
+const toggleSection = (section) => {
+  openSections.value[section] = !openSections.value[section]
+}
 
 const handleClick = (option, toggleSidebar) => {
   activeOption.value = option
@@ -72,8 +83,7 @@ const handleLogout = () => {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div class="flex gap-2 py-2">
-          <div
-            class="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
+          <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#4ed636] to-[#09cb6d] text-white">
             <img src="@/shared/assets/JOM.png" alt="JOM" class="h-4" />
           </div>
           <div class="grid flex-1 text-left text-sm leading-tight">
@@ -84,90 +94,118 @@ const handleLogout = () => {
       </SidebarHeader>
 
       <SidebarContent>
-        <!-- Menú Principal -->
-        <SidebarGroup>
-          <SidebarGroupLabel>Menú Principal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem v-for="item in menuItems.filter(i => ['dashboard', 'cotizar'].includes(i.option))"
-                :key="item.title">
-                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
-                    class="flex justify-start gap-2"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
-                    <component :is="item.icon" class="w-4 h-4" />
-                    <span>{{ item.title }}</span>
-                  </Button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarMenu>
+          <!-- Menú Principal -->
+          <SidebarMenuItem
+            v-for="item in menuItems.filter(i => ['dashboard', 'cotizar'].includes(i.option))"
+            :key="item.title"
+          >
+            <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
+              <Button
+                @click="() => handleClick(item.option, toggleSidebar)"
+                variant="ghost"
+                class="flex justify-start gap-2"
+                :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }"
+              >
+                <component :is="item.icon" class="w-4 h-4" />
+                <span>{{ item.title }}</span>
+              </Button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
 
-        <!-- Gestión de Usuarios -->
-        <SidebarGroup>
-          <SidebarGroupLabel>Usuarios</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem
-                v-for="item in menuItems.filter(i => ['clientes', 'vendedores', 'compras'].includes(i.option))"
-                :key="item.title">
-                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
-                    class="flex justify-start gap-2"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
-                    <component :is="item.icon" class="w-4 h-4" />
-                    <span>{{ item.title }}</span>
-                  </Button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+          <!-- Administración -->
+          <SidebarMenuItem>
+            <SidebarMenuButton class="py-4 px-3" @click="toggleSection('administracion')">
+              <Shield class="w-4 h-4" />
+              <span>Administración</span>
+              <ChevronDown
+                class="ms-auto size-4 transition-transform"
+                :class="{ 'rotate-180': openSections.administracion }"
+              />
+            </SidebarMenuButton>
 
-        <!-- Solicitudes -->
-        <SidebarGroup>
-          <SidebarGroupLabel>Solicitudes</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem v-for="item in menuItems.filter(i => ['solicitudes'].includes(i.option))"
-                :key="item.title">
-                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
-                    class="flex justify-start gap-2"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
+            <transition name="fade">
+              <SidebarMenuSub v-if="openSections.administracion">
+                <SidebarMenuSubItem
+                  v-for="item in menuItems.filter(i => ['clientes', 'vendedores', 'compras','articulos'].includes(i.option))"
+                  :key="item.title"
+                >
+                  <SidebarMenuSubButton
+                    @click="() => handleClick(item.option, toggleSidebar)"
+                    class="py-4 select-none cursor-pointer"
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }"
+                  >
                     <component :is="item.icon" class="w-4 h-4" />
                     <span>{{ item.title }}</span>
-                  </Button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            </transition>
+          </SidebarMenuItem>
 
-        <!-- Reportes / Documentos -->
-        <SidebarGroup>
-          <SidebarGroupLabel>Reportes / Documentos</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem
-                v-for="item in menuItems.filter(i => ['reportes', 'cotizaciones', 'ordenes'].includes(i.option))"
-                :key="item.title">
-                <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-                  <Button @click="() => handleClick(item.option, toggleSidebar)" variant="ghost"
-                    class="flex justify-start gap-2"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
+          <!-- Solicitudes -->
+          <SidebarMenuItem>
+            <SidebarMenuButton class="py-4 px-3" @click="toggleSection('solicitudes')">
+              <Bell class="w-4 h-4" />
+              <span>Solicitudes</span>
+              <ChevronDown
+                class="ms-auto size-4 transition-transform"
+                :class="{ 'rotate-180': openSections.solicitudes }"
+              />
+            </SidebarMenuButton>
+
+            <transition name="fade">
+              <SidebarMenuSub v-if="openSections.solicitudes">
+                <SidebarMenuSubItem
+                  v-for="item in menuItems.filter(i => ['solicitudes'].includes(i.option))"
+                  :key="item.title"
+                >
+                  <SidebarMenuSubButton
+                    @click="() => handleClick(item.option, toggleSidebar)"
+                    class="py-4 select-none cursor-pointer"
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }"
+                  >
                     <component :is="item.icon" class="w-4 h-4" />
                     <span>{{ item.title }}</span>
-                  </Button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            </transition>
+          </SidebarMenuItem>
+
+          <!-- Documentos -->
+          <SidebarMenuItem>
+            <SidebarMenuButton class="py-4 px-3" @click="toggleSection('documentos')">
+              <FileText class="w-4 h-4" />
+              <span>Documentos</span>
+              <ChevronDown
+                class="ms-auto size-4 transition-transform"
+                :class="{ 'rotate-180': openSections.documentos }"
+              />
+            </SidebarMenuButton>
+
+            <transition name="fade">
+              <SidebarMenuSub v-if="openSections.documentos">
+                <SidebarMenuSubItem
+                  v-for="item in menuItems.filter(i => ['reportes', 'cotizaciones', 'ordenes'].includes(i.option))"
+                  :key="item.title"
+                >
+                  <SidebarMenuSubButton
+                    @click="() => handleClick(item.option, toggleSidebar)"
+                    class="py-4 select-none cursor-pointer"
+                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }"
+                  >
+                    <component :is="item.icon" class="w-4 h-4" />
+                    <span>{{ item.title }}</span>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            </transition>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarContent>
 
-
+      <!-- Footer -->
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -187,8 +225,7 @@ const handleLogout = () => {
                   <ChevronsUpDown class="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom"
-                align="end" :side-offset="4">
+              <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom" align="end" :side-offset="4">
                 <DropdownMenuItem @click="router.push('/perfil')" class="cursor-pointer">
                   <User class="mr-2 h-4 w-4" /> Perfil
                 </DropdownMenuItem>
@@ -209,7 +246,7 @@ const handleLogout = () => {
         <Separator orientation="vertical" class="mr-2 h-4" />
         <div class="flex items-center gap-2 flex-1"></div>
         <div class="flex items-center gap-2">
-          <ShoppingCartButton v-if="activeOption === 'cotizar'"/>
+          <ShoppingCartButton v-if="activeOption === 'cotizar'" />
           <ThemeButton />
         </div>
       </header>
@@ -219,3 +256,15 @@ const handleLogout = () => {
     </SidebarInset>
   </SidebarProvider>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>
