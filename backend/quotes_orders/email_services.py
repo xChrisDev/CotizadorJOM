@@ -15,12 +15,10 @@ class EmailService:
             if not recipient_email:
                 raise ValueError("No se proporcionó un email de destinatario")
             
-            # Generar PDF
             pdf_file = PDFGenerator.generate_quote_pdf(quote)
             if not pdf_file:
                 raise Exception("Error al generar el PDF")
             
-            # Preparar el email
             subject = f"Cotización {quote.quote_number} - Refaccionaria JOM"
             
             text_body = f"""
@@ -148,7 +146,7 @@ Contacto: {quote.seller.email} | Tel: {quote.seller.phone_number}
             
             email = EmailMultiAlternatives(
                 subject=subject,
-                body=text_body,  # Texto plano como fallback
+                body=text_body,
                 from_email=settings.EMAIL_HOST_USER,
                 to=[recipient_email],
                 cc=cc_emails if cc_emails else [],

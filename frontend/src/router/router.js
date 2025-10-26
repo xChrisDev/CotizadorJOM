@@ -12,6 +12,13 @@ import MainViewStaff from "@/modules/PurchasingStaff/views/MainView.vue";
 import QuoteView from "@/modules/Quote/views/QuoteView.vue";
 import PurchaseOrderView from "@/modules/PurchaseOrder/views/PurchaseOrderView.vue";
 import Unauthorized from "@/shared/components/Unauthorized.vue";
+import CustomerPanel from "@/modules/Admin/components/CustomerPanel.vue";
+import DashboardPanel from "@/modules/Admin/components/DashboardPanel.vue";
+import SellerPanel from "@/modules/Admin/components/SellerPanel.vue";
+import PurchasingStaffPanel from "@/modules/Admin/components/PurchasingStaffPanel.vue";
+import QuotePanel from "@/modules/Admin/components/QuotePanel.vue";
+import QuotesListPanel from "@/modules/Admin/components/QuotesListPanel.vue";
+import ArticlesPanel from "@/modules/Admin/components/ArticlesPanel.vue";
 
 const routes = [
   {
@@ -47,7 +54,11 @@ const routes = [
   {
     path: "/cotizacion",
     component: QuoteView,
-    meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN", "SELLER"]},
+    meta: {
+      transition: "fade-zoom",
+      requiresAuth: true,
+      roles: ["ADMIN", "SELLER"],
+    },
   },
   {
     path: "/orden-compra",
@@ -57,7 +68,16 @@ const routes = [
   {
     path: "/admin",
     component: DashboardView,
-    meta: { transition: "fade-zoom", requiresAuth: true, roles: ["ADMIN"] },
+    meta: { requiresAuth: true, roles: ["ADMIN"] },
+    redirect: "/admin/dashboard",
+    children: [
+      { path: "dashboard", component: DashboardPanel },
+      { path: "cotizar", component: QuotePanel },
+      { path: "clientes", component: CustomerPanel },
+      { path: "vendedores", component: SellerPanel },
+      { path: "staff", component: PurchasingStaffPanel },
+      { path: "articulos", component: ArticlesPanel },
+    ],
   },
   {
     path: "/vendedor",
