@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>{{ title }} - {{ order.quote_number }}</title>
+    <title>{{ title }} - {{ quote.quote_number }}</title>
     <style>
       @page {
         margin: 20mm 15mm;
@@ -24,12 +24,13 @@
         margin: 0 auto;
         padding: 10px;
       }
+
       /* Header */
       .header {
         display: table;
         width: 100%;
         border-bottom: 2px solid #27ae60;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         padding-bottom: 5px;
       }
       .header-logo {
@@ -56,17 +57,39 @@
         color: #555;
       }
 
+      /* Tabla pequeña de folio y fecha */
+      .folio-table {
+        border-collapse: collapse;
+        font-size: 8pt;
+        width: auto;
+        margin-left: auto;
+        margin-top: 5px;
+      }
+      .folio-table th {
+        background-color: #27ae60;
+        color: #fff;
+        font-weight: bold;
+        padding: 3px 6px;
+        border: 1px solid #27ae60;
+        text-align: center;
+      }
+      .folio-table td {
+        border: 1px solid #27ae60;
+        padding: 3px 6px;
+        text-align: center;
+      }
+
       /* Document title */
       .document-title {
         text-align: center;
-        font-size: 13pt;
+        font-size: 20pt;
         font-weight: bold;
         color: #27ae60;
         margin: 10px 0 15px;
         text-transform: uppercase;
       }
 
-      /* Info section  */
+      /* Info section */
       .info-table {
         width: 100%;
         border-spacing: 0;
@@ -96,8 +119,6 @@
         width: 100%;
         border-collapse: collapse;
         margin-top: 8px;
-        padding-bottom: 10px;
-        /* background-color: #f5f5f5; */
       }
       table thead {
         color: #27ae60;
@@ -105,7 +126,9 @@
       table th {
         text-align: left;
         border-bottom: 1px solid #ddd;
+        border-top: 1px solid #ddd;
         padding-bottom: 5px;
+        padding-top: 5px;
         font-size: 8.5pt;
       }
       table td {
@@ -144,7 +167,6 @@
       .section-box {
         margin-top: 20px;
         border-left: 4px solid #27ae60;
-        border-radius: 3px;
         padding: 8px;
       }
       .section-title {
@@ -161,7 +183,6 @@
       .notes-section {
         margin: 12px 0;
         padding: 8px;
-        border-radius: 3px;
         font-size: 8.5pt;
       }
 
@@ -177,55 +198,75 @@
   </head>
   <body>
     <div class="container">
-      <div class="header">
-        <div class="header-logo">
-          {% if company_info.logo_url %}
-          <img src="{{ company_info.logo_url }}" alt="Logo" />
-          {% endif %}
-        </div>
-        <div class="header-info">
-          <div class="company-name">{{ company_info.razon_social }}</div>
-          <div class="company-details">
-            {{ company_info.direccion }}<br />
-            Tel: {{ company_info.telefono }} | Email: {{ company_info.email }}
-          </div>
-        </div>
-      </div>
-
       <div class="document-title">{{ title }}</div>
 
+      <table class="info-table">
+        <tr style="border: none; width: 70%">
+          <td>
+            <div class="header">
+              <div class="header-logo">
+                {% if company_info.logo_url %}
+                <img src="{{ company_info.logo_url }}" alt="Logo" />
+                {% endif %}
+              </div>
+              <div class="header-info">
+                <div class="company-name">{{ company_info.razon_social }}</div>
+                <div class="company-details">{{ company_info.direccion }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="text-align: right; vertical-align: top; width: 30%">
+            <table class="folio-table">
+              <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ quote.quote_number }}</td>
+                  <td>{{ quote.issue_date|date:"d/m/Y" }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
       <table class="info-table">
         <tr>
           <td class="info-left">
             <div class="info-value">
               <span class="info-label">Cliente:</span><br />
-              {{ order.customer.first_name }} {{ order.customer.last_name }}<br />
-              {{ order.customer.email }}<br />
-              {{ order.customer.phone_number }}
+              {{ quote.customer.first_name }} {{ quote.customer.last_name }}<br />
+              {{ quote.customer.email }}<br />
+              {{ quote.customer.phone_number }}
+            </div>
+          </td>
+          <td class="info-left">
+            <div class="info-value">
+              <span class="info-label">Vendedor:</span><br />
+              {{ quote.seller.first_name }} {{ quote.seller.last_name }}<br />
+              {{ quote.seller.email }}<br />
+              {{ quote.seller.phone_number }}
             </div>
           </td>
           <td class="info-right">
             <div class="info-value">
-              <span class="info-label">No. Orden:</span> {{order.quote_number }}
+              <span class="info-label">Vencimiento:</span>
+              {{ quote.expiration_date|date:"d/m/Y" }}
             </div>
             <div class="info-value">
-              <span class="info-label">Emisión:</span> {{order.issue_date|date:"d/m/Y" }}
+              <span class="info-label">Estado:</span>
+              {{ quote.get_status_display }}
             </div>
-            <div class="info-value">
-              <span class="info-label">Vencimiento:</span> {{order.expiration_date|date:"d/m/Y" }}
-            </div>
-            <div class="info-value">
-              <span class="info-label">Vendedor:</span> {{order.seller.first_name }} {{ order.seller.last_name }}
-            </div>
-            <div class="info-value">
-              <span class="info-label">Estado:</span> {{order.get_status_display }}
-            </div>
-            <div class="info-value"><span class="info-label">Estado de Pago:</span>{{ order.get_payment_status_display }}</div>
           </td>
         </tr>
       </table>
-
-      <table>
+      <div>
+        <p></p>
+      </div>
+      <table style="padding: 8px">
         <thead>
           <tr>
             <th style="width: 10%">Código</th>
@@ -237,14 +278,16 @@
           </tr>
         </thead>
         <tbody>
-          {% for item in order.items.all %}
+          {% for item in items %}
           <tr>
-            <td>{{ item.article.item_code }}</td>
-            <td>{{ item.article.article_name }}</td>
-            <td class="text-center">{{ item.article.unit_of_measure }}</td>
+            <td>{{ item.article.item_code|default:"" }}</td>
+            <td>{{ item.article.article_name|default:"" }}</td>
+            <td class="text-center">
+              {{ item.article.unit_of_measure|default:"" }}
+            </td>
             <td class="text-right">{{ item.quantity }}</td>
-            <td class="text-right">${{ item.price|floatformat:2 }}</td>
-            <td class="text-right">${{ item.subtotal|floatformat:2 }}</td>
+            <td class="text-right">${{ item.price }}</td>
+            <td class="text-right">${{ item.subtotal }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -252,19 +295,26 @@
 
       <div class="totals-section">
         <div class="total-row">
-          <strong>Subtotal:</strong> ${{ order.subtotal|floatformat:2 }}
+          <strong>Subtotal:</strong> ${{ subtotal_fmt }}
         </div>
-        <div class="grand-total">
-          TOTAL: ${{ order.total|floatformat:2 }} MXN
-        </div>
+        <div class="total-row"><strong>IVA:</strong> ${{ iva }}</div>
+        <div class="grand-total">TOTAL: ${{ total_fmt }}</div>
       </div>
 
-      {% if order.notes %}
-      <div class="notes-section">
-        <div class="section-title">Notas</div>
-        <div>{{ order.notes }}</div>
-      </div>
-      {% endif %}
+      <table class="folio-table" style="width: 100%;">
+        <thead>
+          <tr>
+            <th style="width: 30%;">Notas</th>
+            <th style="width: 70%;">Total en texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ quote.notes|default:" " }}</td>
+            <td>{{ total_text }}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <table class="info-table">
         <tr>
@@ -300,7 +350,8 @@
       </table>
 
       <div class="footer">
-        Documento generado electrónicamente por {{ company_info.razon_social}}<br />
+        Documento generado electrónicamente por {{ company_info.razon_social
+        }}<br />
         Válido sin firma autógrafa
       </div>
     </div>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+        text-align: left;
+      }
+      .container {
+        max-width: 600px;
+        margin-left: 0;
+        margin-right: auto;
+        padding: 0;
+      }
+      .header {
+        background-color: #27ae60;
+        color: white;
+        padding: 10px;
+        text-align: left;
+        border-radius: 5px 5px 0 0;
+      }
+      .content {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      .details {
+        background-color: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-left: 4px solid #27ae60;
+      }
+      .detail-row {
+        margin: 6px 0;
+      }
+      .label {
+        font-weight: bold;
+        color: #27ae60;
+      }
+      .footer {
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.9em;
+        border-radius: 0 0 5px 5px;
+      }
+      .signature {
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 2px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Cotización {{quote.quote_number}}</h1>
+      </div>
+
+      <div class="content">
+        <p>
+          Estimado/a
+          <strong>
+            {{quote.customer.first_name}} {{quote.customer.last_name}}</strong
+          >,
+        </p>
+        <p>
+          Le enviamos adjunta la cotización
+          <strong> {{quote.quote_number}}</strong> con los detalles solicitados.
+        </p>
+
+        <div class="details">
+          <h3 style="color: #27ae60; margin-top: 0">
+            Detalles de la Cotización
+          </h3>
+
+          <div class="detail-row">
+            <span class="label">Número:</span> {{quote.quote_number}}
+          </div>
+          <div class="detail-row">
+            <span class="label">Fecha de emisión:</span>
+            {{quote.issue_date}}
+          </div>
+          <div class="detail-row">
+            <span class="label">Fecha de vencimiento:</span>
+            {{quote.expiration_date}}
+          </div>
+        </div>
+
+        <p>Para cualquier duda o aclaración, no dude en contactarnos.</p>
+
+        <div class="signature">
+          <p><strong>Atentamente,</strong></p>
+          <p>
+            <strong>
+              {{quote.seller.first_name}} {{quote.seller.last_name}}</strong
+            ><br />
+            Refaccionaria JOM
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>
+          Este es un correo automático, por favor no responder directamente.
+        </p>
+        <p>📧 {{quote.seller.email}} | 📞 {{quote.seller.phone_number}}</p>
+      </div>
+    </div>
+  </body>
+</html>

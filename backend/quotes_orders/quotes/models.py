@@ -1,14 +1,11 @@
 from django.db import models, transaction
 from users.models import User
 from articles.models import Article
-from .enums import STATUS_CHOICES, PAYMENT_STATUS_CHOICES
 from django.utils import timezone
 from decimal import Decimal
 
-
 class QuoteCounter(models.Model):
     """Contador global para quotes"""
-
     last_number = models.PositiveIntegerField(default=0)
 
 
@@ -20,7 +17,6 @@ class Quote(models.Model):
     seller = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="quotes_as_seller"
     )
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
     issue_date = models.DateField(default=timezone.now)
     expiration_date = models.DateField()
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -28,6 +24,11 @@ class Quote(models.Model):
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "quotes"
+        ordering = ["-created_at"]
+
 
     def save(self, *args, **kwargs):
         if not self.quote_number:
@@ -39,16 +40,15 @@ class Quote(models.Model):
                 self.quote_number = f"COT-{counter.last_number:04d}"
                 counter.save()
         super().save(*args, **kwargs)
-
-    class Meta:
-        db_table = "quotes"
-        ordering = ["-created_at"]
-
+        
     def calculate_totals(self):
         items = self.items.all()
         self.total = sum(Decimal(item.subtotal) for item in items)
         self.subtotal = self.total / Decimal("1.16")
         self.save()
+        
+    def get_current_status(self):
+        return self.status_history.order_by('-date').first()
 
     def __str__(self):
         return f"Quote {self.quote_number}"
@@ -72,55 +72,36 @@ class QuoteItem(models.Model):
     def __str__(self):
         return f"{self.article.article_name} - {self.quantity}"
 
-
-class Order(models.Model):
-    order_number = models.CharField(max_length=50, unique=True)
-    customer = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="orders_as_customer"
-    )
-    seller = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="orders_as_seller"
-    )
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
-    payment_status = models.CharField(
-        max_length=10, choices=PAYMENT_STATUS_CHOICES, default="PENDING"
-    )
-    issue_date = models.DateField(default=timezone.now)
-    expiration_date = models.DateField()
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    notes = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
+class Status(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
+    
     class Meta:
-        db_table = "orders"
-        ordering = ["-created_at"]
-
-    def calculate_totals(self):
-        items = self.items.all()
-        self.subtotal = sum(item.subtotal for item in items)
-        self.total = self.subtotal
-        self.save()
-
+        db_table = "statuses"
+    
     def __str__(self):
-        return f"Order {self.order_number}"
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    article = models.ForeignKey(Article, on_delete=models.PROTECT)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-
+        return self.name
+    
+class QuoteStatus(models.Model):
+    quote = models.ForeignKey(
+        Quote, 
+        on_delete=models.CASCADE, 
+        related_name="status_history"
+    )
+    status = models.ForeignKey(Status, on_delete=models.PROTECT)
+    note = models.TextField(max_length=128, blank=True, null=True)
+    date = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(
+        User, 
+        on_delete=models.PROTECT,
+        related_name="quote_status_changes",
+        null=True,
+        blank=True
+    )
+    
     class Meta:
-        db_table = "order_items"
-
-    def save(self, *args, **kwargs):
-        self.subtotal = self.quantity * self.price
-        super().save(*args, **kwargs)
-        self.order.calculate_totals()
-
+        db_table = "quote_status_history"
+        ordering = ["-date"]
+    
     def __str__(self):
-        return f"{self.article.article_name} - {self.quantity}"
+        return f"{self.quote.quote_number} - {self.status.name} ({self.date})"
