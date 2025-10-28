@@ -77,7 +77,6 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadProducts);
 </script>
 
 <template>
-
     <div class="xl:sticky top-0 pt-2 z-[19]">
         <div class="flex flex-col justify-between md:items-center gap-4">
             <div

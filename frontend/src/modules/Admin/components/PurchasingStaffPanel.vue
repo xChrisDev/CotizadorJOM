@@ -156,10 +156,10 @@ watch([search, ordering, page], loadPurchasingStaff);
                                 </div>
                             </TableCell>
                             <TableCell class="flex gap-2 justify-center">
-                                <EditUser :id="staff.id" role="Vendedor" @update="loadPurchasingStaff" />
-                                <BanUser v-if="staff.status != 'BANNED'" :id="staff.id" role="Vendedor"
+                                <EditUser :id="staff.id" role="Compras" @update="loadPurchasingStaff" />
+                                <BanUser v-if="staff.status != 'BANNED'" :id="staff.id" role="Compras"
                                     @update="loadPurchasingStaff" />
-                                <ActivateUser v-if="staff.status == 'BANNED'" :id="staff.id" role="Vendedor"
+                                <ActivateUser v-if="staff.status == 'BANNED'" :id="staff.id" role="Compras"
                                     @update="loadPurchasingStaff" />
                             </TableCell>
                         </TableRow>

@@ -21,9 +21,11 @@ import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { Separator } from '@/shared/components/ui/separator'
 import { Button } from '@/shared/components/ui/button'
 import ThemeButton from '@/shared/components/ThemeButton.vue'
-import { ChevronsUpDown, LogOut, User, ChevronDown, Shield, FileText, Bell } from 'lucide-vue-next'
+import { ChevronsUpDown, LogOut, User, ChevronDown, Shield, FileText, Bell, LayoutDashboard, Calculator, Users, Briefcase, Truck, Archive, Package, FilePieChart, ShoppingCart, FolderKanban } from 'lucide-vue-next'
 import { useAuthStore } from '@/shared/stores/auth.js'
 import ShoppingCartButton from '@/modules/ProductSearch/components/ShoppingCartButton.vue'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible'
+import NavMain from './NavMain.vue'
 
 const props = defineProps({
   menuItems: { type: Array, required: true },
@@ -98,97 +100,9 @@ const handleLogout = () => {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarMenu>
-          <!-- Menú Principal -->
-          <SidebarMenuItem v-for="item in menuItems.filter(i => ['dashboard', 'cotizar'].includes(i.option))"
-            :key="item.title">
-            <SidebarMenuButton as-child :tooltip="item.title" class="py-4">
-              <Button @click="() => handleClick(item.option, toggleSidebar, item.url)" variant="ghost"
-                class="flex justify-start gap-2"
-                :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
-                <component :is="item.icon" class="w-4 h-4" />
-                <span>{{ item.title }}</span>
-              </Button>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          <!-- Administración -->
-          <SidebarMenuItem>
-            <SidebarMenuButton class="py-4 px-3" @click="toggleSection('administracion')">
-              <Shield class="w-4 h-4" />
-              <span>Administración</span>
-              <ChevronDown class="ms-auto size-4 transition-transform"
-                :class="{ 'rotate-180': openSections.administracion }" />
-            </SidebarMenuButton>
-
-            <transition name="fade">
-              <SidebarMenuSub v-if="openSections.administracion">
-                <SidebarMenuSubItem
-                  v-for="item in menuItems.filter(i => ['clientes', 'vendedores', 'compras', 'articulos'].includes(i.option))"
-                  :key="item.title">
-                  <SidebarMenuSubButton @click="() => handleClick(item.option, toggleSidebar, item.url)"
-                    class="py-4 select-none cursor-pointer"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
-                    <component :is="item.icon" class="w-4 h-4" />
-                    <span>{{ item.title }}</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              </SidebarMenuSub>
-            </transition>
-          </SidebarMenuItem>
-
-          <!-- Solicitudes -->
-          <SidebarMenuItem>
-            <SidebarMenuButton class="py-4 px-3" @click="toggleSection('solicitudes')">
-              <Bell class="w-4 h-4" />
-              <span>Solicitudes</span>
-              <ChevronDown class="ms-auto size-4 transition-transform"
-                :class="{ 'rotate-180': openSections.solicitudes }" />
-            </SidebarMenuButton>
-
-            <transition name="fade">
-              <SidebarMenuSub v-if="openSections.solicitudes">
-                <SidebarMenuSubItem v-for="item in menuItems.filter(i => ['solicitudes'].includes(i.option))"
-                  :key="item.title">
-                  <SidebarMenuSubButton @click="() => handleClick(item.option, toggleSidebar)"
-                    class="py-4 select-none cursor-pointer"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
-                    <component :is="item.icon" class="w-4 h-4" />
-                    <span>{{ item.title }}</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              </SidebarMenuSub>
-            </transition>
-          </SidebarMenuItem>
-
-          <!-- Documentos -->
-          <SidebarMenuItem>
-            <SidebarMenuButton class="py-4 px-3" @click="toggleSection('documentos')">
-              <FileText class="w-4 h-4" />
-              <span>Documentos</span>
-              <ChevronDown class="ms-auto size-4 transition-transform"
-                :class="{ 'rotate-180': openSections.documentos }" />
-            </SidebarMenuButton>
-
-            <transition name="fade">
-              <SidebarMenuSub v-if="openSections.documentos">
-                <SidebarMenuSubItem
-                  v-for="item in menuItems.filter(i => ['reportes', 'cotizaciones', 'ordenes'].includes(i.option))"
-                  :key="item.title">
-                  <SidebarMenuSubButton @click="() => handleClick(item.option, toggleSidebar)"
-                    class="py-4 select-none cursor-pointer"
-                    :class="{ 'bg-sidebar-accent border-[1px] dark:border-gray-700': activeOption === item.option }">
-                    <component :is="item.icon" class="w-4 h-4" />
-                    <span>{{ item.title }}</span>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              </SidebarMenuSub>
-            </transition>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <NavMain :items="menuItems" />
       </SidebarContent>
 
-      <!-- Footer -->
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>

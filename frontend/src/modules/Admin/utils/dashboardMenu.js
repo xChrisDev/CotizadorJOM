@@ -1,72 +1,75 @@
 import {
   LayoutDashboard,
+  Calculator,
+  Bell,
+  Shield,
+  ChevronDown,
   Users,
+  Briefcase,
+  Truck,
+  Archive,
+  Package,
   FileText,
+  FolderKanban,
+  FilePieChart,
   ShoppingCart,
-  FileOutput,
-  UserRoundPlus,
-  PackagePlus
 } from "lucide-vue-next";
 
 export const menuItems = [
   {
-    title: "Dashboard",
-    option: "dashboard",
-    icon: LayoutDashboard,
-    url: "/dashboard"
+    title: "Administracion",
+    url: "/admin",
+    icon: Shield,
+    items: [
+      {
+        title: "Clientes",
+        icon: Users,
+        url: "/admin/clientes",
+      },
+      {
+        title: "Vendedores",
+        icon: Briefcase,
+        url: "/admin/vendedores",
+      },
+      {
+        title: "Personal de compras",
+        icon: Truck,
+        url: "/admin/staff",
+      },
+    ],
   },
   {
-    title: "Cotizar",
-    option: "cotizar",
-    icon: FileOutput,
-    url: "/cotizar"
+    title: "Gestión del cotizador",
+    url: "#",
+    icon: Archive,
+    items: [
+      {
+        title: "Articulos",
+        icon: Package,
+        url: "/admin/articulos",
+      },
+      {
+        title: "Cotizaciones",
+        icon: FileText,
+        url: "/admin/cotizaciones",
+      },
+    ],
   },
   {
-    title: "Solicitudes",
-    option: "solicitudes",
-    icon: UserRoundPlus,
-    url: "/solicitudes"
-  },
-  {
-    title: "Clientes",
-    option: "clientes",
-    icon: Users,
-    url: "/clientes"
-  },
-  {
-    title: "Vendedores",
-    option: "vendedores",
-    icon: Users,
-    url: "/vendedores"
-  },
-  {
-    title: "Personal de Compras",
-    option: "compras",
-    icon: Users,
-    url: "/staff"
-  },
-  {
-    title: "Reportes",
-    option: "reportes",
-    icon: FileText,
-    url: "/reportes"
-  },
-  {
-    title: "Cotizaciones",
-    option: "cotizaciones",
-    icon: FileOutput,
-    url: "/cotizaciones"
-  },
-  {
-    title: "Ordenes de compra",
-    option: "ordenes",
-    icon: ShoppingCart,
-    url: "/ordenes"
-  },
-  {
-    title: "Articulos",
-    option: "articulos",
-    icon: PackagePlus,
-    url: "/articulos"
+    title: "Documentos",
+    url: "#",
+    icon: FolderKanban,
+    items: [
+      {
+        title: "Reportes",
+        icon: FilePieChart,
+        url: "#",
+      },
+      {
+        title: "Ordenes de compra",
+        icon: ShoppingCart,
+        url: "#",
+      },
+    ],
   },
 ];

@@ -125,16 +125,21 @@ const onSubmit = handleSubmit(async (values) => {
     </DialogTrigger>
 
     <DialogContent class="sm:max-w-[480px] rounded-2xl shadow-xl border border-border/40 backdrop-blur-md">
-      <DialogHeader class="text-center">
-        <div class="flex justify-center mb-2">
-          <component :is="roleIcon" class="size-10 text-green-500" />
+      <DialogHeader class="text-center flex">
+        <div class="flex mb-2 gap-4 items-center">
+          <div
+            class="p-3 rounded-xl bg-gradient-to-r from-[#4ed636]/10 to-[#09cb6d]/10 group-hover:from-[#4ed636]/20 group-hover:to-[#09cb6d]/20 transition-all duration-300">
+            <component :is="roleIcon" class="size-10 text-green-500" />
+          </div>
+          <div>
+            <h1 class="text-2xl font-semibold">
+              Registrar {{ props.role }}
+            </h1>
+            <span class="text-muted-foreground text-xs">
+              Completa la información del {{ props.role.toLowerCase() }}.
+            </span>
+          </div>
         </div>
-        <DialogTitle class="text-2xl font-semibold">
-          Registrar {{ props.role }}
-        </DialogTitle>
-        <DialogDescription class="text-muted-foreground text-sm">
-          Completa la información para agregar un nuevo {{ props.role.toLowerCase() }}.
-        </DialogDescription>
       </DialogHeader>
 
       <form @submit.prevent="onSubmit" class="grid gap-4 py-4">

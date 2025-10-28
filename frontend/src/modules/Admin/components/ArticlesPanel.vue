@@ -105,13 +105,13 @@ watch([search, ordering, page], () => {
                         </SelectContent>
                     </Select>
 
-                    <Button>Crear Producto</Button> 
+                    <Button>Crear Producto</Button>
                 </div>
             </div>
         </header>
 
         <Card class="flex flex-col flex-1 overflow-hidden">
-            <CardContent class="px-2 flex-1 overflow-y-auto">
+            <CardContent class="px-2 flex-1 overflow-y-auto overflow-x-auto">
                 <div class="flex items-center gap-2 ps-2">
                     <ListCollapse class="size-5" />
                     Mostrando <span class="font-bold">{{ totalItems }}</span> registros
@@ -127,8 +127,6 @@ watch([search, ordering, page], () => {
                             <TableHead>Imagen</TableHead>
                             <TableHead>SKU</TableHead>
                             <TableHead>Nombre</TableHead>
-                            <TableHead>Familia</TableHead>
-                            <TableHead>Categoría</TableHead>
                             <TableHead>Marca</TableHead>
                             <TableHead>U. de Medida</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
@@ -137,7 +135,8 @@ watch([search, ordering, page], () => {
                     <TableBody>
                         <TableRow v-for="product in products" :key="product.id">
                             <TableCell>
-                                <img :src="product.image || '/src/shared/assets/default-image.jpg'" :alt="product.article_name" class="w-16 h-16 object-cover rounded-md">
+                                <img :src="product.image || '/src/shared/assets/default-image.jpg'"
+                                    :alt="product.article_name" class="w-16 h-16 object-cover rounded-md">
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ product.item_code }}
@@ -145,8 +144,6 @@ watch([search, ordering, page], () => {
                             <TableCell>
                                 {{ product.article_name }}
                             </TableCell>
-                            <TableCell>{{ product.family.name }}</TableCell>
-                            <TableCell>{{ product.category.name }}</TableCell>
                             <TableCell>{{ product.brand.name }}</TableCell>
                             <TableCell>{{ product.unit_of_measure }}</TableCell>
                             <TableCell class="flex gap-2 justify-center">

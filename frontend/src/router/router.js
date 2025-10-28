@@ -19,6 +19,7 @@ import PurchasingStaffPanel from "@/modules/Admin/components/PurchasingStaffPane
 import QuotePanel from "@/modules/Admin/components/QuotePanel.vue";
 import QuotesListPanel from "@/modules/Admin/components/QuotesListPanel.vue";
 import ArticlesPanel from "@/modules/Admin/components/ArticlesPanel.vue";
+import UserRequestPanel from "@/modules/Admin/components/UserRequestPanel.vue";
 
 const routes = [
   {
@@ -72,7 +73,9 @@ const routes = [
     redirect: "/admin/dashboard",
     children: [
       { path: "dashboard", component: DashboardPanel },
+      { path: "solicitudes", component: UserRequestPanel },
       { path: "cotizar", component: QuotePanel },
+      { path: "cotizaciones", component: QuotesListPanel },
       { path: "clientes", component: CustomerPanel },
       { path: "vendedores", component: SellerPanel },
       { path: "staff", component: PurchasingStaffPanel },
