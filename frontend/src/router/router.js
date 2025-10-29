@@ -10,7 +10,6 @@ import DashboardView from "@/modules/Admin/views/DashboardView.vue";
 import MainViewSeller from "@/modules/Seller/views/MainView.vue";
 import MainViewStaff from "@/modules/PurchasingStaff/views/MainView.vue";
 import QuoteView from "@/modules/Quote/views/QuoteView.vue";
-import PurchaseOrderView from "@/modules/PurchaseOrder/views/PurchaseOrderView.vue";
 import Unauthorized from "@/shared/components/Unauthorized.vue";
 import CustomerPanel from "@/modules/Admin/components/CustomerPanel.vue";
 import DashboardPanel from "@/modules/Admin/components/DashboardPanel.vue";
@@ -60,11 +59,6 @@ const routes = [
       requiresAuth: true,
       roles: ["ADMIN", "SELLER"],
     },
-  },
-  {
-    path: "/orden-compra",
-    component: PurchaseOrderView,
-    meta: { transition: "fade-zoom" },
   },
   {
     path: "/admin",

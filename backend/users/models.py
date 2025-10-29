@@ -14,7 +14,7 @@ class User(models.Model):
     phone_number = PhoneNumberField(null=True, blank=True, unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="CUSTOMER")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
-    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default="PENDING")
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default="PERSON")
 
     class Meta:
         db_table = "users"

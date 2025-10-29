@@ -41,7 +41,9 @@ import EditUser from './modals/EditUser.vue';
 import BanUser from './modals/BanUser.vue';
 import ActivateUser from './modals/ActivateUser.vue';
 import CreateUser from './modals/CreateUser.vue';
+import { useDebounce } from '@/shared/utils/useDebounce.js';
 
+let debounceTimeout = null;
 const sellers = ref([]);
 const isLoading = ref(true);
 const search = ref("");
@@ -69,14 +71,11 @@ const loadSellers = async () => {
 };
 
 onMounted(loadSellers);
-let timeout;
-watch([search, ordering, page], () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        loadSellers();
-    }, 300);
-});
 
+const debouncedSearch = useDebounce(search, 300);
+const debouncedPage = useDebounce(page, 300);
+const debouncedOrdering = useDebounce(ordering, 300);
+watch([debouncedSearch, debouncedOrdering, debouncedPage], loadSellers);
 </script>
 <template>
     <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
@@ -150,7 +149,7 @@ watch([search, ordering, page], () => {
                                 {{ seller.username }}
                             </TableCell>
                             <TableCell>
-                                {{ seller.first_name }} {{ seller.last_name }}
+                                {{ seller.name }}
                             </TableCell>
                             <TableCell>{{ seller.email }}</TableCell>
                             <TableCell>{{ seller.phone_number }}</TableCell>

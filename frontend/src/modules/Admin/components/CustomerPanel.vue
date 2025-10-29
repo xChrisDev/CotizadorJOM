@@ -42,7 +42,9 @@ import EditUser from './modals/EditUser.vue';
 import BanUser from './modals/BanUser.vue';
 import ActivateUser from './modals/ActivateUser.vue';
 import CreateUser from './modals/CreateUser.vue';
+import { useDebounce } from '@/shared/utils/useDebounce.js';
 
+let debounceTimeout = null;
 const customers = ref([]);
 const isLoading = ref(true);
 const search = ref("");
@@ -69,17 +71,12 @@ const loadCustomers = async () => {
     }
 };
 
-
 onMounted(loadCustomers);
 
-let timeout;
-watch([search, ordering, page], () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        loadCustomers();
-    }, 300);
-});
-
+const debouncedSearch = useDebounce(search, 300);
+const debouncedPage = useDebounce(page, 300);
+const debouncedOrdering = useDebounce(ordering, 300);
+watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
 </script>
 <template>
     <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
@@ -153,7 +150,7 @@ watch([search, ordering, page], () => {
                                 {{ customer.username }}
                             </TableCell>
                             <TableCell>
-                                {{ customer.first_name }} {{ customer.last_name }}
+                                {{ customer.name }}
                             </TableCell>
                             <TableCell>{{ customer.email }}</TableCell>
                             <TableCell>{{ customer.phone_number }}</TableCell>

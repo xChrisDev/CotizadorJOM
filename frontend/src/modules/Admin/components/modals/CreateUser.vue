@@ -1,9 +1,18 @@
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { useForm } from "vee-validate"
 import { toTypedSchema } from "@vee-validate/zod"
 import * as z from "zod"
 import { Button } from "@/shared/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select"
 import {
   Dialog,
   DialogClose,
@@ -34,13 +43,12 @@ import { registerUser } from "@/modules/Auth/services/authService.js"
 
 const toast = useToast()
 
-const props = defineProps({
-  role: { type: String, required: true },
-})
+const isDialogOpen = ref(false)
+const props = defineProps({ role: { type: String, required: true } })
 const emit = defineEmits(["update"])
 const isLoading = ref(false)
+const isClientRole = computed(() => props.role.toLowerCase() === 'cliente')
 
-// Ícono dinámico según el rol
 const roleIcon = computed(() => {
   switch (props.role.toLowerCase()) {
     case "vendedor":
@@ -54,41 +62,76 @@ const roleIcon = computed(() => {
   }
 })
 
-// Validación con zod
-const formSchema = toTypedSchema(
-  z.object({
+const formSchema = computed(() => {
+  const baseSchema = {
     username: z.string().min(3, { message: "Debe tener al menos 3 caracteres." }),
     firstName: z.string().min(2, { message: "El nombre es demasiado corto." }),
-    lastName: z.string().min(2, { message: "El apellido es demasiado corto." }),
     email: z.string().email({ message: "El formato del correo no es válido." }),
     password: z.string().min(8, { message: "Debe tener al menos 8 caracteres." }),
     phoneNumber: z.string().regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
-  })
-)
+  };
 
-const { handleSubmit, defineField, errors, resetForm } = useForm({
-  validationSchema: formSchema,
+  if (isClientRole.value) {
+    baseSchema.clientType = z.string({ message: "Debe seleccionar un tipo." })
+  } else {
+    baseSchema.clientType = z.string().optional().nullable()
+  }
+
+  return toTypedSchema(z.object(baseSchema))
 })
 
+const { handleSubmit, defineField, errors, resetForm } = useForm({
+  validationSchema: formSchema.value,
+  initialValues: {
+    clientType: isClientRole.value ? undefined : 'NOT_APPLICABLE',
+    username: "",
+    firstName: "",
+    email: "",
+    password: "",
+    phoneNumber: ""
+  }
+})
+
+const [clientType, clientTypeAttrs] = defineField("clientType")
 const [username, usernameAttrs] = defineField("username")
 const [firstName, firstNameAttrs] = defineField("firstName")
-const [lastName, lastNameAttrs] = defineField("lastName")
 const [email, emailAttrs] = defineField("email")
 const [password, passwordAttrs] = defineField("password")
 const [phoneNumber, phoneNumberAttrs] = defineField("phoneNumber")
 
 const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true
+  let role = 'CUSTOMER'
+
+  switch (props.role.toLowerCase()) {
+    case "vendedor":
+      role = 'SELLER'
+      break
+    case "cliente":
+      role = 'CUSTOMER'
+      break
+    case "compras":
+      role = 'STAFF'
+      break
+  }
+
   try {
     const userData = {
       username: values.username,
-      first_name: values.firstName,
-      last_name: values.lastName,
+      name: values.firstName,
       email: values.email,
       password: values.password,
       phone_number: "+52" + values.phoneNumber,
-      role: props.role,
+      role: role,
+      status: 'ACTIVE'
     }
+
+    if (isClientRole.value) {
+      userData.type = values.clientType
+    }
+
+    console.log(userData);
+
 
     const response = await registerUser(userData)
 
@@ -105,6 +148,7 @@ const onSubmit = handleSubmit(async (values) => {
       position: "top-center",
     })
 
+    isDialogOpen.value = false
     emit("update")
     resetForm()
   } catch (error) {
@@ -113,10 +157,11 @@ const onSubmit = handleSubmit(async (values) => {
     isLoading.value = false
   }
 })
+
 </script>
 
 <template>
-  <Dialog>
+  <Dialog v-model:open="isDialogOpen">
     <DialogTrigger as-child>
       <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 shadow-md">
         <Plus class="size-4 mr-1" />
@@ -143,49 +188,57 @@ const onSubmit = handleSubmit(async (values) => {
       </DialogHeader>
 
       <form @submit.prevent="onSubmit" class="grid gap-4 py-4">
-        <!-- Username -->
+        <div v-if="isClientRole" class="relative">
+          <User class="absolute left-3 top-2.5 text-muted-foreground size-4" />
+          <Select v-model="clientType" v-bind="clientTypeAttrs">
+            <SelectTrigger :class="{ 'border-red-500': errors.clientType }" class="w-full pl-9">
+              <SelectValue placeholder="Selecciona un tipo de cliente" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Tipo de cliente</SelectLabel>
+                <SelectItem value="PERSON">
+                  Persona
+                </SelectItem>
+                <SelectItem value="BUSINESS">
+                  Empresa
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <p v-if="errors.clientType" class="text-red-500 text-xs mt-1">{{ errors.clientType }}</p>
+        </div>
+
         <div class="relative">
-          <User class="absolute left-3 top-3 text-muted-foreground size-4" />
+          <User class="absolute left-3 top-2.5 text-muted-foreground size-4" />
           <Input id="username" v-model="username" v-bind="usernameAttrs" placeholder="Nombre de usuario" class="pl-9"
             autocomplete="off" />
           <p v-if="errors.username" class="text-red-500 text-xs mt-1">{{ errors.username }}</p>
         </div>
 
-        <!-- Nombre -->
         <div class="relative">
-          <IdCard class="absolute left-3 top-3 text-muted-foreground size-4" />
-          <Input id="first-name" v-model="firstName" v-bind="firstNameAttrs" placeholder="Nombre(s)" class="pl-9"
+          <IdCard class="absolute left-3 top-2.5 text-muted-foreground size-4" />
+          <Input id="first-name" v-model="firstName" v-bind="firstNameAttrs" placeholder="Nombre completo" class="pl-9"
             autocomplete="off" />
           <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">{{ errors.firstName }}</p>
         </div>
 
-        <!-- Apellido -->
         <div class="relative">
-          <UserRound class="absolute left-3 top-3 text-muted-foreground size-4" />
-          <Input id="last-name" v-model="lastName" v-bind="lastNameAttrs" placeholder="Apellidos" class="pl-9"
-            autocomplete="off" />
-          <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">{{ errors.lastName }}</p>
-        </div>
-
-        <!-- Email -->
-        <div class="relative">
-          <Mail class="absolute left-3 top-3 text-muted-foreground size-4" />
+          <Mail class="absolute left-3 top-2.5 text-muted-foreground size-4" />
           <Input id="email" type="email" v-model="email" v-bind="emailAttrs" placeholder="Correo electrónico"
             class="pl-9" autocomplete="off" />
           <p v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
         </div>
 
-        <!-- Contraseña -->
         <div class="relative">
-          <Lock class="absolute left-3 top-3 text-muted-foreground size-4" />
+          <Lock class="absolute left-3 top-2.5 text-muted-foreground size-4" />
           <Input id="password" type="password" v-model="password" v-bind="passwordAttrs" placeholder="Contraseña"
             class="pl-9" autocomplete="off" />
           <p v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</p>
         </div>
 
-        <!-- Teléfono -->
         <div class="relative">
-          <Phone class="absolute left-3 top-3 text-muted-foreground size-4" />
+          <Phone class="absolute left-3 top-2.5 text-muted-foreground size-4" />
           <Input id="phone-number" v-model="phoneNumber" v-bind="phoneNumberAttrs" placeholder="Ej. 4931234567"
             class="pl-9" autocomplete="off" />
           <p v-if="errors.phoneNumber" class="text-red-500 text-xs mt-1">{{ errors.phoneNumber }}</p>

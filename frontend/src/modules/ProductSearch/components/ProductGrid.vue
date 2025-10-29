@@ -69,9 +69,9 @@ const loadFilters = async () => {
 onMounted(loadProducts)
 onMounted(loadFilters)
 
-const debouncedSearch = useDebounce(search, 500);
-const debouncedPage = useDebounce(page, 500);
-const debouncedOrdering = useDebounce(page, 500);
+const debouncedSearch = useDebounce(search, 300);
+const debouncedPage = useDebounce(page, 300);
+const debouncedOrdering = useDebounce(ordering, 300);
 watch([debouncedSearch, debouncedOrdering, debouncedPage], loadProducts);
 
 </script>

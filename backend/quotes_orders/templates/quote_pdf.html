@@ -256,10 +256,10 @@
               <span class="info-label">Vencimiento:</span>
               {{ quote.expiration_date|date:"d/m/Y" }}
             </div>
-            <div class="info-value">
+            <!-- <div class="info-value">
               <span class="info-label">Estado:</span>
               {{ quote.get_status_display }}
-            </div>
+            </div> -->
           </td>
         </tr>
       </table>
@@ -350,8 +350,7 @@
       </table>
 
       <div class="footer">
-        Documento generado electrónicamente por {{ company_info.razon_social
-        }}<br />
+        Documento generado electrónicamente por {{ company_info.razon_social }}<br />
         Válido sin firma autógrafa
       </div>
     </div>

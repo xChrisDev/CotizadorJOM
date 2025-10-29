@@ -30,6 +30,10 @@ const formSchema = toTypedSchema(
 
 const { handleSubmit, defineField, errors, resetForm } = useForm({
   validationSchema: formSchema,
+  initialValues: {
+    username: "",
+    password: ""
+  }
 })
 
 const [username, usernameAttrs] = defineField('username')

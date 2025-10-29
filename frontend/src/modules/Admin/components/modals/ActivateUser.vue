@@ -95,7 +95,7 @@ const getUserInitials = () => {
                         </AvatarFallback>
                     </Avatar>
                     <div class="flex flex-col gap-1">
-                        <p class="font-semibold text-lg">{{ user.first_name }} {{ user.last_name }}</p>
+                        <p class="font-semibold text-lg">{{ user.name }}</p>
                         <p class="text-sm text-gray-600">{{ user.email || "Sin email" }}</p>
                         <p class="text-sm text-gray-600">{{ user.phone_number || "Sin teléfono" }}</p>
                     </div>

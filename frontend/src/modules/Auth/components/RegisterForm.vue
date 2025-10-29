@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
@@ -7,43 +7,70 @@ import { Button } from '@/shared/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs'
 import { CircleCheckBig, Eye, EyeClosed, LoaderCircle } from 'lucide-vue-next'
 import { useToast } from 'vue-toastification'
 import { registerUser } from '../services/authService.js'
+
 const toast = useToast()
 const showPassword = ref(false)
 const isLoading = ref(false)
+const activeTab = ref('person')
 
-const formSchema = toTypedSchema(
-  z.object({
-    username: z.string()
-      .min(1, { message: "El nombre de usuario es obligatorio." })
-      .min(3, { message: "Debe tener al menos 3 caracteres." }),
+const baseSchema = {
+  username: z.string()
+    .min(1, { message: "El nombre de usuario es obligatorio." })
+    .min(3, { message: "Debe tener al menos 3 caracteres." }),
+  email: z.string()
+    .min(1, { message: "El correo es obligatorio." })
+    .email({ message: "El formato del correo no es válido." }),
+  password: z.string()
+    .min(1, { message: "La contraseña es obligatoria." })
+    .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
+  phoneNumber: z.string()
+    .min(1, { message: "El número telefónico es obligatorio." })
+    .regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
+}
 
-    firstName: z.string()
-      .min(1, { message: "El nombre es obligatorio." })
-      .min(2, { message: "El nombre es demasiado corto." }),
+const personSchema = {
+  firstName: z.string()
+    .min(1, { message: "El nombre es obligatorio." })
+    .min(2, { message: "El nombre es demasiado corto." }),
+  lastName: z.string()
+    .min(1, { message: "Los apellidos son obligatorios." })
+    .min(2, { message: "El apellido es demasiado corto." }),
+}
 
-    lastName: z.string()
-      .min(1, { message: "Los apellidos son obligatorios." })
-      .min(2, { message: "El apellido es demasiado corto." }),
+const companySchema = {
+  firstName: z.string()
+    .min(1, { message: "El nombre de la empresa es obligatorio." })
+    .min(3, { message: "El nombre es demasiado corto." }),
+  lastName: z.string().optional(),
+}
 
-    email: z.string()
-      .min(1, { message: "El correo es obligatorio." })
-      .email({ message: "El formato del correo no es válido." }),
+const formSchema = computed(() => {
+  if (activeTab.value === 'person') {
+    return toTypedSchema(z.object({ ...baseSchema, ...personSchema }))
+  } else {
+    return toTypedSchema(z.object({ ...baseSchema, ...companySchema }))
+  }
+})
 
-    password: z.string()
-      .min(1, { message: "La contraseña es obligatoria." })
-      .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
-
-    phoneNumber: z.string()
-      .min(1, { message: "El número telefónico es obligatorio." })
-      .regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
-  })
-)
-
-const { handleSubmit, defineField, errors, resetForm } = useForm({
+const { handleSubmit, defineField, errors, resetForm, resetField } = useForm({
   validationSchema: formSchema,
+  initialValues: {
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    phoneNumber: ""
+  }
+})
+
+watch(activeTab, () => {
+  resetField('firstName')
+  resetField('lastName')
 })
 
 const [username, usernameAttrs] = defineField('username')
@@ -55,11 +82,20 @@ const [phoneNumber, phoneNumberAttrs] = defineField('phoneNumber')
 
 const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true
+
+  const name = activeTab.value === 'person'
+    ? `${values.firstName} ${values.lastName}`
+    : values.firstName
+
+  const type = activeTab.value === 'person'
+    ? 'PERSON'
+    : 'BUSINESS'
+
   const userData = {
     username: values.username,
     password: values.password,
-    first_name: values.firstName,
-    last_name: values.lastName,
+    name: name,
+    type: type,
     email: values.email,
     phone_number: "+52" + values.phoneNumber
   }
@@ -88,11 +124,11 @@ const onSubmit = handleSubmit(async (values) => {
     isLoading.value = false
   }
 })
-
-
 </script>
+
 <template>
-  <Card class="w-full max-w-sm">
+
+  <Card class="w-full max-w-lg">
     <CardHeader>
       <CardTitle class="text-2xl">
         Solicitar registro
@@ -103,37 +139,69 @@ const onSubmit = handleSubmit(async (values) => {
     </CardHeader>
     <form @submit.prevent="onSubmit">
       <CardContent class="grid gap-4">
+        <Tabs v-model="activeTab" default-value="person" class="w-full">
+          <TabsList class="grid w-full gap-2 grid-cols-2">
+            <TabsTrigger value="person">
+              Persona
+            </TabsTrigger>
+            <TabsTrigger value="company">
+              Empresa
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="person" class="mt-4 grid gap-4">
+            <div class="grid gap-2">
+              <Label for="first-name">Nombre(s)</Label>
+              <Input autocomplete="off" id="first-name" placeholder="Ej. José Martin" v-model="firstName"
+                v-bind="firstNameAttrs" />
+              <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">{{ errors.firstName }}</p>
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="last-name">Apellido(s)</Label>
+              <Input autocomplete="off" id="last-name" placeholder="Ej. Mendez Sosa" v-model="lastName"
+                v-bind="lastNameAttrs" />
+              <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">{{ errors.lastName }}</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="company" class="mt-4 grid gap-4">
+            <div class="grid gap-2">
+              <Label for="company-name">Nombre de la Empresa</Label>
+              <Input autocomplete="off" id="company-name" placeholder="Ej. Mi Empresa S.A. de C.V." v-model="firstName"
+                v-bind="firstNameAttrs" />
+              <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">{{ errors.firstName }}</p>
+            </div>
+          </TabsContent>
+        </Tabs>
+
         <div class="grid gap-2">
           <Label for="username">Nombre de usuario</Label>
-          <Input autocomplete="off" id="username" placeholder="Ej. JoseMar99" v-model="username"
+          <Input autocomplete="off" id="username"
+            :placeholder="activeTab === 'person' ? 'Ej. JoseMar99' : 'Ej. Empresa123'" v-model="username"
             v-bind="usernameAttrs" />
           <p v-if="errors.username" class="text-red-500 text-xs mt-1">{{ errors.username }}</p>
         </div>
 
-        <div class="grid gap-2">
-          <Label for="first-name">Nombre(s)</Label>
-          <Input autocomplete="off" id="first-name" placeholder="Ej. José Martin" v-model="firstName"
-            v-bind="firstNameAttrs" />
-          <p v-if="errors.firstName" class="text-red-500 text-xs mt-1">{{ errors.firstName }}</p>
-        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="grid gap-2">
+            <Label for="email">Correo Electrónico</Label>
+            <Input autocomplete="off" id="email" type="email" placeholder="Ej. tudirección@correo.com" v-model="email"
+              v-bind="emailAttrs" />
+          </div>
 
-        <div class="grid gap-2">
-          <Label for="last-name">Apellido(s)</Label>
-          <Input autocomplete="off" id="last-name" placeholder="Ej. Mendez Sosa" v-model="lastName"
-            v-bind="lastNameAttrs" />
-          <p v-if="errors.lastName" class="text-red-500 text-xs mt-1">{{ errors.lastName }}</p>
-        </div>
-
-        <div class="grid gap-2">
-          <Label for="email">Correo Electrónico</Label>
-          <Input autocomplete="off" id="email" type="email" placeholder="Ej. tudirección@correo.com" v-model="email"
-            v-bind="emailAttrs" />
+          <div class="grid gap-2">
+            <Label for="phone-number">Teléfono</Label>
+            <Input autocomplete="off" id="phone-number" type="text" placeholder="4931234567" v-model="phoneNumber"
+              v-bind="phoneNumberAttrs" />
+          </div>
+          <p v-if="errors.phoneNumber" class="text-red-500 text-xs mt-1">{{ errors.phoneNumber }}</p>
           <p v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
         </div>
 
         <div class="grid gap-2">
           <Label for="password">Contraseña</Label>
-          <div class="relative w-full max-w-sm items-center">
+          <div class="relative w-full items-center">
             <Input autocomplete="off" id="password" v-model="password" v-bind="passwordAttrs"
               :type="showPassword ? 'text' : 'password'" />
             <span class="absolute end-0 inset-y-0 flex items-center justify-center p-0.5">
@@ -146,12 +214,6 @@ const onSubmit = handleSubmit(async (values) => {
           <p v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</p>
         </div>
 
-        <div class="grid gap-2">
-          <Label for="phone-number">Teléfono</Label>
-          <Input autocomplete="off" id="phone-number" type="text" placeholder="4931234567" v-model="phoneNumber"
-            v-bind="phoneNumberAttrs" />
-          <p v-if="errors.phoneNumber" class="text-red-500 text-xs mt-1">{{ errors.phoneNumber }}</p>
-        </div>
       </CardContent>
       <CardFooter>
         <div class="flex flex-col w-full">

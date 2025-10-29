@@ -28,7 +28,9 @@ import {
     PaginationEllipsis
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
+import { useDebounce } from '@/shared/utils/useDebounce.js';
 
+let debounceTimeout = null;
 const products = ref([]);
 const isLoading = ref(true);
 const search = ref("");
@@ -56,16 +58,12 @@ const loadProducts = async () => {
 };
 
 onMounted(loadProducts);
-
-let timeout;
-watch([search, ordering, page], () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        loadProducts();
-    }, 300);
-});
-
+const debouncedSearch = useDebounce(search, 500);
+const debouncedPage = useDebounce(page, 500);
+const debouncedOrdering = useDebounce(ordering, 500);
+watch([debouncedSearch, debouncedOrdering, debouncedPage], loadProducts);
 </script>
+
 <template>
     <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
         <header

@@ -71,9 +71,17 @@ const handleApproveCustomer = (customer) => {
     isConfirmDialogOpen.value = true;
 };
 
-const confirmApproval = () => {
+const confirmApproval = async () => {
     if (selectedCustomerForApproval.value) {
-        // TODO: implement approval fetching 
+        const data = {
+            status: "ACTIVE"
+        }
+        try {
+            await patchUser(props.id, data)
+            toast.info(`El ${props.role} ha sido aprobado`)
+        } catch (error) {
+            console.error(error)
+        }
     }
     closeDialog();
 };
@@ -163,7 +171,7 @@ watch([search, ordering, page], () => {
                                 {{ customer.username }}
                             </TableCell>
                             <TableCell>
-                                {{ customer.first_name }} {{ customer.last_name }}
+                                {{ customer.name }}
                             </TableCell>
                             <TableCell>{{ customer.email }}</TableCell>
                             <TableCell>{{ customer.phone_number }}</TableCell>

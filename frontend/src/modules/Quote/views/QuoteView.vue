@@ -84,7 +84,7 @@ const handleGenerateQuote = async () => {
         const data = await postQuote({
             customer_id: client.value.id,
             seller_id: localStorage.getItem('user_id'),
-            status: "PENDING",
+            initial_status_id: 1,
             issue_date: quoteData.value.date,
             expiration_date: quoteData.value.dueDate,
             notes: quoteData.value.notes,

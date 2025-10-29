@@ -41,7 +41,9 @@ import EditUser from './modals/EditUser.vue';
 import BanUser from './modals/BanUser.vue';
 import ActivateUser from './modals/ActivateUser.vue';
 import CreateUser from './modals/CreateUser.vue';
+import { useDebounce } from '@/shared/utils/useDebounce.js';
 
+let debounceTimeout = null;
 const purchasingStaff = ref([]);
 const isLoading = ref(true);
 const search = ref("");
@@ -70,8 +72,11 @@ const loadPurchasingStaff = async () => {
 
 
 onMounted(loadPurchasingStaff);
-watch([search, ordering, page], loadPurchasingStaff);
 
+const debouncedSearch = useDebounce(search, 300);
+const debouncedPage = useDebounce(page, 300);
+const debouncedOrdering = useDebounce(ordering, 300);
+watch([debouncedSearch, debouncedOrdering, debouncedPage], loadPurchasingStaff);
 </script>
 <template>
     <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
@@ -145,7 +150,7 @@ watch([search, ordering, page], loadPurchasingStaff);
                                 {{ staff.username }}
                             </TableCell>
                             <TableCell>
-                                {{ staff.first_name }} {{ staff.last_name }}
+                                {{ staff.name }}
                             </TableCell>
                             <TableCell>{{ staff.email }}</TableCell>
                             <TableCell>{{ staff.phone_number }}</TableCell>
