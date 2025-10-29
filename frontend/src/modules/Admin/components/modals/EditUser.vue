@@ -38,16 +38,14 @@ const emit = defineEmits(["update"])
 const isLoading = ref(false)
 
 const form = ref({
-  first_name: "",
-  last_name: "",
+  name: "",
   username: "",
   email: "",
   phone_number: "",
 })
 
 const errors = reactive({
-  first_name: null,
-  last_name: null,
+  name: null,
   username: null,
   email: null,
   phone_number: null,
@@ -55,8 +53,7 @@ const errors = reactive({
 
 const schema = z.object({
   username: z.string().min(3, { message: "Debe tener al menos 3 caracteres." }),
-  first_name: z.string().min(2, { message: "El nombre es demasiado corto." }),
-  last_name: z.string().min(2, { message: "El apellido es demasiado corto." }),
+  name: z.string().min(2, { message: "El nombre es demasiado corto." }),
   email: z.string().email({ message: "El formato del correo no es válido." }),
   phone_number: z.string().regex(/^\d{10}$/, { message: "Debe ser un número de 10 dígitos." }),
 })
@@ -145,17 +142,10 @@ const onSubmit = async () => {
         <!-- Nombre -->
         <div class="relative">
           <IdCard class="absolute left-3 top-3 text-muted-foreground size-4" />
-          <Input autocomplete="off" v-model="form.first_name" placeholder="Nombre(s)" class="pl-9" />
-          <p v-if="errors.first_name" class="text-red-500 text-xs mt-1">{{ errors.first_name }}</p>
+          <Input autocomplete="off" v-model="form.name" placeholder="Nombre(s)" class="pl-9" />
+          <p v-if="errors.name" class="text-red-500 text-xs mt-1">{{ errors.name }}</p>
         </div>
-
-        <!-- Apellido -->
-        <div class="relative">
-          <UserRound class="absolute left-3 top-3 text-muted-foreground size-4" />
-          <Input autocomplete="off" v-model="form.last_name" placeholder="Apellido(s)" class="pl-9" />
-          <p v-if="errors.last_name" class="text-red-500 text-xs mt-1">{{ errors.last_name }}</p>
-        </div>
-
+        
         <!-- Usuario -->
         <div class="relative">
           <User class="absolute left-3 top-3 text-muted-foreground size-4" />

@@ -39,7 +39,7 @@ export const menuItems = [
     ],
   },
   {
-    title: "Gestión del cotizador",
+    title: "Cotizador",
     url: "#",
     icon: Archive,
     items: [

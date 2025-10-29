@@ -79,50 +79,56 @@ const debouncedOrdering = useDebounce(ordering, 300);
 watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
 </script>
 <template>
-    <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
-        <header
-            class="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between bg-card/60 backdrop-blur-md rounded-xl p-4 border border-border shadow-sm">
-            <div>
-                <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
-                    <UserRoundPlus class="text-primary size-6" />
-                    Clientes
-                </h2>
-                <p class="text-sm text-muted-foreground">
-                    Administra y gestiona los clientes registrados en el sistema.
-                </p>
-            </div>
+    <div class="flex gap-4 flex-col h-dynamic-minus-120">
+        <div class="relative py-3 rounded-xl overflow-hidden shadow-sm bg-cover bg-center border-2 border-white dark:border-secondary"
+            style="background-image: url('/src/shared/assets/customers-banner.jpg')">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-xs"></div>
 
-            <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end w-full sm:w-auto">
-                <div class="relative w-full sm:w-72">
-                    <Input v-model="search" type="text" placeholder="Buscar cliente..." autocomplete="off"
-                        class="pl-10 w-full focus:ring-2 focus:ring-primary/30 transition-all" />
-                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
-                        <Search class="size-5 text-muted-foreground" />
-                    </span>
+            <header
+                class="relative flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between p-6 z-10">
+                <div class="z-20">
+                    <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2 text-white">
+                        <UserRoundPlus class="size-6" />
+                        Clientes
+                    </h2>
+                    <p class="text-sm text-white/90">
+                        Administra y gestiona los clientes registrados en el sistema.
+                    </p>
                 </div>
 
-                <div class="grid grid-cols-2 items-center gap-2 justify-center lg:justify-end">
-                    <Select v-model="ordering">
-                        <SelectTrigger class="col-span-1 w-full">
-                            <SelectValue placeholder="Ordenar por..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Ordenar por</SelectLabel>
-                                <SelectItem value="username">Usuario</SelectItem>
-                                <SelectItem value="first_name">Nombre</SelectItem>
-                                <SelectItem value="email">Correo</SelectItem>
-                                <SelectItem value="status">Status</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end w-full sm:w-auto z-20">
+                    <div class="relative w-full sm:w-72">
+                        <Input v-model="search" type="text" placeholder="Buscar cliente..." autocomplete="off"
+                            class="bg-white dark:bg-[#18181B] pl-10 w-full focus:ring-2 focus:ring-primary/30 transition-all" />
+                        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                            <Search class="size-5 text-gray-500" />
+                        </span>
+                    </div>
 
-                    <CreateUser role="Cliente" @update="loadCustomers" />
+                    <div class="grid grid-cols-2 items-center gap-2 justify-center lg:justify-end">
+                        <Select v-model="ordering">
+                            <SelectTrigger class="dark:bg-[#18181B] hover:dark:bg-[#222225] dark:text-white col-span-1 w-full bg-white text-gray-800">
+                                <SelectValue placeholder="Ordenar por..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Ordenar por</SelectLabel>
+                                    <SelectItem value="username">Usuario</SelectItem>
+                                    <SelectItem value="first_name">Nombre</SelectItem>
+                                    <SelectItem value="email">Correo</SelectItem>
+                                    <SelectItem value="status">Status</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+
+                        <CreateUser role="Cliente" @update="loadCustomers" />
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
+        </div>
 
-        <Card class="flex flex-col flex-1 overflow-hidden">
+
+        <Card class="flex flex-col flex-1 overflow-hidden dark:bg-[#18181B]">
             <CardContent class="px-2 flex-1 overflow-y-auto">
                 <div class="flex items-center gap-2 ps-2">
                     <ListCollapse class="size-5" />

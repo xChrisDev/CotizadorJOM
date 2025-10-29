@@ -4,7 +4,7 @@ import {
     CardContent,
     CardFooter,
     CardHeader,
-    CardTitle
+    CardTitle,
 } from '@/shared/components/ui/card';
 import {
     Table,
@@ -12,29 +12,36 @@ import {
     TableCell,
     TableHead,
     TableHeader,
-    TableRow
+    TableRow,
 } from '@/shared/components/ui/table';
 import Button from '@/shared/components/ui/button/Button.vue';
 import { Search, ListCollapse, PackagePlus } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 import { fetchArticles } from '@/shared/services/productService.js';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/shared/components/ui/select';
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
     PaginationPrevious,
     PaginationNext,
-    PaginationEllipsis
-} from "@/shared/components/ui/pagination";
+    PaginationEllipsis,
+} from '@/shared/components/ui/pagination';
 import Input from '@/shared/components/ui/input/Input.vue';
 import { useDebounce } from '@/shared/utils/useDebounce.js';
 
-let debounceTimeout = null;
 const products = ref([]);
 const isLoading = ref(true);
-const search = ref("");
-const ordering = ref("article_name");
+const search = ref('');
+const ordering = ref('article_name');
 const page = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = 10;
@@ -51,7 +58,7 @@ const loadProducts = async () => {
         products.value = data.results ?? [];
         totalItems.value = data.count ?? 0;
     } catch (error) {
-        console.error("Error al cargar productos:", error);
+        console.error('Error al cargar productos:', error);
     } finally {
         isLoading.value = false;
     }
@@ -65,48 +72,52 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadProducts);
 </script>
 
 <template>
-    <div class="flex gap-4 flex-col h-[calc(100vh-120px)]">
-        <header
-            class="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between bg-card/60 backdrop-blur-md rounded-xl p-4 border border-border shadow-sm">
-            <div>
-                <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
-                    <PackagePlus class="text-primary size-6" />
-                    Productos
-                </h2>
-                <p class="text-sm text-muted-foreground">
-                    Administra y gestiona los productos registrados en el sistema.
-                </p>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end w-full sm:w-auto">
-                <div class="relative w-full sm:w-72">
-                    <Input v-model="search" type="text" placeholder="Buscar producto..." autocomplete="off"
-                        class="pl-10 w-full focus:ring-2 focus:ring-primary/30 transition-all" />
-                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
-                        <Search class="size-5 text-muted-foreground" />
-                    </span>
+    <div class="flex gap-4 flex-col h-dynamic-minus-120">
+        <div class="relative py-3 rounded-xl overflow-hidden shadow-sm bg-cover bg-center border-2 border-white dark:border-secondary"
+            style="background-image: url('/src/shared/assets/hero-image.jpg');">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-xs"></div>
+            <header
+                class="relative flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between p-6 z-10">
+                <div class="z-20">
+                    <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2 text-white">
+                        <PackagePlus class="size-6" />
+                        Productos
+                    </h2>
+                    <p class="text-sm text-white/90">Administra y gestiona los productos registrados en el sistema.</p>
                 </div>
 
-                <div class="grid grid-cols-2 items-center gap-2 justify-center lg:justify-end">
-                    <Select v-model="ordering">
-                        <SelectTrigger class="col-span-1 w-full">
-                            <SelectValue placeholder="Ordenar por..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Ordenar por</SelectLabel>
-                                <SelectItem value="article_name">Nombre</SelectItem>
-                                <SelectItem value="item_code">Código</SelectItem>
-                                <SelectItem value="category__name">Categoría</SelectItem>
-                                <SelectItem value="brand__name">Marca</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end w-full sm:w-auto z-20">
+                    <div class="relative w-full sm:w-72">
+                        <Input v-model="search" type="text" placeholder="Buscar producto..." autocomplete="off"
+                            class="bg-white dark:bg-[#18181B] pl-10 w-full focus:ring-2 focus:ring-primary/30 transition-all" />
+                        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                            <Search class="size-5 text-gray-500" />
+                        </span>
+                    </div>
 
-                    <Button>Crear Producto</Button>
+                    <div class="grid grid-cols-2 items-center gap-2 justify-center lg:justify-end">
+                        <Select v-model="ordering">
+                            <SelectTrigger
+                                class="dark:bg-[#18181B] hover:dark:bg-[#222225] dark:text-white col-span-1 w-full bg-white text-gray-800">
+                                <SelectValue placeholder="Ordenar por..." />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Ordenar por</SelectLabel>
+                                    <SelectItem value="article_name">Nombre</SelectItem>
+                                    <SelectItem value="item_code">Código</SelectItem>
+                                    <SelectItem value="category__name">Categoría</SelectItem>
+                                    <SelectItem value="brand__name">Marca</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+
+                        <Button>Crear Producto</Button>
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
+        </div>
 
         <Card class="flex flex-col flex-1 overflow-hidden">
             <CardContent class="px-2 flex-1 overflow-y-auto overflow-x-auto">
@@ -130,18 +141,16 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadProducts);
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
+
                     <TableBody>
                         <TableRow v-for="product in products" :key="product.id">
                             <TableCell>
                                 <img :src="product.image || '/src/shared/assets/default-image.jpg'"
-                                    :alt="product.article_name" class="w-16 h-16 object-cover rounded-md">
+                                    :alt="product.article_name" class="w-16 h-16 object-cover rounded-md" />
                             </TableCell>
-                            <TableCell class="font-medium">
-                                {{ product.item_code }}
-                            </TableCell>
-                            <TableCell>
-                                {{ product.article_name }}
-                            </TableCell>
+
+                            <TableCell class="font-medium">{{ product.item_code }}</TableCell>
+                            <TableCell>{{ product.article_name }}</TableCell>
                             <TableCell>{{ product.brand.name }}</TableCell>
                             <TableCell>{{ product.unit_of_measure }}</TableCell>
                             <TableCell class="flex gap-2 justify-center">

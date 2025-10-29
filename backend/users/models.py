@@ -7,17 +7,19 @@ from datetime import timedelta
 
 
 class User(models.Model):
-    username = models.CharField(max_length=128, unique=True)
+    username = models.CharField(max_length=128, unique=True, verbose_name="nombre de usuario")
     password = models.CharField(max_length=128)
     name = models.CharField(max_length=50, default="")
-    email = models.EmailField(null=True, blank=True, unique=True)
-    phone_number = PhoneNumberField(null=True, blank=True, unique=True)
+    email = models.EmailField(null=True, blank=True, unique=True, verbose_name="correo")
+    phone_number = PhoneNumberField(null=True, blank=True, unique=True, verbose_name="numero telefónico")
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="CUSTOMER")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default="PERSON")
 
     class Meta:
         db_table = "users"
+        verbose_name = "usuario"
+        verbose_name_plural = "usuarios"
 
 
 def get_expiration_time():

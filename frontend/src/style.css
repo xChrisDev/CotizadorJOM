@@ -181,3 +181,28 @@ input[type=number] {
     @apply cursor-pointer;
   }
 }
+
+/* Mobile viewport height fix: set a CSS variable --vh from JS to avoid 100vh problems
+   on mobile browsers (address bar collapse/expand) which often cause vertical
+   overflow. Also add helper utilities used across the project: h-svh and min-h-svh.
+*/
+:root {
+  --vh: 1vh; /* fallback */
+}
+
+/* Utility classes used in components (h-svh / min-h-svh) */
+.h-svh { height: calc(var(--vh) * 100); }
+.min-h-svh { min-height: calc(var(--vh) * 100); }
+
+/* Helper for components that subtract a fixed header height (e.g. 120px). Use
+  class `h-dynamic-minus-120` where previously `h-[calc(100vh-120px)]` was used.
+*/
+.h-dynamic-minus-120 { height: calc(var(--vh) * 100 - 120px); }
+
+/* Prevent unexpected horizontal scroll from elements that can overflow the viewport */
+html, body {
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after { box-sizing: inherit; }

@@ -36,35 +36,7 @@ const props = defineProps({
 
 const router = useRouter()
 const authStore = useAuthStore()
-const emit = defineEmits(["update:view"])
 const sidebarTriggerRef = ref(null)
-const activeOption = ref(localStorage.getItem('sidebarActive') || '')
-
-// Estado para controlar secciones abiertas
-const openSections = ref({
-  administracion: true,
-  solicitudes: true,
-  documentos: true,
-})
-
-const toggleSection = (section) => {
-  openSections.value[section] = !openSections.value[section]
-}
-
-const handleClick = (option, toggleSidebar, url) => {
-  activeOption.value = option
-  localStorage.setItem('sidebarActive', option)
-  if (props.userRole == 'ADMIN') {
-    router.push("/admin" + url)
-  }
-  emit("update:view", option)
-
-  if (window.innerWidth < 768) {
-    nextTick(() => {
-      sidebarTriggerRef.value?.$el?.click?.()
-    })
-  }
-}
 
 const getUserRoleLabel = () => {
   const roles = { 'ADMIN': 'Administrador', 'SELLER': 'Vendedor', 'STAFF': 'Compras' }
@@ -144,7 +116,6 @@ const handleLogout = () => {
         <Separator orientation="vertical" class="mr-2 h-4" />
         <div class="flex items-center gap-2 flex-1"></div>
         <div class="flex items-center gap-2">
-          <ShoppingCartButton v-if="activeOption === 'cotizar'" />
           <ThemeButton />
         </div>
       </header>
