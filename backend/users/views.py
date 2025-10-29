@@ -22,8 +22,8 @@ class UserViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
     ]
     filterset_class = UserFilter
-    search_fields = ["username", "first_name", "last_name"]
-    ordering_fields = ["username", "first_name", "last_name", "status"]
+    search_fields = ["username", "name"]
+    ordering_fields = ["username", "name", "status"]
     pagination_class = PageNumberPagination
 
     def get_permissions(self):

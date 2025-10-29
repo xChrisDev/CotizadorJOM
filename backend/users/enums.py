@@ -11,3 +11,8 @@ ROLE_CHOICES = [
     ("SELLER", "Seller"),
     ("CUSTOMER", "Customer"),
 ]
+
+TYPE_CHOICES = [
+    ("PERSON", "Persona"),
+    ("BUSINESS", "Empresa"),
+]

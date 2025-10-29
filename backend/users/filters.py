@@ -9,21 +9,19 @@ class UserFilter(django_filters.FilterSet):
     ordering = django_filters.OrderingFilter(
         fields=(
             ("username", "username"),
-            ("first_name", "first_name"),
-            ("last_name", "last_name"),
+            ("name", "name"),
             ("status", "status"),
         )
     )
 
     class Meta:
         model = User
-        fields = ["username", "email", "first_name", "last_name", "status"]
+        fields = ["username", "email", "name", "status"]
 
     def filter_search(self, queryset, name, value):
         terms = value.split()
         query = Q()
         for term in terms:
             query |= Q(username__icontains=term)
-            query |= Q(first_name__icontains=term)
-            query |= Q(last_name__icontains=term)
+            query |= Q(name__icontains=term)
         return queryset.filter(query)

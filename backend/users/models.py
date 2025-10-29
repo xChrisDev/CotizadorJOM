@@ -1,7 +1,7 @@
 import secrets
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-from .enums import ROLE_CHOICES, STATUS_CHOICES
+from .enums import ROLE_CHOICES, STATUS_CHOICES, TYPE_CHOICES
 from django.utils import timezone
 from datetime import timedelta
 
@@ -9,12 +9,12 @@ from datetime import timedelta
 class User(models.Model):
     username = models.CharField(max_length=128, unique=True)
     password = models.CharField(max_length=128)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50, default="")
     email = models.EmailField(null=True, blank=True, unique=True)
     phone_number = PhoneNumberField(null=True, blank=True, unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="CUSTOMER")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default="PENDING")
 
     class Meta:
         db_table = "users"

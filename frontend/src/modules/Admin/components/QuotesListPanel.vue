@@ -71,6 +71,7 @@ const loadQuotes = async () => {
         const data = await fetchQuotes(params);
         quotes.value = data.results ?? [];
         totalItems.value = data.count ?? 0;
+        console.log(quotes.value);
     } catch (error) {
         console.error("Error al cargar cotizaciones:", error);
     } finally {
@@ -119,7 +120,6 @@ watch(page, () => {
         <header class="flex flex-col gap-6 bg-card/70 backdrop-blur-xl rounded-2xl p-6 border border-border/60 
          shadow-sm transition-all hover:shadow-md">
 
-            <!-- 🧾 Encabezado -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
                     <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
@@ -138,10 +138,8 @@ watch(page, () => {
                 </Button>
             </div>
 
-            <!-- 🎛️ Controles de filtrado -->
             <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between mt-2">
 
-                <!-- 🔍 Búsqueda -->
                 <div class="relative w-full lg:max-w-xs">
                     <Input v-model="search" type="text" placeholder="Buscar cotización..." autocomplete="off" class="pl-9 w-full focus:ring-2 focus:ring-primary/40 focus:border-primary/60 
                placeholder:text-muted-foreground/70 text-sm transition-all" />
@@ -150,7 +148,6 @@ watch(page, () => {
                     </span>
                 </div>
 
-                <!-- 📅 Filtros de fecha -->
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                     <label class="flex items-center gap-2 text-sm text-muted-foreground">
                         <Calendar class="size-4" /> Fecha de emisión
@@ -162,7 +159,6 @@ watch(page, () => {
                     </div>
                 </div>
 
-                <!-- ⚙️ Filtros y orden -->
                 <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
 
                     <Select v-model="status">
@@ -200,8 +196,6 @@ watch(page, () => {
             </div>
         </header>
 
-
-        <!-- 📋 Tabla -->
         <Card class="flex flex-col flex-1 overflow-hidden">
             <CardContent class="px-2 flex-1 overflow-y-auto">
                 <div class="flex items-center gap-2 ps-2">
@@ -222,7 +216,6 @@ watch(page, () => {
                             <TableHead>Emisión</TableHead>
                             <TableHead>Vencimiento</TableHead>
                             <TableHead>Total</TableHead>
-                            <TableHead class="text-center">Status</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -234,12 +227,6 @@ watch(page, () => {
                             <TableCell>{{ quote.issue_date }}</TableCell>
                             <TableCell>{{ quote.expiration_date }}</TableCell>
                             <TableCell>{{ formatCurrency(quote.total) }}</TableCell>
-                            <TableCell class="text-center">
-                                <div
-                                    :class="['inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold', getStatusClasses(quote.status)]">
-                                    {{ getStatusText(quote.status) }}
-                                </div>
-                            </TableCell>
                             <TableCell class="text-center">
                                 <TableCell class="flex gap-2 justify-center">
                                     <TooltipProvider>
