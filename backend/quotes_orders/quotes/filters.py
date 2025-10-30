@@ -16,7 +16,6 @@ class QuoteFilter(django_filters.FilterSet):
             ("quote_number", "quote_number"),
             ("issue_date", "issue_date"),
             ("expiration_date", "expiration_date"),
-            ("status", "status"),
             ("total", "total"),
         ]
     )
@@ -25,7 +24,6 @@ class QuoteFilter(django_filters.FilterSet):
         model = Quote
         fields = [
             "quote_number",
-            "status",
             "customer",
             "seller",
             "issue_date",
@@ -42,13 +40,10 @@ class QuoteFilter(django_filters.FilterSet):
         )
 
         if len(terms) == 1:
-            q |= Q(customer__first_name__icontains=terms[0]) | Q(
-                customer__last_name__icontains=terms[0]
-            )
+            q |= Q(customer__name__icontains=terms[0])
         elif len(terms) >= 2:
             q |= Q(
-                customer__first_name__icontains=terms[0],
-                customer__last_name__icontains=terms[-1],
+                customer__name__icontains=terms[0]
             )
 
         return queryset.filter(q)

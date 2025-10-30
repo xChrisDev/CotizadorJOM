@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Quote, QuoteItem, Status, QuoteStatus
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, LightUserSerializer
 from articles.models import Article
 from articles.serializers import ArticleSerializer
 
@@ -11,12 +11,25 @@ class StatusSerializer(serializers.ModelSerializer):
         model = Status
         fields = ["id", "name", "description"]
 
+
+class LightStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = ["id", "name", "description"]
+
+
+class LightCurrentStatusSerializer(serializers.ModelSerializer):
+    status = LightStatusSerializer()
+
+    class Meta:
+        model = QuoteStatus
+        fields = ["id", "status", "date"]
+
+
 class QuoteStatusSerializer(serializers.ModelSerializer):
     status = StatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(
-        queryset=Status.objects.all(), 
-        source="status", 
-        write_only=True
+        queryset=Status.objects.all(), source="status", write_only=True
     )
     created_by = UserSerializer(read_only=True)
     created_by_id = serializers.PrimaryKeyRelatedField(
@@ -24,7 +37,7 @@ class QuoteStatusSerializer(serializers.ModelSerializer):
         source="created_by",
         write_only=True,
         required=False,
-        allow_null=True
+        allow_null=True,
     )
 
     class Meta:
@@ -37,7 +50,7 @@ class QuoteStatusSerializer(serializers.ModelSerializer):
             "note",
             "date",
             "created_by",
-            "created_by_id"
+            "created_by_id",
         ]
         read_only_fields = ["date"]
 
@@ -93,11 +106,9 @@ class QuoteSerializer(serializers.ModelSerializer):
             "total",
             "notes",
             "items",
-            "created_at",
-            "updated_at",
         ]
-        read_only_fields = ["subtotal", "total", "created_at", "updated_at"]
-    
+        read_only_fields = ["subtotal", "total"]
+
     def get_current_status(self, obj):
         current = obj.get_current_status()
         if current:
@@ -108,9 +119,7 @@ class QuoteSerializer(serializers.ModelSerializer):
 class QuoteCreateSerializer(serializers.ModelSerializer):
     items = QuoteItemSerializer(many=True)
     initial_status_id = serializers.PrimaryKeyRelatedField(
-        queryset=Status.objects.all(),
-        write_only=True,
-        required=False
+        queryset=Status.objects.all(), write_only=True, required=False
     )
 
     customer_id = serializers.PrimaryKeyRelatedField(
@@ -137,7 +146,7 @@ class QuoteCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         items_data = validated_data.pop("items")
         initial_status = validated_data.pop("initial_status_id", None)
-        
+
         quote = Quote.objects.create(**validated_data)
 
         # Crear items
@@ -147,13 +156,40 @@ class QuoteCreateSerializer(serializers.ModelSerializer):
         # Crear estado inicial
         if not initial_status:
             initial_status = Status.objects.get(name="PENDING")
-        
+
         QuoteStatus.objects.create(
             quote=quote,
             status=initial_status,
             note="Estado inicial de la cotización",
-            created_by=quote.seller
+            created_by=quote.seller,
         )
 
         quote.calculate_totals()
         return quote
+
+
+class QuoteListSerializer(serializers.ModelSerializer):
+    customer = LightUserSerializer()
+    seller = LightUserSerializer()
+
+    current_status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Quote
+        fields = [
+            "id",
+            "quote_number",
+            "customer",
+            "seller",
+            "current_status",
+            "issue_date",
+            "expiration_date",
+            "total",
+        ]
+
+    def get_current_status(self, obj: Quote):
+        status_obj = obj.get_current_status()
+
+        if status_obj:
+            return LightCurrentStatusSerializer(status_obj).data
+        return None

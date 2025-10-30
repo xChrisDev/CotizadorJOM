@@ -17,7 +17,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { Ban, PencilLine, MoreVertical, Info, Search, ListCollapse, UserRoundPlus, Calendar, MessageCircle, FileDown, Printer, Mail } from 'lucide-vue-next';
+import { Ban, PencilLine, MoreVertical, Info, Search, ListCollapse, UserRoundPlus, Calendar, MessageCircle, FileDown, Printer, Mail, FilePlus } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 import { fetchQuotes } from '@/modules/Quote/services/quoteService.js';
 import Skeleton from '@/shared/components/ui/skeleton/Skeleton.vue';
@@ -29,10 +29,14 @@ import {
     PaginationPrevious, PaginationNext, PaginationEllipsis
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
-import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
+import { getStatusClasses, getStatusText, getQuoteStatus } from '../utils/styleBadge.js'
 import { downloadQuote, printQuote } from '@/modules/Quote/services/quoteService.js'
 import { useToast } from 'vue-toastification';
+import { useDebounce } from '@/shared/utils/useDebounce.js';
+import { useRouter } from 'vue-router';
 
+let debounceTimeout = null;
+const router = useRouter()
 const toast = useToast()
 const quotes = ref([]);
 const isLoading = ref(true);
@@ -41,7 +45,6 @@ const ordering = ref("-issue_date");
 const page = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = 10;
-
 const status = ref("");
 const issueDateStart = ref("");
 const issueDateEnd = ref("");
@@ -71,7 +74,6 @@ const loadQuotes = async () => {
         const data = await fetchQuotes(params);
         quotes.value = data.results ?? [];
         totalItems.value = data.count ?? 0;
-        console.log(quotes.value);
     } catch (error) {
         console.error("Error al cargar cotizaciones:", error);
     } finally {
@@ -98,21 +100,13 @@ const handlePrintPDF = async (quote_id) => {
 
 onMounted(loadQuotes);
 
-let timeout;
-watch([search, ordering, status, issueDateStart, issueDateEnd], () => {
-    page.value = 1;
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        loadQuotes();
-    }, 300);
-});
-
-watch(page, () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        loadQuotes();
-    }, 300);
-});
+const debouncedSearch = useDebounce(search, 300);
+const debouncedPage = useDebounce(page, 300);
+const debouncedOrdering = useDebounce(ordering, 300);
+const debouncedStatus = useDebounce(status, 300);
+const debouncedIssueDateStart = useDebounce(issueDateStart, 300);
+const debouncedIssueDateEnd = useDebounce(issueDateEnd, 300);
+watch([debouncedSearch, debouncedOrdering, debouncedPage, debouncedStatus, debouncedIssueDateStart, debouncedIssueDateEnd], loadQuotes);
 </script>
 
 <template>
@@ -131,9 +125,9 @@ watch(page, () => {
                     </p>
                 </div>
 
-                <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-95 hover:scale-[1.02]
-             transition-all font-medium shadow-sm">
-                    <UserRoundPlus class="size-4 mr-1" />
+                <Button class="bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 shadow-md"
+                    @click="router.push('/admin/cotizar')">
+                    <FilePlus class="size-4 mr-1" />
                     Nueva
                 </Button>
             </div>
@@ -141,7 +135,8 @@ watch(page, () => {
             <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between mt-2">
 
                 <div class="relative w-full lg:max-w-xs">
-                    <Input v-model="search" type="text" placeholder="Buscar cotización..." autocomplete="off" class="pl-9 w-full focus:ring-2 focus:ring-primary/40 focus:border-primary/60 
+                    <Input v-model="search" @input="isLoading = true" type="text" placeholder="Buscar cotización..."
+                        autocomplete="off" class="pl-9 w-full focus:ring-2 focus:ring-primary/40 focus:border-primary/60 
                placeholder:text-muted-foreground/70 text-sm transition-all" />
                     <span class="absolute left-2 inset-y-0 flex items-center justify-center">
                         <Search class="size-4 text-muted-foreground/80" />
@@ -196,8 +191,8 @@ watch(page, () => {
             </div>
         </header>
 
-        <Card class="flex flex-col flex-1 overflow-hidden">
-            <CardContent class="px-2 flex-1 overflow-y-auto">
+        <Card class="flex flex-col flex-1 overflow-hidden dark:bg-[#18181B]">
+            <CardContent class="px-2 flex-1 overflow-y-auto custom-scrollbar">
                 <div class="flex items-center gap-2 ps-2">
                     <ListCollapse class="size-5" />
                     Mostrando <span class="font-bold">{{ totalItems }}</span> registros
@@ -215,6 +210,7 @@ watch(page, () => {
                             <TableHead>Vendedor</TableHead>
                             <TableHead>Emisión</TableHead>
                             <TableHead>Vencimiento</TableHead>
+                            <TableHead>Status</TableHead>
                             <TableHead>Total</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
@@ -222,10 +218,18 @@ watch(page, () => {
                     <TableBody>
                         <TableRow v-for="quote in quotes" :key="quote.id">
                             <TableCell class="font-medium">{{ quote.quote_number }}</TableCell>
-                            <TableCell>{{ quote.customer.first_name }} {{ quote.customer.last_name }}</TableCell>
-                            <TableCell>{{ quote.seller.first_name }} {{ quote.seller.last_name }}</TableCell>
+                            <TableCell>{{ quote.customer.name }}</TableCell>
+                            <TableCell>{{ quote.seller.name }}</TableCell>
                             <TableCell>{{ quote.issue_date }}</TableCell>
                             <TableCell>{{ quote.expiration_date }}</TableCell>
+                            <TableCell>
+                                <span :class="[
+                                    'inline-flex w-24 justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                                    getQuoteStatus(quote.current_status.status.name).class
+                                ]">
+                                    {{ getQuoteStatus(quote.current_status.status.name).text }}
+                                </span>
+                            </TableCell>
                             <TableCell>{{ formatCurrency(quote.total) }}</TableCell>
                             <TableCell class="text-center">
                                 <TableCell class="flex gap-2 justify-center">
@@ -294,7 +298,7 @@ watch(page, () => {
             </CardContent>
 
             <CardFooter v-if="totalItems > itemsPerPage"
-                class="sticky bottom-0 bg-background border-t flex justify-center p-4">
+                class="sticky bottom-0 bg-background border-t flex justify-center px-4 dark:bg-[#18181B]">
                 <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems">
                     <PaginationContent v-slot="{ items }">
                         <PaginationPrevious />

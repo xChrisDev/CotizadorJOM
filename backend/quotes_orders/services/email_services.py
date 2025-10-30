@@ -21,7 +21,7 @@ class EmailService:
             subject = f"Cotización {quote.quote_number} - Refaccionaria JOM"
 
             text_body = f"""
-                Estimado/a {quote.customer.first_name} {quote.customer.last_name},
+                Estimado/a {quote.customer.name}
 
                 Le enviamos adjunta la cotización {quote.quote_number} con los detalles solicitados.
 
@@ -33,7 +33,7 @@ class EmailService:
                 Para cualquier duda o aclaración, no dude en contactarnos.
 
                 Atentamente,
-                {quote.seller.first_name} {quote.seller.last_name}
+                {quote.seller.name}
                 Refaccionaria JOM
 
                 ---

@@ -241,18 +241,3 @@ onMounted(() => {
         </div>
     </div>
 </template>
-
-<style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(120, 120, 120, 0.4);
-    border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(120, 120, 120, 0.6);
-}
-</style>

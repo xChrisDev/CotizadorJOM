@@ -9,6 +9,11 @@ from num2words import num2words
 class PDFGenerator:
     @staticmethod
     def value_to_text(valor_str):
+        if isinstance(valor_str, (Decimal, int, float)):
+             valor_str = str(valor_str)
+        elif isinstance(valor_str, str):
+             valor_str = valor_str.replace(',', '')
+             
         try:
             value = Decimal(valor_str)
         except:
@@ -60,7 +65,7 @@ class PDFGenerator:
             "iva": iva,
             "subtotal_fmt": subtotal,
             "total_fmt": total,
-            "total_text": PDFGenerator.value_to_text(total),
+            "total_text": PDFGenerator.value_to_text(quote.total),
             "company_info": COMPANY_INFO,
             "bank_info": BANK_INFO,
             "terms": TERMS_AND_CONDITIONS,

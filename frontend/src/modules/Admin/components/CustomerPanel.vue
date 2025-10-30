@@ -82,7 +82,7 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
     <div class="flex gap-4 flex-col h-dynamic-minus-120">
         <div class="relative py-3 rounded-xl overflow-hidden shadow-sm bg-cover bg-center border-2 border-white dark:border-secondary"
             style="background-image: url('/src/shared/assets/customers-banner.jpg')">
-            <div class="absolute inset-0 bg-black/50 backdrop-blur-xs"></div>
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
             <header
                 class="relative flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between p-6 z-10">
@@ -98,7 +98,8 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
 
                 <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end w-full sm:w-auto z-20">
                     <div class="relative w-full sm:w-72">
-                        <Input v-model="search" type="text" placeholder="Buscar cliente..." autocomplete="off"
+                        <Input v-model="search" type="text" @input="isLoading = true" placeholder="Buscar cliente..."
+                            autocomplete="off"
                             class="bg-white dark:bg-[#18181B] pl-10 w-full focus:ring-2 focus:ring-primary/30 transition-all" />
                         <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
                             <Search class="size-5 text-gray-500" />
@@ -107,7 +108,8 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
 
                     <div class="grid grid-cols-2 items-center gap-2 justify-center lg:justify-end">
                         <Select v-model="ordering">
-                            <SelectTrigger class="dark:bg-[#18181B] hover:dark:bg-[#222225] dark:text-white col-span-1 w-full bg-white text-gray-800">
+                            <SelectTrigger
+                                class="dark:bg-[#18181B] hover:dark:bg-[#222225] dark:text-white col-span-1 w-full bg-white text-gray-800">
                                 <SelectValue placeholder="Ordenar por..." />
                             </SelectTrigger>
                             <SelectContent>
@@ -129,7 +131,7 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
 
 
         <Card class="flex flex-col flex-1 overflow-hidden dark:bg-[#18181B]">
-            <CardContent class="px-2 flex-1 overflow-y-auto">
+            <CardContent class="px-2 flex-1 overflow-y-auto custom-scrollbar">
                 <div class="flex items-center gap-2 ps-2">
                     <ListCollapse class="size-5" />
                     Mostrando <span class="font-bold">{{ totalItems }}</span> registros
@@ -183,7 +185,7 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage], loadCustomers);
             </CardContent>
 
             <CardFooter v-if="totalItems > itemsPerPage"
-                class="sticky bottom-0 bg-background border-t flex justify-center p-4">
+                class="sticky bottom-0 bg-background border-t flex justify-center px-4 dark:bg-[#18181B]">
                 <Pagination v-model:page="page" :items-per-page="itemsPerPage" :total="totalItems">
                     <PaginationContent v-slot="{ items }">
                         <PaginationPrevious />

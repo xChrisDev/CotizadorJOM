@@ -5,7 +5,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from .models import Quote, Status
-from .serializers import QuoteSerializer, QuoteCreateSerializer
+from .serializers import QuoteSerializer, QuoteCreateSerializer, QuoteListSerializer
 from .filters import QuoteFilter
 from quotes_orders.services.pdf_generator import PDFGenerator
 from quotes_orders.services.email_services import EmailService
@@ -33,39 +33,38 @@ class QuoteViewSet(viewsets.ModelViewSet):
     ]
     pagination_class = PageNumberPagination
 
+
     def get_serializer_class(self):
         if self.action == "create":
             return QuoteCreateSerializer
-        return QuoteSerializer
-    
+        elif self.action == "list":
+            return QuoteListSerializer
+        elif self.action in ["retrieve", "update", "partial_update"]:
+            return QuoteSerializer
+
     @action(detail=True, methods=["post"], url_path="change-status")
     def change_status(self, request, pk=None):
         """Cambia el estado de una cotización"""
         quote = self.get_object()
-        status_id = request.data.get('status_id')
-        note = request.data.get('note', '')
-        
+        status_id = request.data.get("status_id")
+        note = request.data.get("note", "")
+
         if not status_id:
             return Response(
-                {"error": "Se requiere status_id"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Se requiere status_id"}, status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         try:
             new_status = Status.objects.get(id=status_id)
         except Status.DoesNotExist:
             return Response(
-                {"error": "Estado no válido"},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Estado no válido"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
         QuoteStatus.objects.create(
-            quote=quote,
-            status=new_status,
-            note=note,
-            created_by=request.user
+            quote=quote, status=new_status, note=note, created_by=request.user
         )
-        
+
         serializer = self.get_serializer(quote)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -76,7 +75,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
         history = quote.status_history.all()
         serializer = QuoteStatusSerializer(history, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=["get"], url_path="by_status/(?P<status_name>[^/.]+)")
     def get_by_status(self, request, status_name=None):
         """Obtiene todas las cotizaciones por estado actual"""
@@ -183,7 +182,9 @@ class QuoteViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(filtered_quotes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="by_status/(?P<quote_status>[^/.]+)")
+    @action(
+        detail=False, methods=["get"], url_path="by_status/(?P<quote_status>[^/.]+)"
+    )
     def get_by_status(self, request, quote_status=None):
         """Obtiene todas las cotizaciones por estado"""
         quotes = self.queryset.filter(status=quote_status.upper())

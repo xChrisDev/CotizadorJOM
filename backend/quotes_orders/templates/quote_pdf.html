@@ -2,6 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <title>{{ title }} - {{ quote.quote_number }}</title>
     <style>
       @page {
@@ -13,7 +14,7 @@
         box-sizing: border-box;
       }
       body {
-        font-family: "Helvetica", Arial, sans-serif;
+        font-family: "Poppins",sans-serif;
         font-size: 9pt;
         color: #222;
         line-height: 1.3;
@@ -26,20 +27,13 @@
       }
 
       /* Header */
-      .header {
-        display: table;
-        width: 100%;
-        border-bottom: 2px solid #27ae60;
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-      }
       .header-logo {
         display: table-cell;
         width: 25%;
         vertical-align: middle;
       }
       .header-logo img {
-        width: 90px;
+        width: 120px;
         height: auto;
       }
       .header-info {
@@ -56,7 +50,7 @@
         font-size: 7.5pt;
         color: #555;
       }
-
+      
       /* Tabla pequeña de folio y fecha */
       .folio-table {
         border-collapse: collapse;
@@ -69,8 +63,8 @@
         background-color: #27ae60;
         color: #fff;
         font-weight: bold;
-        padding: 3px 6px;
         border: 1px solid #27ae60;
+        padding: 3px 6px;
         text-align: center;
       }
       .folio-table td {
@@ -79,10 +73,31 @@
         text-align: center;
       }
 
+      /* Tabla items de la cotización */
+      .items-table {
+        border-collapse: collapse;
+        font-size: 8pt;
+        width: auto;
+        margin-left: auto;
+        margin-top: 5px;
+      }
+      .items-table th {
+        background-color: #27ae60;
+        color: #fff;
+        font-weight: bold;
+        padding: 3px 6px;
+        border: 1px solid #27ae60;
+        text-align: center;
+      }
+      .items-table td {
+        border-bottom: 0.5px solid #27ae60;
+        padding: 3px 6px;
+      }
+
       /* Document title */
       .document-title {
         text-align: center;
-        font-size: 20pt;
+        font-size: 22pt;
         font-weight: bold;
         color: #27ae60;
         margin: 10px 0 15px;
@@ -165,34 +180,22 @@
 
       /* Notes & sections */
       .section-box {
-        margin-top: 20px;
         border-left: 4px solid #27ae60;
-        padding: 8px;
       }
       .section-title {
         font-weight: bold;
         font-size: 9pt;
         color: #27ae60;
-        margin-bottom: 4px;
       }
       .bank-detail,
       .term-item {
         font-size: 8.5pt;
-        margin-bottom: 2px;
+        
       }
       .notes-section {
         margin: 12px 0;
         padding: 8px;
         font-size: 8.5pt;
-      }
-
-      /* Footer */
-      .footer {
-        margin-top: 15px;
-        text-align: center;
-        font-size: 7.5pt;
-        color: #666;
-        padding-top: 5px;
       }
     </style>
   </head>
@@ -202,18 +205,24 @@
 
       <table class="info-table">
         <tr style="border: none; width: 70%">
-          <td>
-            <div class="header">
-              <div class="header-logo">
-                {% if company_info.logo_url %}
-                <img src="{{ company_info.logo_url }}" alt="Logo" />
-                {% endif %}
-              </div>
-              <div class="header-info">
+          <td style="padding-bottom: 10px;">
+            <table>
+            <tr>
+              <td style="width: 20%; border-bottom: 0px;">
+                <div class="header-logo">
+                  {% if company_info.logo_url %}
+                  <img src="{{ company_info.logo_url }}" alt="Logo" />
+                  {% endif %}
+                </div>  
+              </td>
+              <td style="width: 40%; border-bottom: 0px;">
+                <div class="header-info">
                 <div class="company-name">{{ company_info.razon_social }}</div>
                 <div class="company-details">{{ company_info.direccion }}</div>
               </div>
-            </div>
+              </td>
+            </tr>
+          </table>
           </td>
           <td style="text-align: right; vertical-align: top; width: 30%">
             <table class="folio-table">
@@ -235,38 +244,31 @@
       </table>
       <table class="info-table">
         <tr>
-          <td class="info-left">
+          <td class="info-left" style="border-bottom: 0px; padding-bottom: 10px;">
             <div class="info-value">
               <span class="info-label">Cliente:</span><br />
-              {{ quote.customer.first_name }} {{ quote.customer.last_name }}<br />
+              {{ quote.customer.name }}<br />
               {{ quote.customer.email }}<br />
               {{ quote.customer.phone_number }}
             </div>
           </td>
-          <td class="info-left">
+          <td class="info-left" style="border-bottom: 0px;">
             <div class="info-value">
               <span class="info-label">Vendedor:</span><br />
-              {{ quote.seller.first_name }} {{ quote.seller.last_name }}<br />
+              {{ quote.seller.name }}<br />
               {{ quote.seller.email }}<br />
               {{ quote.seller.phone_number }}
             </div>
           </td>
-          <td class="info-right">
+          <td class="info-right" style="border-bottom: 0px;">
             <div class="info-value">
-              <span class="info-label">Vencimiento:</span>
+              <span class="info-label">Vencimiento:</span><br>
               {{ quote.expiration_date|date:"d/m/Y" }}
             </div>
-            <!-- <div class="info-value">
-              <span class="info-label">Estado:</span>
-              {{ quote.get_status_display }}
-            </div> -->
           </td>
         </tr>
       </table>
-      <div>
-        <p></p>
-      </div>
-      <table style="padding: 8px">
+      <table class="items-table" style="padding: 8px">
         <thead>
           <tr>
             <th style="width: 10%">Código</th>
@@ -292,35 +294,66 @@
           {% endfor %}
         </tbody>
       </table>
+      <table>
+        <tbody>
+          <tr>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 3px; padding-bottom: 0px;">­ </td>
+            <td style="border-bottom: 0px; width: 40%; padding-top: 3px; padding-bottom: 0px;">­ </td>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 3px; padding-bottom: 0px;">­ </td>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 3px; padding-bottom: 0px;">­ </td>
+            <td class="text-right" style="width: 15%; padding-top: 3px; padding-bottom: 0px; border-bottom: 0px;"> <strong>Subtotal:</strong> </td>
+            <td class="text-right" style="width: 15%; padding-top: 3px; padding-bottom: 0px; border-bottom: 0px;">${{ subtotal_fmt }}</td>
+          </tr>
+          <tr>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 2px; padding-bottom: 0px;">­ </td>
+            <td style="border-bottom: 0px; width: 40%; padding-top: 2px; padding-bottom: 0px;">­ </td>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 2px; padding-bottom: 0px;">­ </td>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 2px; padding-bottom: 0px;">­ </td>
+            <td class="text-right" style="width: 15%; padding-top: 2px; padding-bottom: 0px;"><strong>IVA:</strong> </td>
+            <td class="text-right" style="width: 15%; padding-top: 2px; padding-bottom: 0px;">${{ iva }}</td>
+          </tr>
+          <tr>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 5px; padding-bottom: 10px;">­ </td>
+            <td style="border-bottom: 0px; width: 40%; padding-top: 5px; padding-bottom: 10px;">­ </td>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 5px; padding-bottom: 10px;">­ </td>
+            <td style="border-bottom: 0px; width: 10%; padding-top: 5px; padding-bottom: 10px;">­ </td>
+            <td class="text-right grand-total" style="width: 15%; padding-top: 5px; padding-bottom: 10px; border-bottom: 0px;">TOTAL:</td>
+            <td class="text-right grand-total" style="width: 15%; padding-top: 5px; padding-bottom: 10px; border-bottom: 0px;">${{ total_fmt }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-      <div class="totals-section">
-        <div class="total-row">
-          <strong>Subtotal:</strong> ${{ subtotal_fmt }}
-        </div>
-        <div class="total-row"><strong>IVA:</strong> ${{ iva }}</div>
-        <div class="grand-total">TOTAL: ${{ total_fmt }}</div>
-      </div>
-
-      <table class="folio-table" style="width: 100%;">
+      <table class="folio-table">
         <thead>
           <tr>
-            <th style="width: 30%;">Notas</th>
-            <th style="width: 70%;">Total en texto</th>
+            <th>Importe total en texto</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>{{ quote.notes|default:" " }}</td>
             <td>{{ total_text }}</td>
           </tr>
         </tbody>
       </table>
 
+       <table class="folio-table">
+          <thead>
+            <tr>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+               <td>{{ quote.notes|default:" " }}</td>
+            </tr>
+          </tbody>
+        </table>
+
       <table class="info-table">
         <tr>
-          <td>
+          <td style="border-bottom: 0px;">
             <div class="section-box">
-              <div class="section-title">Información Bancaria</div>
+              <div class="section-title" style="font-size: 1.4rem;">Información Bancaria</div>
               <div class="bank-detail">
                 <strong>RAZÓN SOCIAL:</strong> {{ bank_info.titular }}
               </div>
@@ -338,9 +371,9 @@
               </div>
             </div>
           </td>
-          <td>
+          <td style="border-bottom: 0px; padding-top: 20px;">
             <div class="section-box">
-              <div class="section-title">Términos y Condiciones</div>
+              <div class="section-title" style="font-size: 1.4rem;">Términos y Condiciones</div>
               {% for term in terms %}
               <div class="term-item">{{ forloop.counter }}. {{ term }}</div>
               {% endfor %}
@@ -348,11 +381,6 @@
           </td>
         </tr>
       </table>
-
-      <div class="footer">
-        Documento generado electrónicamente por {{ company_info.razon_social }}<br />
-        Válido sin firma autógrafa
-      </div>
     </div>
   </body>
 </html>
