@@ -50,54 +50,55 @@ const currentPrice = computed(() => {
             <div>
                 <div class="flex gap-2 items-center">
                     <h4 class="text-md font-semibold mt-2">{{ product.article_name }}</h4>
+                    <p class="text-sm text-muted-foreground mt-1">
+                        <strong>Categoría:</strong> {{ product.category.name }} |
+                        <strong>Familia:</strong> {{ product.family.name }}
+                    </p>
                 </div>
 
-                <p class="text-sm text-muted-foreground mt-1">
-                    <strong>Categoría:</strong> {{ product.category.name }} |
-                    <strong>Familia:</strong> {{ product.family.name }}
-                </p>
+                <div class="flex gap-4 mt-2">
+                    <div class="w-full border dark:border-[#38383d] border-green-400 rounded-lg overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow
+                                    class="dark:bg-[#27272a] bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold">
+                                    <TableHead class="text-center dark:text-white">Lista</TableHead>
+                                    <TableHead class="text-center dark:text-white">Descuento</TableHead>
+                                    <TableHead class="text-center dark:text-white">Mayoreo</TableHead>
+                                    <TableHead class="text-center dark:text-white">Mínimo</TableHead>
+                                    <TableHead class="text-center dark:text-white">Crédito</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow class="text-sm">
+                                    <TableCell v-for="price in product.prices" :key="price.id"
+                                        class="text-center font-medium">
+                                        ${{ parseFloat(price.price).toFixed(2) }}
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <div class="flex-shrink-0 w-full md:w-48 flex flex-col items-stretch justify-center gap-2">
+                        <div class="w-full flex">
+                            <Button variant="outline" size="icon" class="h-9 w-9" @click="decrement">
+                                <Minus class="w-4 h-4" />
+                            </Button>
+                            <Input type="text" readonly min="1" v-model="productAmount" class="h-9 text-center mx-1" />
+                            <Button variant="outline" size="icon" class="h-9 w-9" @click="increment">
+                                <Plus class="w-4 h-4" />
+                            </Button>
+                        </div>
 
-                <div class="border dark:border-[#38383d] border-green-400 rounded-lg overflow-hidden mt-2">
-                    <Table>
-                        <TableHeader>
-                            <TableRow class="dark:bg-[#27272a] bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold">
-                                <TableHead class="text-center dark:text-white">Lista</TableHead>
-                                <TableHead class="text-center dark:text-white">Descuento</TableHead>
-                                <TableHead class="text-center dark:text-white">Mayoreo</TableHead>
-                                <TableHead class="text-center dark:text-white">Mínimo</TableHead>
-                                <TableHead class="text-center dark:text-white">Crédito</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow class="text-sm">
-                                <TableCell v-for="price in product.prices" :key="price.id"
-                                    class="text-center font-medium">
-                                    ${{ parseFloat(price.price).toFixed(2) }}
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                        <Button @click="cartStore.addToCart(product, productAmount, currentPrice.value)"
+                            class="w-full bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 disabled:opacity-50 disabled:bg-gray-500">
+                            <PackagePlusIcon class="size-5 mr-2" />
+                            <span>Agregar</span>
+                        </Button>
+                    </div>
                 </div>
 
             </div>
-        </div>
-
-        <div class="flex-shrink-0 w-full md:w-48 flex flex-col items-stretch justify-center gap-2 mt-15">
-            <div class="w-full flex">
-                <Button variant="outline" size="icon" class="h-9 w-9" @click="decrement">
-                    <Minus class="w-4 h-4" />
-                </Button>
-                <Input type="text" readonly min="1" v-model="productAmount" class="h-9 text-center mx-1" />
-                <Button variant="outline" size="icon" class="h-9 w-9" @click="increment">
-                    <Plus class="w-4 h-4" />
-                </Button>
-            </div>
-
-            <Button @click="cartStore.addToCart(product, productAmount, currentPrice.value)"
-                class="w-full bg-gradient-to-r from-[#4ed636] to-[#09cb6d] hover:opacity-90 disabled:opacity-50 disabled:bg-gray-500">
-                <PackagePlusIcon class="size-5 mr-2" />
-                <span>Agregar</span>
-            </Button>
         </div>
     </Card>
 </template>

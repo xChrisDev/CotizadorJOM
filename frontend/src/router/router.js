@@ -19,6 +19,7 @@ import QuotePanel from "@/modules/Admin/components/QuotePanel.vue";
 import QuotesListPanel from "@/modules/Admin/components/QuotesListPanel.vue";
 import ArticlesPanel from "@/modules/Admin/components/ArticlesPanel.vue";
 import UserRequestPanel from "@/modules/Admin/components/UserRequestPanel.vue";
+import DashboardSellerPanel from "@/modules/Seller/components/DashboardSellerPanel.vue";
 
 const routes = [
   {
@@ -79,7 +80,16 @@ const routes = [
   {
     path: "/vendedor",
     component: MainViewSeller,
-    meta: { transition: "fade-zoom", requiresAuth: true, roles: ["SELLER"] },
+    meta: { requiresAuth: true, roles: ["SELLER"] },
+    redirect: "/vendedor/dashboard",
+    children: [
+      { path: "dashboard", component: DashboardSellerPanel },
+      { path: "cotizar", component: QuotePanel },
+      { path: "clientes", component: CustomerPanel },
+      { path: "solicitudes", component: UserRequestPanel },
+      { path: "cotizaciones", component: QuotesListPanel },
+      { path: "articulos", component: ArticlesPanel },
+    ],
   },
   {
     path: "/compras",

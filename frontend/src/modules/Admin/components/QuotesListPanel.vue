@@ -20,7 +20,6 @@ import {
 import { Ban, PencilLine, MoreVertical, Info, Search, ListCollapse, UserRoundPlus, Calendar, MessageCircle, FileDown, Printer, Mail, FilePlus } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 import { fetchQuotes } from '@/modules/Quote/services/quoteService.js';
-import Skeleton from '@/shared/components/ui/skeleton/Skeleton.vue';
 import {
     Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue
 } from '@/shared/components/ui/select';
@@ -210,7 +209,7 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage, debouncedStatus, debou
                             <TableHead>Vendedor</TableHead>
                             <TableHead>Emisión</TableHead>
                             <TableHead>Vencimiento</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead class="ps-8">Status</TableHead>
                             <TableHead>Total</TableHead>
                             <TableHead class="text-center">Acciones</TableHead>
                         </TableRow>
@@ -231,62 +230,60 @@ watch([debouncedSearch, debouncedOrdering, debouncedPage, debouncedStatus, debou
                                 </span>
                             </TableCell>
                             <TableCell>{{ formatCurrency(quote.total) }}</TableCell>
-                            <TableCell class="text-center">
-                                <TableCell class="flex gap-2 justify-center">
-                                    <TooltipProvider>
-                                        <div class="flex gap-2">
+                            <TableCell class="flex gap-2 justify-center">
+                                <TooltipProvider>
+                                    <div class="flex gap-2">
 
-                                            <Tooltip>
-                                                <TooltipTrigger as-child>
-                                                    <Button variant="default"
-                                                        class="bg-blue-500 hover:bg-blue-600 text-white transition-all">
-                                                        <Mail class="w-5 h-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Enviar Correo</p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger as-child>
+                                                <Button variant="default"
+                                                    class="bg-blue-500 hover:bg-blue-600 text-white transition-all">
+                                                    <Mail class="w-5 h-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Enviar Correo</p>
+                                            </TooltipContent>
+                                        </Tooltip>
 
-                                            <Tooltip>
-                                                <TooltipTrigger as-child>
-                                                    <Button variant="default"
-                                                        class="bg-green-500 hover:bg-green-600 text-white transition-all">
-                                                        <MessageCircle class="w-5 h-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Enviar WhatsApp</p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger as-child>
+                                                <Button variant="default"
+                                                    class="bg-green-500 hover:bg-green-600 text-white transition-all">
+                                                    <MessageCircle class="w-5 h-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Enviar WhatsApp</p>
+                                            </TooltipContent>
+                                        </Tooltip>
 
-                                            <Tooltip>
-                                                <TooltipTrigger as-child>
-                                                    <Button variant="default" @click="handleDownloadPDF(quote.id)"
-                                                        class="bg-red-500 hover:bg-red-600 text-white transition-all">
-                                                        <FileDown class="w-5 h-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Descargar Archivo</p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger as-child>
+                                                <Button variant="default" @click="handleDownloadPDF(quote.id)"
+                                                    class="bg-red-500 hover:bg-red-600 text-white transition-all">
+                                                    <FileDown class="w-5 h-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Descargar Archivo</p>
+                                            </TooltipContent>
+                                        </Tooltip>
 
-                                            <Tooltip>
-                                                <TooltipTrigger as-child>
-                                                    <Button variant="default" @click="handlePrintPDF(quote.id)"
-                                                        class="bg-slate-600 hover:bg-slate-700 text-white transition-all">
-                                                        <Printer class="w-5 h-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Imprimir</p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger as-child>
+                                                <Button variant="default" @click="handlePrintPDF(quote.id)"
+                                                    class="bg-slate-600 hover:bg-slate-700 text-white transition-all">
+                                                    <Printer class="w-5 h-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Imprimir</p>
+                                            </TooltipContent>
+                                        </Tooltip>
 
-                                        </div>
-                                    </TooltipProvider>
-                                </TableCell>
+                                    </div>
+                                </TooltipProvider>
                             </TableCell>
                         </TableRow>
                     </TableBody>

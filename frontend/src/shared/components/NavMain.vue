@@ -18,6 +18,7 @@ import {
 } from "@/shared/components/ui/sidebar"
 
 defineProps<{
+    role: string,
     items: {
         title: string
         url: string
@@ -41,19 +42,31 @@ const handleActive = (item: any) => {
     <SidebarGroup>
         <SidebarGroupLabel>Menu principal</SidebarGroupLabel>
         <SidebarMenu>
-            <RouterLink to="/admin/dashboard" class="flex items-center gap-2">
+            <RouterLink v-if="role==='ADMIN'" to="/admin/dashboard" class="flex items-center gap-2">
                 <SidebarMenuButton tooltip="Dashboard">
                     <LayoutDashboard class="size-4" />
                     <span class="font-medium">Dashboard</span>
                 </SidebarMenuButton>
             </RouterLink>
-            <RouterLink to="/admin/cotizar" class="flex items-center gap-2">
+            <RouterLink v-if="role==='SELLER'" to="/vendedor/dashboard" class="flex items-center gap-2">
+                <SidebarMenuButton tooltip="Dashboard">
+                    <LayoutDashboard class="size-4" />
+                    <span class="font-medium">Dashboard</span>
+                </SidebarMenuButton>
+            </RouterLink>
+            <RouterLink v-if="role==='ADMIN'" to="/admin/cotizar" class="flex items-center gap-2">
                 <SidebarMenuButton tooltip="Cotizar">
                     <FileEdit class="size-4" />
                     <span class="font-medium">Cotizar</span>
                 </SidebarMenuButton>
             </RouterLink>
-            <RouterLink to="/admin/solicitudes" class="flex items-center gap-2">
+            <RouterLink v-if="role==='SELLER'" to="/vendedor/cotizar" class="flex items-center gap-2">
+                <SidebarMenuButton tooltip="Cotizar">
+                    <FileEdit class="size-4" />
+                    <span class="font-medium">Cotizar</span>
+                </SidebarMenuButton>
+            </RouterLink>
+            <RouterLink v-if="role==='ADMIN'" to="/admin/solicitudes" class="flex items-center gap-2">
                 <SidebarMenuButton tooltip="Solicitudes">
                     <Bell class="size-4" />
                     <span class="font-medium">Solicitudes</span>

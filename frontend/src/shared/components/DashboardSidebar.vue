@@ -72,7 +72,7 @@ const handleLogout = () => {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain :items="menuItems" />
+        <NavMain :role="userRole" :items="menuItems" />
       </SidebarContent>
 
       <SidebarFooter>

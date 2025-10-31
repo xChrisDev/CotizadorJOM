@@ -48,7 +48,7 @@ function decrement() { if (productAmount.value > 1) productAmount.value--; }
                 <span class="font-medium">Familia:</span> {{ product.family.name }}
             </p>
 
-            <div class="border dark:border-[#38383d] border-green-400 rounded-lg overflow-hidden">
+            <div class="border dark:border-[#38383d] border-green-400 rounded-lg overflow-hidden custom-scrollbar">
                 <Table>
                     <TableHeader>
                         <TableRow class="dark:bg-[#27272a] bg-green-100/60 hover:bg-green-100/60 text-xs font-semibold">
