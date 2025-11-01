@@ -37,7 +37,7 @@ import {
     PaginationEllipsis
 } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
-import { getStatusClasses, getStatusText } from '../utils/styleBadge.js'
+import { getStatusClasses, getStatusText } from '@/shared/utils/styleBadge.js'
 import EditUser from './modals/EditUser.vue';
 import BanUser from './modals/BanUser.vue';
 import ActivateUser from './modals/ActivateUser.vue';

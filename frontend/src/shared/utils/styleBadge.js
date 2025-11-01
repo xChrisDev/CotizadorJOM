@@ -30,8 +30,6 @@ export const getStatusText = (status) => {
   }
 };
 
-// En tu archivo donde defines getQuoteStatus.js
-
 export const getQuoteStatus = (status) => {
   const s = status.toLowerCase();
 

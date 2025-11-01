@@ -5,7 +5,7 @@ import Button from '@/shared/components/ui/button/Button.vue';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip'
 import { Search, ListCollapse, Calendar, MessageCircle, FileDown, Printer, Mail, FilePlus } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-import { fetchQuotes } from '@/modules/Quote/services/quoteService.js';
+import { fetchQuotesBySeller } from '@/modules/Quote/services/quoteService.js';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/shared/components/ui/pagination";
 import Input from '@/shared/components/ui/input/Input.vue';
@@ -14,6 +14,7 @@ import { downloadQuote, printQuote } from '@/modules/Quote/services/quoteService
 import { useToast } from 'vue-toastification';
 import { useDebounce } from '@/shared/utils/useDebounce.js';
 import { useRouter } from 'vue-router';
+import { getProfileUser } from '@/modules/Auth/services/authService.js'
 
 const router = useRouter()
 const toast = useToast()
@@ -50,7 +51,8 @@ const loadQuotes = async () => {
     };
 
     try {
-        const data = await fetchQuotes(params);
+        const response = await getProfileUser();
+        const data = await fetchQuotesBySeller(params, response.id);
         quotes.value = data.results ?? [];
         totalItems.value = data.count ?? 0;
     } catch (error) {

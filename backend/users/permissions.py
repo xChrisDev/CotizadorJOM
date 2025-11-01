@@ -27,7 +27,7 @@ class IsAuth(BasePermission):
 
         # Verificar si el token ha expirado
         if token.expires < timezone.now():
-            token.delete()  # Opcional: eliminar tokens expirados
+            token.delete()
             raise AuthenticationFailed("Token expirado")
 
         # Guardar el usuario y el token en el request para uso posterior

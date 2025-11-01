@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
+from django.db.models import Count, Sum, Subquery, OuterRef
 from .models import Quote, Status
 from .serializers import QuoteSerializer, QuoteCreateSerializer, QuoteListSerializer
 from .filters import QuoteFilter
@@ -11,7 +12,8 @@ from quotes_orders.services.pdf_generator import PDFGenerator
 from quotes_orders.services.email_services import EmailService
 from users.permissions import IsAuth
 from users.pagination import PageNumberPagination
-
+from django.core.paginator import Paginator
+from collections import defaultdict
 
 class QuoteViewSet(viewsets.ModelViewSet):
     queryset = Quote.objects.all()
@@ -37,14 +39,84 @@ class QuoteViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "create":
             return QuoteCreateSerializer
-        elif self.action == "list":
+        elif self.action == "list" or self.action == "quotes_by_customer" or self.action == "quotes_by_seller" or self.action == "customer_all":
             return QuoteListSerializer
         elif self.action in ["retrieve", "update", "partial_update"]:
             return QuoteSerializer
 
+    @action(detail=False, methods=["get"], url_path="customer/(?P<customer_id>\d+)")
+    def quotes_by_customer(self, request, customer_id=None):
+        queryset = self.filter_queryset(self.get_queryset().filter(customer_id=customer_id))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="seller/(?P<seller_id>\d+)")
+    def quotes_by_seller(self, request, seller_id=None):
+        queryset = self.filter_queryset(self.get_queryset().filter(seller_id=seller_id))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["get"], url_path="customer/all")
+    def customer_all(self, request):
+        queryset = self.get_queryset()
+
+        latest_status = self.get_queryset().model.status_history.rel.related_model.objects.filter(
+            quote_id=OuterRef('id')
+        ).order_by('-date')
+
+        queryset = queryset.annotate(
+            current_status_name=Subquery(latest_status.values('status__name')[:1])
+        )
+
+        summary_data_list = list(queryset.values(
+            'customer__name',
+            'current_status_name'
+        ).annotate(
+            quotes_count=Count('id'),
+            quotes_total=Sum('total')
+        ).order_by('current_status_name', 'customer__name'))
+        
+        grouped_result = defaultdict(list)
+        for item in summary_data_list:
+            status_name = item['current_status_name']
+            if status_name: 
+                grouped_result[status_name].append({
+                    "customer_name": item['customer__name'],
+                    "quotes_count": item['quotes_count'],
+                    "quotes_total": item['quotes_total']
+                })
+
+        paginable_data = list(grouped_result.items())
+
+        paginator = self.paginator
+        
+        if not paginator:
+            paginator = Paginator(paginable_data, 10)
+
+        page = self.paginate_queryset(paginable_data) 
+        
+        if page is not None:
+            paginated_result_dict = dict(page)
+            
+            return self.get_paginated_response(paginated_result_dict)
+
+        return Response(dict(grouped_result), status=status.HTTP_200_OK)
+
+
     @action(detail=True, methods=["post"], url_path="change-status")
     def change_status(self, request, pk=None):
-        """Cambia el estado de una cotización"""
         quote = self.get_object()
         status_id = request.data.get("status_id")
         note = request.data.get("note", "")
@@ -76,20 +148,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
         serializer = QuoteStatusSerializer(history, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="by_status/(?P<status_name>[^/.]+)")
-    def get_by_status(self, request, status_name=None):
-        """Obtiene todas las cotizaciones por estado actual"""
-        try:
-            status_obj = Status.objects.get(name=status_name.upper())
-        except Status.DoesNotExist:
-            return Response(
-                {"error": f"Estado '{status_name}' no encontrado."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
     @action(detail=True, methods=["get"], url_path="pdf")
     def generate_pdf(self, request, pk=None):
-        """Genera y devuelve el PDF de la cotización"""
         quote = self.get_object()
         pdf_file = PDFGenerator.generate_quote_pdf(quote)
 
@@ -103,7 +163,6 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"], url_path="download")
     def download_pdf(self, request, pk=None):
-        """Descarga el PDF de la cotización"""
         quote = self.get_object()
         pdf_file = PDFGenerator.generate_quote_pdf(quote)
 
@@ -135,71 +194,3 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 {"error": "Error al enviar el email"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-    @action(
-        detail=False, methods=["get"], url_path="by_customer/(?P<customer_id>[^/.]+)"
-    )
-    def get_by_customer(self, request, customer_id=None):
-        """Obtiene todas las cotizaciones de un cliente"""
-        quotes = self.queryset.filter(customer__id=customer_id)
-        filtered_quotes = QuoteFilter(request.GET, queryset=quotes).qs
-
-        if not filtered_quotes.exists():
-            return Response(
-                {
-                    "error": f"No se encontraron cotizaciones para el cliente {customer_id}."
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        page = self.paginate_queryset(filtered_quotes)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered_quotes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=["get"], url_path="by_seller/(?P<seller_id>[^/.]+)")
-    def get_by_seller(self, request, seller_id=None):
-        """Obtiene todas las cotizaciones de un vendedor"""
-        quotes = self.queryset.filter(seller__id=seller_id)
-        filtered_quotes = QuoteFilter(request.GET, queryset=quotes).qs
-
-        if not filtered_quotes.exists():
-            return Response(
-                {
-                    "error": f"No se encontraron cotizaciones para el vendedor {seller_id}."
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        page = self.paginate_queryset(filtered_quotes)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered_quotes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=False, methods=["get"], url_path="by_status/(?P<quote_status>[^/.]+)"
-    )
-    def get_by_status(self, request, quote_status=None):
-        """Obtiene todas las cotizaciones por estado"""
-        quotes = self.queryset.filter(status=quote_status.upper())
-        filtered_quotes = QuoteFilter(request.GET, queryset=quotes).qs
-
-        if not filtered_quotes.exists():
-            return Response(
-                {"error": f"No se encontraron cotizaciones con estado {quote_status}."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        page = self.paginate_queryset(filtered_quotes)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered_quotes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)

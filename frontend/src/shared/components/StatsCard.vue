@@ -39,10 +39,10 @@ const getVariantClasses = (variant) => {
 const getIconClasses = (variant) => {
   const classes = {
     default: 'text-primary',
-    success: 'text-green-600 dark:text-green-400',
-    warning: 'text-yellow-600 dark:text-yellow-400',
-    danger: 'text-red-600 dark:text-red-400',
-    info: 'text-blue-600 dark:text-blue-400'
+    success: 'bg-green-400/40 p-2 rounded-md text-green-600 dark:text-green-400',
+    warning: 'bg-yellow-400/40 p-2 rounded-md text-yellow-600 dark:text-yellow-400',
+    danger: 'bg-red-400/40 p-2 rounded-md text-red-600 dark:text-red-400',
+    info: 'bg-blue-400/40 p-2 rounded-md text-blue-600 dark:text-blue-400'
   }
   return classes[variant]
 }
@@ -51,14 +51,14 @@ const getIconClasses = (variant) => {
 <template>
   <Card :class="getVariantClasses(variant)">
     <CardHeader class="flex flex-row items-center justify-between">
-      <CardTitle class="text-md font-medium">
+      <CardTitle class="text-lg font-medium">
         {{ title }}
       </CardTitle>
-      <component :is="icon" :class="['w-5 h-5', getIconClasses(variant)]" />
+      <component :is="icon" :class="['size-10', getIconClasses(variant)]" />
     </CardHeader>
     <CardContent>
-      <div class="text-3xl font-bold">{{ value }}</div>
-      <p v-if="description" class="text-xs text-muted-foreground mt-1">
+      <div class="text-4xl font-bold">{{ value }}</div>
+      <p v-if="description" class="text-sm text-muted-foreground mt-1">
         {{ description }}
       </p>
     </CardContent>

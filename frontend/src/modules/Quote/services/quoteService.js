@@ -13,6 +13,29 @@ export const fetchQuotes = async (params = {}) => {
   }
 };
 
+export const fetchQuotesByCustomerAndStatus = async () => {
+  try {
+    const response = await apiClient.get("/quotes/customer/all");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching quotes:", error);
+    throw error;
+  }
+};
+
+export const fetchQuotesBySeller = async (params = {}, idSeller) => {
+  try {
+    const response = await apiClient.get(`/quotes/seller/${idSeller}`, {
+      params,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching quotes:", error);
+    throw error;
+  }
+};
+
 export const postQuote = async (data) => {
   try {
     const response = await apiClient.post("/quotes/", data);
@@ -65,13 +88,10 @@ export const printQuote = async (quoteId) => {
         printWindow.print();
       };
     } else {
-      console.error("No se pudo abrir la ventana para imprimir.");
+      console.error("Error opening printing window.");
     }
   } catch (error) {
-    console.error(
-      "Error al imprimir la cotización:",
-      error.response?.data || error.message
-    );
+    console.error("Error printing:", error.response?.data || error.message);
     throw error;
   }
 };

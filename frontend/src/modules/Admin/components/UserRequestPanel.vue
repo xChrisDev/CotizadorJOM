@@ -35,7 +35,7 @@ import {
     DialogTitle,
 } from '@/shared/components/ui/dialog';
 import Input from '@/shared/components/ui/input/Input.vue';
-import { getStatusClasses, getStatusText } from '../utils/styleBadge.js';
+import { getStatusClasses, getStatusText } from '@/shared/utils/styleBadge.js';
 
 const customers = ref([]);
 const isLoading = ref(true);
